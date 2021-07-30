@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Crowdsec_Bouncer Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   Crowdsec
+ * @package    Crowdsec_Bouncer
+ * @copyright  Copyright (c)  2021+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category Crowdsec
+ * @package  Crowdsec_Bouncer
+ * @module   Bouncer
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="crowdsec_bouncer">
+        <job name="crowdsec_bouncer_refresh_cache" instance="Crowdsec\Bouncer\Cron\RefreshCache" method="refreshCache">
+            <config_path>crowdsec_bouncer/advanced/mode/refresh_cron_expr</config_path>
+        </job>
+    </group>
+</config>

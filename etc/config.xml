@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Crowdsec_Bouncer Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   Crowdsec
+ * @package    Crowdsec_Bouncer
+ * @copyright  Copyright (c)  2021+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category Crowdsec
+ * @package  Crowdsec_Bouncer
+ * @module   Bouncer
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <crowdsec_bouncer>
+            <general>
+                <bouncing>
+                    <level>normal_bouncing</level>
+                </bouncing>
+            </general>
+            <theme>
+                <captcha>
+                    <wall_tab_title><![CDATA[Oops..]]></wall_tab_title>
+                    <wall_title><![CDATA[Hmm, sorry but...]]></wall_title>
+                    <wall_subtitle><![CDATA[Please complete the security check.]]></wall_subtitle>
+                    <wall_refresh_image_link><![CDATA[refresh image]]></wall_refresh_image_link>
+                    <wall_input_placeholder><![CDATA[Type here...]]></wall_input_placeholder>
+                    <wall_send_button><![CDATA[CONTINUE]]></wall_send_button>
+                    <wall_error_message><![CDATA[Please try again.]]></wall_error_message>
+                </captcha>
+                <ban>
+                    <wall_tab_title><![CDATA[Oops..]]></wall_tab_title>
+                    <wall_title><![CDATA[Oh!]]></wall_title>
+                    <wall_subtitle><![CDATA[This page is protected against cyber attacks and your IP has been banned by our system.]]></wall_subtitle>
+                </ban>
+                <color>
+                    <text_primary><![CDATA[black]]></text_primary>
+                    <text_secondary><![CDATA[#AAA]]></text_secondary>
+                    <text_button><![CDATA[white]]></text_button>
+                    <text_error_message><![CDATA[#b90000]]></text_error_message>
+                    <background_page><![CDATA[#eee]]></background_page>
+                    <background_container><![CDATA[white]]></background_container>
+                    <background_button><![CDATA[#626365]]></background_button>
+                    <background_button_hover><![CDATA[#333]]></background_button_hover>
+                </color>
+            </theme>
+            <advanced>
+                <mode>
+                    <refresh_cron_expr><![CDATA[* * * * *]]></refresh_cron_expr>
+                </mode>
+                <remediation>
+                    <fallback>bypass</fallback>
+                </remediation>
+                <cache>
+                    <technology>phpfs</technology>
+                    <clean_ip_cache_duration>1</clean_ip_cache_duration>
+                    <bad_ip_cache_duration>1</bad_ip_cache_duration>
+                </cache>
+            </advanced>
+        </crowdsec_bouncer>
+    </default>
+</config>

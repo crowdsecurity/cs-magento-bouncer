@@ -1,0 +1,327 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Crowdsec_Bouncer Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   Crowdsec
+ * @package    Crowdsec_Bouncer
+ * @copyright  Copyright (c)  2021+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category Crowdsec
+ * @package  Crowdsec_Bouncer
+ * @module   Bouncer
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="crowdsec" translate="label,comment,tooltip" sortOrder="201">
+            <label>CrowdSec</label>
+        </tab>
+        <section id="crowdsec_bouncer" translate="label,comment,tooltip" type="text" sortOrder="520" showInDefault="1"
+                 showInWebsite="1" showInStore="1">
+            <tab>crowdsec</tab>
+            <resource>Crowsec_Bouncer::config</resource>
+            <class>separator-top</class>
+            <label>CrowdSec Bouncer</label>
+            <!-- General -->
+            <group id="general" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General settings</label>
+                <!-- Connection -->
+                <group id="connection" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Connection details</label>
+                    <attribute type="expanded">1</attribute>
+                    <comment><![CDATA[Connect Magento 2 to your CrowdSec LAPI.]]></comment>
+                    <field id="api_url" translate="label,comment,tooltip tooltip" type="text" sortOrder="200" showInDefault="1">
+                        <label>Your LAPI url *</label>
+                        <comment><![CDATA[If the CrowdSec Agent is installed on this server, you will set this field to http://localhost:8080.]]></comment>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="api_key" translate="label,comment,tooltip tooltip" type="text" sortOrder="300" showInDefault="1">
+                        <label>Your bouncer key *</label>
+                        <comment><![CDATA[Generated with the cscli command, ex: <em>cscli bouncers add magento2-bouncer</em>]]></comment>
+                        <validate>required-entry</validate>
+                    </field>
+                </group>
+                <group id="bouncing" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Bouncing</label>
+                    <attribute type="expanded">1</attribute>
+                    <comment><![CDATA[Refine bouncing according to your needs.]]></comment>
+                    <field id="front_enabled" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable bouncer on Frontend area</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="admin_enabled" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
+                        <label>Enable bouncer on Adminhtml area</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="api_enabled" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
+                        <label>Enable bouncer on API areas</label>
+                        <comment><![CDATA[REST, SOAP and GraphQL areas]]></comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="level" translate="label,comment,tooltip" type="select" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Bouncing level</label>
+                        <source_model>Crowdsec\Bouncer\Model\Config\Source\Level</source_model>
+                        <tooltip><![CDATA[<ul>
+        <li><strong>Flex bouncing</strong>: Display Captcha only, even if CrowdSec advises to ban the IP.</li>
+        <li><strong>Normal bouncing</strong>: Follow CrowdSec advice (Ban or Captcha).</li>
+                    </ul>]]></tooltip>
+                    </field>
+                </group>
+            </group>
+            <!-- Customization -->
+            <group id="theme" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Theme customization</label>
+                <!-- Captcha wall -->
+                <group id="captcha" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Adapt the wording of the Captcha Wall</label>
+                    <comment><![CDATA[You can customize the text display on the captcha wall.]]></comment>
+                    <field id="wall_tab_title" translate="label,comment,tooltip" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Browser tab text</label>
+                        <comment><![CDATA[The text in the browser tab of the captcha wall page.]]></comment>
+                    </field>
+                    <field id="wall_title" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title text</label>
+                        <comment><![CDATA[The title text of the captcha wall page.]]></comment>
+                    </field>
+                    <field id="wall_subtitle" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Subtitle text</label>
+                        <comment><![CDATA[The subtitle text of the captcha wall page.]]></comment>
+                    </field>
+                    <field id="wall_refresh_image_link" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Refresh image text</label>
+                        <comment><![CDATA[The "refresh image" text of the captcha wall page.]]></comment>
+                    </field>
+                    <field id="wall_input_placeholder" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Input placeholder</label>
+                        <comment><![CDATA[The placeholder text of the captcha wall page.]]></comment>
+                    </field>
+                    <field id="wall_send_button" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Send button text</label>
+                        <comment><![CDATA[The "Send button" text of the captcha wall page.]]></comment>
+                    </field>
+                    <field id="wall_error_message" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Error message</label>
+                        <comment><![CDATA[The "error message" text of the captcha wall page when a captcha is not successfuly resolved.]]></comment>
+                    </field>
+                    <field id="wall_footer" translate="label,comment,tooltip" type="textarea" sortOrder="800" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Custom footer text</label>
+                        <comment><![CDATA[You can add a custom footer text.]]></comment>
+                    </field>
+                </group>
+                <!-- Ban page -->
+                <group id="ban" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Adapt the wording of the Ban Wall</label>
+                    <comment><![CDATA[You can customize the text display on the ban wall.]]></comment>
+                    <field id="wall_tab_title" translate="label,comment,tooltip" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Browser tab text</label>
+                        <comment><![CDATA[The text in the browser tab of the ban wall page.]]></comment>
+                    </field>
+                    <field id="wall_title" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Title text</label>
+                        <comment><![CDATA[The title text of the ban wall page.]]></comment>
+                    </field>
+                    <field id="wall_subtitle" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Subtitle text</label>
+                        <comment><![CDATA[The subtitle text of the ban wall page.]]></comment>
+                    </field>
+                    <field id="wall_footer" translate="label,comment,tooltip" type="textarea" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Custom footer text</label>
+                        <comment><![CDATA[You can add a custom footer text.]]></comment>
+                    </field>
+                </group>
+                <!-- Colors -->
+                <group id="color" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[Use your own colors]]></label>
+                    <comment><![CDATA[You can customize remediation wall colors (ban wall and captcha wall).]]></comment>
+                    <field id="text_primary" translate="label,comment,tooltip" type="text" sortOrder="1500" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Primary text color</label>
+                        <comment><![CDATA[The color used for primary text on the two pages.]]></comment>
+                    </field>
+                    <field id="text_secondary" translate="label,comment,tooltip" type="text" sortOrder="1600" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Secondary text color</label>
+                        <comment><![CDATA[The color used for secondary text on the two pages.]]></comment>
+                    </field>
+                    <field id="text_button" translate="label,comment,tooltip" type="text" sortOrder="1700" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Button text color</label>
+                        <comment><![CDATA[The color of the text of the button on the captcha wall page.]]></comment>
+                    </field>
+                    <field id="text_error_message" translate="label,comment,tooltip" type="text" sortOrder="1700" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Error message text color</label>
+                        <comment><![CDATA[The color used for the error message (when captcha resolution failed).]]></comment>
+                    </field>
+                    <field id="background_page" translate="label,comment,tooltip" type="text" sortOrder="1800" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Page background color</label>
+                        <comment><![CDATA[The background color used of the two pages.]]></comment>
+                    </field>
+                    <field id="background_container" translate="label,comment,tooltip" type="text" sortOrder="1900" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Container background color</label>
+                        <comment><![CDATA[The background color used for the central block on the two pages]]></comment>
+                    </field>
+                    <field id="background_button" translate="label,comment,tooltip" type="text" sortOrder="1900" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Button background color</label>
+                        <comment><![CDATA[The background color used for the captcha validation button.]]></comment>
+                    </field>
+                    <field id="background_button_hover" translate="label,comment,tooltip" type="text" sortOrder="2000" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Button background color (hover)</label>
+                        <comment><![CDATA[The background color used for the captcha validation button when it\'s hover.]]></comment>
+                    </field>
+                </group>
+                <!-- Custom css -->
+                <group id="css" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[Use your own CSS code]]></label>
+                    <comment><![CDATA[You can customize remediation walls with CSS code (ban wall and captcha wall).]]></comment>
+                    <field id="custom" translate="label,comment,tooltip" type="textarea" sortOrder="2100" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Custom CSS code</label>
+                        <comment><![CDATA[The CSS code to use in the remediation wall (ban wall and captcha wall).]]></comment>
+                    </field>
+                </group>
+            </group>
+            <!-- Advanced -->
+            <group id="advanced" translate="label,comment,tooltip" showInDefault="1">
+                <label>Advanced settings</label>
+                <!-- Communication mode -->
+                <group id="mode" translate="label,comment,tooltip" showInDefault="1">
+                    <label><![CDATA[Communication mode to the API]]></label>
+                    <attribute type="expanded">1</attribute>
+                    <field id="stream" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                        <label>Enable the "Stream" Mode</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[With the stream mode, every decision is retrieved in an asynchronous way. 3 advantages: <br>&nbsp;1) Invisible latency when loading pages<br>&nbsp;2) The IP verifications works even if your CrowdSec is not reachable.<br>&nbsp;3) The API can never be overloaded by the Magento traffic]]></comment>
+                        <tooltip><![CDATA[Note: This method has one limit: all the decisions updates since the previous refresh will not be taken in account until the next refresh.]]></tooltip>
+                    </field>
+                    <field id="refresh_cron_expr" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
+                        <label><![CDATA[Cron expression for cache refresh *]]></label>
+                        <tooltip><![CDATA[Example: * * * * *]]></tooltip>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/mode/stream">1</field>
+                        </depends>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="refresh_cache"  translate="button_label" sortOrder="300" showInDefault="1">
+                        <button_label>Refresh cache</button_label>
+                        <frontend_model>Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Refresh</frontend_model>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/mode/stream">1</field>
+                        </depends>
+                    </field>
+                </group>
+                <!-- Cache -->
+                <group id="cache" translate="label,comment,tooltip" showInDefault="1">
+                    <label><![CDATA[Cache configuration]]></label>
+                    <attribute type="expanded">1</attribute>
+                    <comment><![CDATA[Polish the decisions cache settings by selecting the best technology or the cache durations best suited to your use.]]></comment>
+                    <field id="technology" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                        <label>Technology</label>
+                        <source_model>Crowdsec\Bouncer\Model\Config\Source\Cache</source_model>
+                        <comment><![CDATA[The File system cache is faster than calling LAPI. Redis or Memcached is faster than the File System cache.]]></comment>
+                    </field>
+                    <field id="clear_cache"  translate="button_label" sortOrder="200" showInDefault="1">
+                        <button_label>Clear cache</button_label>
+                        <frontend_model>Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Clear</frontend_model>
+                    </field>
+                    <field id="prune_cache"  translate="button_label" sortOrder="300" showInDefault="1">
+                        <button_label>Prune Filesystem cache</button_label>
+                        <frontend_model>Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Prune</frontend_model>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/cache/technology">phpfs</field>
+                        </depends>
+                    </field>
+                    <field id="redis_dsn" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
+                        <label><![CDATA[Redis DSN *]]></label>
+                        <tooltip><![CDATA[Example of DSN: redis://localhost:6379/0]]></tooltip>
+                        <comment><![CDATA[Fill in this field only if you have chosen the Redis cache.]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/cache/technology">redis</field>
+                        </depends>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="memcached_dsn" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
+                        <label><![CDATA[Memcached DSN *]]></label>
+                        <tooltip><![CDATA[Example of DSN: memcached://localhost:11211]]></tooltip>
+                        <comment><![CDATA[Fill in this field only if you have chosen the Memcached cache.]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/cache/technology">memcached</field>
+                        </depends>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="clean_ip_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
+                        <label><![CDATA[Clean IPs cache duration * (in seconds)]]></label>
+                        <tooltip><![CDATA[Live mode only]]></tooltip>
+                        <comment><![CDATA[The duration between re-asking LAPI about an already checked clean IP.<br>Minimum 1 second.]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/mode/stream">0</field>
+                        </depends>
+                        <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
+                    </field>
+                    <field id="bad_ip_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
+                        <label><![CDATA[Bad IPs cache duration * (in seconds)]]></label>
+                        <tooltip><![CDATA[Live mode only]]></tooltip>
+                        <comment><![CDATA[The duration between re-asking LAPI about an already checked bad IP.<br>Minimum 1 second.]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/mode/stream">0</field>
+                        </depends>
+                        <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
+                    </field>
+                </group>
+                <!-- Remediation -->
+                <group id="remediation" translate="label,comment,tooltip" showInDefault="1" >
+                    <label><![CDATA[Remediations]]></label>
+                    <attribute type="expanded">1</attribute>
+                    <comment><![CDATA[Configure some details about remediations.]]></comment>
+                    <field id="fallback" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                        <label>Fallback to</label>
+                        <source_model>Crowdsec\Bouncer\Model\Config\Source\Fallback</source_model>
+                        <comment><![CDATA[Which remediation to apply when CrowdSec advises unhandled remediation.]]></comment>
+                    </field>
+                    <field id="trust_ip_forward_list" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
+                        <label><![CDATA[Trust these CDN IPs<br>(or Load Balancer, HTTP Proxy)]]></label>
+                        <backend_model>Crowdsec\Bouncer\Model\Config\Backend\TrustedForwardedIps</backend_model>
+                        <tooltip><![CDATA[Example: 1.2.3.4/24, 2.3.4.5, 3.4.5.6/27.]]></tooltip>
+                        <comment><![CDATA[The <em><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For" target="_blank">X-forwarded-For</a></em> HTTP Header will be trust only when the client IP is in this list.<br><strong>Comma (,)</strong> separated ips or ips ranges.
+<br>Some common CDN IP list: <a href="https://www.cloudflare.com/fr-fr/ips/" target="_blank">Cloudflare</a>, <a href="https://api.fastly.com/public-ip-list" target="_blank">Fastly</a>.]]></comment>
+                    </field>
+                    <field id="hide_mentions" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
+                        <label>Hide CrowdSec mentions</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Enable if you want to hide CrowdSec mentions on the Ban and Captcha pages]]></comment>
+                    </field>
+                </group>
+                <!-- Debug mode -->
+                <group id="debug" translate="label,comment,tooltip" showInDefault="1">
+                    <label><![CDATA[Configure the debug mode]]></label>
+                    <field id="log" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                        <label>Enable debug log</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Debug logs will be written in "var/log/crowdsec-bouncer-debug.log". Should not be used in production as this log could grow fast.]]></comment>
+                    </field>
+                    <field id="display_errors" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
+                        <label>Display bouncing errors</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[ Do not use in production. When this mode is enabled, you will see every unexpected bouncing errors in the browser.]]></comment>
+                    </field>
+                    <field id="disable_prod_log" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
+                        <label>Disable prod log</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[By default, production logs are written in "var/log/crowdsec-bouncer-prod.log". You can disable this log here. ]]></comment>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

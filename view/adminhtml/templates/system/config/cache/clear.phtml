@@ -1,0 +1,90 @@
+<?php
+/**
+ * Crowdsec_Bouncer Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   Crowdsec
+ * @package    Crowdsec_Bouncer
+ * @copyright  Copyright (c)  2021+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category Crowdsec
+ * @package  Crowdsec_Bouncer
+ * @module   Bouncer
+ * @author   CrowdSec team
+ *
+ */
+
+/** @var \Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Clear $block */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+/**  @var \Magento\Framework\Escaper $escaper */
+?>
+
+<?php
+
+ $ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
+ $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during Crowdsec Cache clearing.')));
+
+ $scriptString = <<<script
+require(['prototype'], function(){
+
+//<![CDATA[
+    function clearCache() {
+        var clearCacheMessage = $('cache_clearing_result');
+
+        params = {};
+
+        new Ajax.Request('{$ajaxUrl}', {
+            parameters: params,
+            onSuccess: function(response) {
+                var result = '{$errorMessage}';
+                try {
+                    if (response.responseText.isJSON()) {
+                        response = response.responseText.evalJSON();
+                        result = response.message;
+                    }
+                    if (response.valid == 1) {
+                        clearCacheMessage.removeClassName('hidden').removeClassName('admin__field-error').
+                        addClassName('note');
+                        clearCacheMessage.setStyle({color:'green'});
+                    } else {
+                        clearCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                    }
+                } catch (e) {
+                    clearCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                }
+                clearCacheMessage.update(result);
+            }
+        });
+    }
+
+    window.clearCache = clearCache;
+//]]>
+
+});
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
+
+<div class="actions actions-clear-cache">
+    <button class="action-clear-cache" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
+        <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+    <p class="admin__field-error hidden" id="cache_clearing_result"></p>
+</div>
+<?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#cache_clearing_result {margin-bottom: 10px;}', false); ?>
+<?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
+    'onclick',
+    'clearCache();event.preventDefault();',
+    '#' . /* @noEscape */ $block->getHtmlId()
+); ?>

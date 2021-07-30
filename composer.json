@@ -1,0 +1,28 @@
+{
+  "name": "crowdsec/magento2-module-bouncer",
+  "description": "The Bouncer module for Magento 2 allows rejecting IP detected as malicious by CrowdSec",
+  "type": "magento2-module",
+  "version": "0.0.1",
+  "minimum-stability": "dev",
+  "license": "GPL-3.0+",
+    "authors": [
+        {
+            "name": "CrowdSec",
+            "email": "info@crowdsec.net"
+        }
+    ],
+  "keywords": ["magento", "magento2", "extension", "module", "crowdsec", "security", "bouncer"],
+  "require": {
+    "php": "^7.2",
+    "magento/framework": "^102",
+    "jlo/bouncer-lib": "*"
+  },
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Crowdsec\\Bouncer\\": ""
+    }
+  }
+}

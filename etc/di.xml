@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Crowdsec_Bouncer Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   Crowdsec
+ * @package    Crowdsec_Bouncer
+ * @copyright  Copyright (c)  2021+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+ 
+/**
+ *
+ * @category Crowdsec
+ * @package  Crowdsec_Bouncer
+ * @module   Bouncer
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <!-- Logger -->
+    <type name="Crowdsec\Bouncer\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Crowdsec\Bouncer\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">crowdsec-bouncer</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="prod" xsi:type="object">Crowdsec\Bouncer\Logger\Handlers\Prod</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Plugin -->
+    <type name="Magento\Framework\App\FrontControllerInterface">
+        <plugin name="crowdsec-front-controller" type="Crowdsec\Bouncer\Plugin\FrontController" sortOrder="1" />
+    </type>
+    <!-- Session -->
+    <virtualType name="Crowdsec\Bouncer\Model\Session\Storage" type="Magento\Framework\Session\Storage">
+        <arguments>
+            <argument name="namespace" xsi:type="string">crowdsec</argument>
+        </arguments>
+    </virtualType>
+    <type name="Crowdsec\Bouncer\Model\Session">
+        <arguments>
+            <argument name="storage" xsi:type="object">Crowdsec\Bouncer\Model\Session\Storage</argument>
+        </arguments>
+    </type>
+    <!-- Bouncer -->
+    <type name="Crowdsec\Bouncer\Model\Bouncer">
+        <arguments>
+            <argument name="session" xsi:type="object">Crowdsec\Bouncer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+</config>
