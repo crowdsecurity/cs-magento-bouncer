@@ -1,0 +1,95 @@
+<?php
+/**
+ * Crowdsec_Bouncer Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   Crowdsec
+ * @package    Crowdsec_Bouncer
+ * @copyright  Copyright (c)  2021+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category Crowdsec
+ * @package  Crowdsec_Bouncer
+ * @module   Bouncer
+ * @author   CrowdSec team
+ *
+ */
+
+/** @var \Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Prune $block */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+/**  @var \Magento\Framework\Escaper $escaper */
+?>
+
+<?php
+/** @var \Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Prune $block */
+?>
+<script>
+    require(['prototype'], function(){
+
+//<![CDATA[
+        function pruneCache() {
+            var pruneCacheMessage = $('cache_pruning_result');
+
+            params = {};
+
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
+                parameters: params,
+                onSuccess: function(response) {
+                    var result = '<?= $block->escapeJs($block->escapeHtml(__('Error during Crowdsec Cache pruning.')))
+                    ?>';
+                    try {
+                        if (response.responseText.isJSON()) {
+                            response = response.responseText.evalJSON();
+                            result = response.message;
+                        }
+                        if (response.pruned == 1) {
+                            pruneCacheMessage.removeClassName('hidden').removeClassName('admin__field-error').
+                            addClassName('note');
+                            pruneCacheMessage.setStyle(
+                                {
+                                    color:'green',
+                                    border:'1px solid #ee7d7d',
+                                    padding:'.8rem 1rem .9rem'
+                                }
+                            );
+                        } else {
+                            pruneCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                        }
+                    } catch (e) {
+                        pruneCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                    }
+                    pruneCacheMessage.update(result);
+                }
+            });
+        }
+
+        window.pruneCache = pruneCache;
+//]]>
+
+    });
+</script>
+
+<div class="actions actions-prune-cache">
+    <button onclick="javascript:pruneCache(); return false;" class="action-prune-cache" type="button" id="<?=
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+    <p class="admin__field-error hidden" id="cache_pruning_result"></p>
+    <p class="note">
+        <span><?= $block->escapeHtml(
+            __('Cache pruning is the process whereby entries that have expired are removed from the cache.
+        Unlike Redis and Memcached, File system cache has no auto-purge mechanism.')
+        ) ?></span>
+    </p>
+</div>
+

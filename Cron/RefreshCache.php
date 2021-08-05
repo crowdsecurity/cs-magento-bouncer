@@ -30,14 +30,6 @@ class RefreshCache
      */
     public function refreshCache(): void
     {
-
-        // TODO use vendor/magento/module-cron/Model/Schedule.php:105 to validate expression cron with backend
-        // validation beforeSave
-
-        // ET ça ? vendor/magento/module-cron/Model/Schedule.php:123
-
-        // noter ça https://github.com/mageplaza/magento-2-cron-schedule
-
         if ($this->helper->isStreamModeEnabled()) {
             try {
                 $bouncer = $this->registryBouncer->create();

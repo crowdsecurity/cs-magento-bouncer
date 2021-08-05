@@ -1,0 +1,87 @@
+<?php
+/**
+ * Crowdsec_Bouncer Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   Crowdsec
+ * @package    Crowdsec_Bouncer
+ * @copyright  Copyright (c)  2021+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category Crowdsec
+ * @package  Crowdsec_Bouncer
+ * @module   Bouncer
+ * @author   CrowdSec team
+ *
+ */
+?>
+
+<?php
+/** @var \Crowdsec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping $block */
+?>
+<script>
+    require(['prototype'], function(){
+
+//<![CDATA[
+        function pingConnection() {
+            var pingConnectionMessage = $('cache_ping_result');
+
+            params = {
+                api_url: $('<?= $block->escapeJs($block->getUrlField()) ?>').value,
+                bouncer_key: $('<?= $block->escapeJs($block->getKeyField()) ?>').value
+            };
+
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
+                parameters: params,
+                onSuccess: function(response) {
+                    var result =
+                        '<?= $block->escapeJs($block->escapeHtml(__('Error during Crowdsec Connection ping.'))) ?>';
+                    try {
+                        if (response.responseText.isJSON()) {
+                            response = response.responseText.evalJSON();
+                            result = response.message;
+                        }
+                        if (response.connection == 1) {
+                            pingConnectionMessage.removeClassName('hidden').removeClassName('admin__field-error').
+                            addClassName('note');
+                            pingConnectionMessage.setStyle(
+                                {
+                                    color:'green',
+                                    border:'1px solid #ee7d7d',
+                                    padding:'.8rem 1rem .9rem'
+                                }
+                            );
+                        } else {
+                            pingConnectionMessage.removeClassName('hidden').addClassName('admin__field-error');
+                        }
+                    } catch (e) {
+                        pingConnectionMessage.removeClassName('hidden').addClassName('admin__field-error');
+                    }
+                    pingConnectionMessage.update(result);
+                }
+            });
+        }
+
+        window.pingConnection = pingConnection;
+//]]>
+
+    });
+</script>
+
+<div class="actions actions-ping-connection">
+    <button onclick="javascript:pingConnection(); return false;" class="action-ping-connection" type="button" id="<?=
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+    <p class="admin__field-error hidden" id="cache_ping_result"></p>
+</div>

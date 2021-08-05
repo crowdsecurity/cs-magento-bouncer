@@ -27,7 +27,7 @@
 
 namespace Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Cache;
 
-use Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Cache;
+use Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
@@ -37,7 +37,7 @@ use Crowdsec\Bouncer\Exception\CrowdsecException;
 use Crowdsec\Bouncer\Helper\Data as Helper;
 use Crowdsec\Bouncer\Constants;
 
-class Prune extends Cache implements HttpPostActionInterface
+class Prune extends Action implements HttpPostActionInterface
 {
     /**
      * @var JsonFactory
@@ -84,7 +84,7 @@ class Prune extends Cache implements HttpPostActionInterface
                 $bouncer = $this->registryBouncer->create();
             }
 
-            $result = $bouncer->init(['forced_cache_system' => Constants::CACHE_SYSTEM_PHPFS])->pruneCache();
+            $result = (int) $bouncer->init(['forced_cache_system' => Constants::CACHE_SYSTEM_PHPFS])->pruneCache();
             $cacheOptions = $this->helper->getCacheSystemOptions();
             $cacheLabel = $cacheOptions[Constants::CACHE_SYSTEM_PHPFS] ?? __('Unknown');
             $message = __('CrowdSec cache (%1) has been pruned.', $cacheLabel);
@@ -104,7 +104,7 @@ class Prune extends Cache implements HttpPostActionInterface
         $resultJson = $this->resultJsonFactory->create();
 
         return $resultJson->setData([
-            'cache_pruned' => $result,
+            'pruned' => $result,
             'message' => $message,
         ]);
     }

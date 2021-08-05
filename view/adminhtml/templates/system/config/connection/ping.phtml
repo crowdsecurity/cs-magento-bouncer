@@ -25,24 +25,29 @@
  *
  */
 
-/** @var \Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Prune $block */
+/** @var \Crowdsec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping $block */
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 /**  @var \Magento\Framework\Escaper $escaper */
 ?>
 
 <?php
 
- $ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
- $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during Crowdsec Cache pruning.')));
+$ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
+$errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during Crowdsec Connection ping.')));
+$urlField = $escaper->escapeJs($block->getUrlField());
+$keyField = $escaper->escapeJs($block->getKeyField());
 
  $scriptString = <<<script
 require(['prototype'], function(){
 
 //<![CDATA[
-    function pruneCache() {
-        var pruneCacheMessage = $('cache_pruning_result');
+    function pingConnection() {
+        var pingConnectionMessage = $('cache_ping_result');
 
-        params = {};
+        params = {
+            api_url: $('{$urlField}').value,
+            bouncer_key: $('{$keyField}').value
+        };
 
         new Ajax.Request('{$ajaxUrl}', {
             parameters: params,
@@ -53,10 +58,10 @@ require(['prototype'], function(){
                         response = response.responseText.evalJSON();
                         result = response.message;
                     }
-                    if (response.pruned == 1) {
-                        pruneCacheMessage.removeClassName('hidden').removeClassName('admin__field-error').
+                    if (response.connection == 1) {
+                        pingConnectionMessage.removeClassName('hidden').removeClassName('admin__field-error').
                         addClassName('note');
-                        pruneCacheMessage.setStyle(
+                        pingConnectionMessage.setStyle(
                             {
                                 color:'green',
                                 border:'1px solid #ee7d7d',
@@ -64,17 +69,17 @@ require(['prototype'], function(){
                              }
                         );
                     } else {
-                        pruneCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                        pingConnectionMessage.removeClassName('hidden').addClassName('admin__field-error');
                     }
                 } catch (e) {
-                    pruneCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                    pingConnectionMessage.removeClassName('hidden').addClassName('admin__field-error');
                 }
-                pruneCacheMessage.update(result);
+                pingConnectionMessage.update(result);
             }
         });
     }
 
-    window.pruneCache = pruneCache;
+    window.pingConnection = pingConnection;
 //]]>
 
 });
@@ -82,21 +87,15 @@ script;
 ?>
 <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
 
-<div class="actions actions-prune-cache">
-    <button class="action-prune-cache" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
+<div class="actions actions-ping-connection">
+    <button class="action-ping-connection" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
         <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
-    <p class="admin__field-error hidden" id="cache_pruning_result"></p>
-    <p class="note">
-        <span><?= $escaper->escapeHtml(
-            __('Cache pruning is the process whereby entries that have expired are removed from the cache.
-        Unlike Redis and Memcached, File system cache has no auto-purge mechanism.')
-        ) ?></span>
-    </p>
+    <p class="admin__field-error hidden" id="cache_ping_result"></p>
 </div>
-<?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#cache_pruning_result {margin-bottom: 10px;}', false); ?>
+<?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#cache_ping_result {margin-bottom: 10px;}', false); ?>
 <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
     'onclick',
-    'pruneCache();event.preventDefault();',
+    'pingConnection();event.preventDefault();',
     '#' . /* @noEscape */ $block->getHtmlId()
 ); ?>

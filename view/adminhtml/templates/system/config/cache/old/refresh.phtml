@@ -1,0 +1,85 @@
+<?php
+/**
+ * Crowdsec_Bouncer Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   Crowdsec
+ * @package    Crowdsec_Bouncer
+ * @copyright  Copyright (c)  2021+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category Crowdsec
+ * @package  Crowdsec_Bouncer
+ * @module   Bouncer
+ * @author   CrowdSec team
+ *
+ */
+
+?>
+
+<?php
+/** @var \Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Refresh $block */
+?>
+<script>
+    require(['prototype'], function(){
+
+//<![CDATA[
+        function refreshCache() {
+            var refreshCacheMessage = $('cache_refresh_result');
+
+            params = {};
+
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
+                parameters: params,
+                onSuccess: function(response) {
+                    var result =
+                        '<?= $block->escapeJs($block->escapeHtml(__('Error during Crowdsec Cache refresh.'))) ?>';
+                    try {
+                        if (response.responseText.isJSON()) {
+                            response = response.responseText.evalJSON();
+                            result = response.message;
+                        }
+                        if (response.refresh == 1) {
+                            refreshCacheMessage.removeClassName('hidden').removeClassName('admin__field-error').
+                            addClassName('note');
+                            refreshCacheMessage.setStyle(
+                                {
+                                    color:'green',
+                                    border:'1px solid #ee7d7d',
+                                    padding:'.8rem 1rem .9rem'
+                                }
+                            );
+                        } else {
+                            refreshCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                        }
+                    } catch (e) {
+                        refreshCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                    }
+                    refreshCacheMessage.update(result);
+                }
+            });
+        }
+
+        window.refreshCache = refreshCache;
+//]]>
+
+    });
+</script>
+
+<div class="actions actions-refresh-cache">
+    <button onclick="javascript:refreshCache(); return false;" class="action-refresh-cache" type="button" id="<?=
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+    <p class="admin__field-error hidden" id="cache_refresh_result"></p>
+</div>

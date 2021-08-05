@@ -62,7 +62,7 @@
             </theme>
             <advanced>
                 <mode>
-                    <refresh_cron_expr><![CDATA[* * * * *]]></refresh_cron_expr>
+                    <refresh_cron_expr><![CDATA[0 0 * * *]]></refresh_cron_expr>
                 </mode>
                 <remediation>
                     <fallback>bypass</fallback>

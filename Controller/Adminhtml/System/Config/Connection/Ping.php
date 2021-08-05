@@ -25,18 +25,20 @@
  *
  */
 
-namespace Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Cache;
+namespace Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Connection;
 
 use Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Action;
+use Exception;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Crowdsec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
-use Crowdsec\Bouncer\Exception\CrowdsecException;
 use Crowdsec\Bouncer\Helper\Data as Helper;
+use CrowdSecBouncer\RestClient;
+use Crowdsec\Bouncer\Constants;
 
-class Clear extends Action implements HttpPostActionInterface
+class Ping extends Action implements HttpPostActionInterface
 {
     /**
      * @var JsonFactory
@@ -53,68 +55,61 @@ class Clear extends Action implements HttpPostActionInterface
      */
     protected $helper;
 
+    /** @var  RestClient */
+    protected $restClient;
+
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param RegistryBouncer $registryBouncer
      * @param Helper $helper
+     * @param RestClient $restClient
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         RegistryBouncer $registryBouncer,
-        Helper $helper
+        Helper $helper,
+        RestClient $restClient
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->registryBouncer = $registryBouncer;
         $this->helper = $helper;
+        $this->restClient = $restClient;
     }
 
     /**
-     * Clear cache
+     * Test connection
      *
      * @return Json
      */
     public function execute(): Json
     {
         try {
-            if (!($bouncer = $this->registryBouncer->get())) {
-                $bouncer = $this->registryBouncer->create();
-            }
-
-            $bouncer = $bouncer->init();
-            $result = (int) $bouncer->clearCache();
-            $cacheSystem = $this->helper->getCacheTechnology();
-            $cacheOptions = $this->helper->getCacheSystemOptions();
-            $cacheLabel = $cacheOptions[$cacheSystem] ?? __('Unknown');
-            $message = __('CrowdSec cache (%1) has been cleared.', $cacheLabel);
-            if ($this->helper->isStreamModeEnabled()) {
-                $warmUpCacheResult = $bouncer->warmBlocklistCacheUp();
-                $decisionsCount = $warmUpCacheResult['count']??0;
-                $decisionsMessage =
-                    $decisionsCount > 1 ? 'There are now %1 decisions in cache.' : 'There is now %1 decision in cache.';
-                $message .=' '. __('As the stream mode is enabled, cache has been warmed up too.', $cacheLabel);
-                $message .=  ' '.__("$decisionsMessage", $decisionsCount);
-            }
-
-        } catch (CrowdsecException $e) {
+            $baseUri = $this->getRequest()->getParam('api_url');
+            $userAgent = Constants::BASE_USER_AGENT;
+            $apiKey = $this->getRequest()->getParam('bouncer_key');
+            $this->helper->ping($this->restClient, $baseUri, $userAgent, $apiKey);
+            $result = 1;
+            $message = __('Connection test result: success.');
+        } catch (Exception $e) {
             $this->helper->error('', [
-                'type' => 'M2_EXCEPTION_WHILE_CLEARING_CACHE',
+                'type' => 'M2_EXCEPTION_WHILE_TESTING_CONNECTION',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
             $result = false;
-            $message = __('Technical error while clearing the cache: ' . $e->getMessage());
+            $message = __('Technical error while testing connection: ' . $e->getMessage());
         }
 
         $resultJson = $this->resultJsonFactory->create();
 
         return $resultJson->setData([
-            'cleared' => $result,
-            'message' => $message,
+            'connection' => $result,
+            'message' => $message .'<br><br>'. __('Tested url: %1 <br> Tested key: %2', $baseUri??"", $apiKey??""),
         ]);
     }
 }

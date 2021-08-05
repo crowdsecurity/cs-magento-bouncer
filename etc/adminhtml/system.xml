@@ -28,32 +28,33 @@
  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <tab id="crowdsec" translate="label,comment,tooltip" sortOrder="201">
-            <label>CrowdSec</label>
-        </tab>
         <section id="crowdsec_bouncer" translate="label,comment,tooltip" type="text" sortOrder="520" showInDefault="1"
                  showInWebsite="1" showInStore="1">
-            <tab>crowdsec</tab>
+            <tab>security</tab>
             <resource>Crowsec_Bouncer::config</resource>
             <class>separator-top</class>
             <label>CrowdSec Bouncer</label>
             <!-- General -->
-            <group id="general" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="general" translate="label, comment" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General settings</label>
                 <!-- Connection -->
                 <group id="connection" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Connection details</label>
                     <attribute type="expanded">1</attribute>
                     <comment><![CDATA[Connect Magento 2 to your CrowdSec LAPI.]]></comment>
-                    <field id="api_url" translate="label,comment,tooltip tooltip" type="text" sortOrder="200" showInDefault="1">
-                        <label>Your LAPI url *</label>
+                    <field id="api_url" translate="label,comment,tooltip tooltip" type="text" sortOrder="100" showInDefault="1">
+                        <label>Your LAPI url</label>
                         <comment><![CDATA[If the CrowdSec Agent is installed on this server, you will set this field to http://localhost:8080.]]></comment>
                         <validate>required-entry</validate>
                     </field>
-                    <field id="api_key" translate="label,comment,tooltip tooltip" type="text" sortOrder="300" showInDefault="1">
-                        <label>Your bouncer key *</label>
+                    <field id="api_key" translate="label,comment,tooltip tooltip" type="text" sortOrder="200" showInDefault="1">
+                        <label>Your bouncer key</label>
                         <comment><![CDATA[Generated with the cscli command, ex: <em>cscli bouncers add magento2-bouncer</em>]]></comment>
                         <validate>required-entry</validate>
+                    </field>
+                    <field id="test"  translate="button_label" sortOrder="300" showInDefault="1">
+                        <button_label>Test connection</button_label>
+                        <frontend_model>Crowdsec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping</frontend_model>
                     </field>
                 </group>
                 <group id="bouncing" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -93,30 +94,37 @@
                     <field id="wall_tab_title" translate="label,comment,tooltip" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Browser tab text</label>
                         <comment><![CDATA[The text in the browser tab of the captcha wall page.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="wall_title" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Title text</label>
                         <comment><![CDATA[The title text of the captcha wall page.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="wall_subtitle" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Subtitle text</label>
                         <comment><![CDATA[The subtitle text of the captcha wall page.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="wall_refresh_image_link" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Refresh image text</label>
                         <comment><![CDATA[The "refresh image" text of the captcha wall page.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="wall_input_placeholder" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Input placeholder</label>
                         <comment><![CDATA[The placeholder text of the captcha wall page.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="wall_send_button" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Send button text</label>
                         <comment><![CDATA[The "Send button" text of the captcha wall page.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="wall_error_message" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Error message</label>
                         <comment><![CDATA[The "error message" text of the captcha wall page when a captcha is not successfuly resolved.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="wall_footer" translate="label,comment,tooltip" type="textarea" sortOrder="800" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Custom footer text</label>
@@ -130,14 +138,17 @@
                     <field id="wall_tab_title" translate="label,comment,tooltip" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Browser tab text</label>
                         <comment><![CDATA[The text in the browser tab of the ban wall page.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="wall_title" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Title text</label>
                         <comment><![CDATA[The title text of the ban wall page.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="wall_subtitle" translate="label,comment,tooltip" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Subtitle text</label>
                         <comment><![CDATA[The subtitle text of the ban wall page.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="wall_footer" translate="label,comment,tooltip" type="textarea" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Custom footer text</label>
@@ -151,34 +162,42 @@
                     <field id="text_primary" translate="label,comment,tooltip" type="text" sortOrder="1500" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Primary text color</label>
                         <comment><![CDATA[The color used for primary text on the two pages.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="text_secondary" translate="label,comment,tooltip" type="text" sortOrder="1600" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Secondary text color</label>
                         <comment><![CDATA[The color used for secondary text on the two pages.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="text_button" translate="label,comment,tooltip" type="text" sortOrder="1700" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Button text color</label>
                         <comment><![CDATA[The color of the text of the button on the captcha wall page.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="text_error_message" translate="label,comment,tooltip" type="text" sortOrder="1700" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Error message text color</label>
                         <comment><![CDATA[The color used for the error message (when captcha resolution failed).]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="background_page" translate="label,comment,tooltip" type="text" sortOrder="1800" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Page background color</label>
                         <comment><![CDATA[The background color used of the two pages.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="background_container" translate="label,comment,tooltip" type="text" sortOrder="1900" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Container background color</label>
                         <comment><![CDATA[The background color used for the central block on the two pages]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="background_button" translate="label,comment,tooltip" type="text" sortOrder="1900" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Button background color</label>
                         <comment><![CDATA[The background color used for the captcha validation button.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                     <field id="background_button_hover" translate="label,comment,tooltip" type="text" sortOrder="2000" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Button background color (hover)</label>
                         <comment><![CDATA[The background color used for the captcha validation button when it\'s hover.]]></comment>
+                        <validate>required-entry</validate>
                     </field>
                 </group>
                 <!-- Custom css -->
@@ -205,9 +224,20 @@
                         <tooltip><![CDATA[Note: This method has one limit: all the decisions updates since the previous refresh will not be taken in account until the next refresh.]]></tooltip>
                     </field>
                     <field id="refresh_cron_expr" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
-                        <label><![CDATA[Cron expression for cache refresh *]]></label>
-                        <tooltip><![CDATA[Example: * * * * *]]></tooltip>
-                        <comment><![CDATA[]]></comment>
+                        <label><![CDATA[Cron expression for cache refresh ]]></label>
+                        <tooltip><![CDATA[
+                        Examples:
+                        <ul>
+                            <li>Every minute : * * * * * </li>
+                            <li>At midnight : 0 0 * * * </li>
+                            <li>At every 5th minute : */5 * * * *</li>
+                            <li>At minute 15 and 45 past every hour from 7 through 23 : 15,45 7-23 * * * </li>
+                        </ul>
+                        ]]>
+                        </tooltip>
+                        <comment><![CDATA[
+                        Please use the standard cron syntax :  [minute] [hour] [day of month] [month] [day of week]. <br>
+                        To disable this cron job, you can set 0 0 30 2 * <a href="https://devdocs.magento.com/guides/v2.4/config-guide/cron/custom-cron-ref.html#disable-cron-job" target="_blank">as explained in the official documentation.</a> ]]></comment>
                         <depends>
                             <field id="crowdsec_bouncer/advanced/mode/stream">1</field>
                         </depends>
@@ -243,7 +273,7 @@
                         </depends>
                     </field>
                     <field id="redis_dsn" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
-                        <label><![CDATA[Redis DSN *]]></label>
+                        <label><![CDATA[Redis DSN ]]></label>
                         <tooltip><![CDATA[Example of DSN: redis://localhost:6379/0]]></tooltip>
                         <comment><![CDATA[Fill in this field only if you have chosen the Redis cache.]]></comment>
                         <depends>
@@ -252,7 +282,7 @@
                         <validate>required-entry</validate>
                     </field>
                     <field id="memcached_dsn" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
-                        <label><![CDATA[Memcached DSN *]]></label>
+                        <label><![CDATA[Memcached DSN ]]></label>
                         <tooltip><![CDATA[Example of DSN: memcached://localhost:11211]]></tooltip>
                         <comment><![CDATA[Fill in this field only if you have chosen the Memcached cache.]]></comment>
                         <depends>
@@ -261,7 +291,7 @@
                         <validate>required-entry</validate>
                     </field>
                     <field id="clean_ip_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
-                        <label><![CDATA[Clean IPs cache duration * (in seconds)]]></label>
+                        <label><![CDATA[Clean IPs cache duration  (in seconds)]]></label>
                         <tooltip><![CDATA[Live mode only]]></tooltip>
                         <comment><![CDATA[The duration between re-asking LAPI about an already checked clean IP.<br>Minimum 1 second.]]></comment>
                         <depends>
@@ -270,7 +300,7 @@
                         <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
                     </field>
                     <field id="bad_ip_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
-                        <label><![CDATA[Bad IPs cache duration * (in seconds)]]></label>
+                        <label><![CDATA[Bad IPs cache duration  (in seconds)]]></label>
                         <tooltip><![CDATA[Live mode only]]></tooltip>
                         <comment><![CDATA[The duration between re-asking LAPI about an already checked bad IP.<br>Minimum 1 second.]]></comment>
                         <depends>

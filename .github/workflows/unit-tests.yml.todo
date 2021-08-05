@@ -1,0 +1,15 @@
+name: M2 Unit Tests
+on: [push]
+jobs:
+  unit-tests:
+    name: M2 Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker://yireo/github-actions-magento-unit-tests:7.3
+        env:
+          MAGENTO_VERSION: '2.4.2'
+          MAGENTO_MARKETPLACE_USERNAME: ${{ secrets.MAGENTO_MARKETPLACE_USERNAME }}
+          MAGENTO_MARKETPLACE_PASSWORD: ${{ secrets.MAGENTO_MARKETPLACE_PASSWORD }}
+          MODULE_NAME: Crowdsec_Bouncer
+          COMPOSER_NAME: crowdsec/magento2-module-bouncer

@@ -31,7 +31,7 @@
         <resources>
             <resource id="Magento_Backend::admin">
                 <resource id="Crowdsec_Bouncer::admin" title="CrowdSec" translate="title" sortOrder="40">
-                    <resource id="Crowdsec_Bouncer::manage_cache" title="Manage Cache" translate="title" sortOrder="40"/>
+                    <resource id="Crowdsec_Bouncer::manage_config_actions" title="Manage Config Actions" translate="title" sortOrder="40"/>
                 </resource>
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">

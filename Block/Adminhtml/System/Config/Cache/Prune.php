@@ -28,13 +28,15 @@
 namespace Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache;
 
 use Crowdsec\Bouncer\Constants;
-use Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache;
+use Crowdsec\Bouncer\Block\Adminhtml\System\Config\Button;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-class Prune extends Cache
+class Prune extends Button
 {
     /** @var string  */
     protected $template = 'Crowdsec_Bouncer::system/config/cache/prune.phtml';
+    /** @var string  */
+    protected $oldTemplate = 'Crowdsec_Bouncer::system/config/cache/old/prune.phtml';
 
     /**
      * Get the button and scripts contents

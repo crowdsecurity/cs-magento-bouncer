@@ -25,18 +25,52 @@
  *
  */
 
-namespace Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache;
+namespace Crowdsec\Bouncer\Block\Adminhtml\System\Config\Connection;
 
-use Crowdsec\Bouncer\Constants;
 use Crowdsec\Bouncer\Block\Adminhtml\System\Config\Button;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-class Refresh extends Button
+class Ping extends Button
 {
+
+    /**
+     * LAPI Url field Name
+     *
+     * @var string
+     */
+    protected $_apiUrlField = 'crowdsec_bouncer_general_connection_api_url';
+
+    /**
+     * Bouncer key field name
+     *
+     * @var string
+     */
+    protected $_bouncerKeyField = 'crowdsec_bouncer_general_connection_api_key';
+
     /** @var string  */
-    protected $template = 'Crowdsec_Bouncer::system/config/cache/refresh.phtml';
+    protected $template = 'Crowdsec_Bouncer::system/config/connection/ping.phtml';
     /** @var string  */
-    protected $oldTemplate = 'Crowdsec_Bouncer::system/config/cache/old/refresh.phtml';
+    protected $oldTemplate = 'Crowdsec_Bouncer::system/config/connection/old/ping.phtml';
+
+    /**
+     * Get LAPI Url field Name
+     *
+     * @return string
+     */
+    public function getUrlField()
+    {
+        return $this->_apiUrlField;
+    }
+
+    /**
+     * Get Bouncer key field Name
+     *
+     * @return string
+     */
+    public function getKeyField()
+    {
+        return $this->_bouncerKeyField;
+    }
 
     /**
      * Get the button and scripts contents
@@ -46,15 +80,12 @@ class Refresh extends Button
      */
     protected function _getElementHtml(AbstractElement $element): string
     {
-        $originalData = $element->getOriginalData();
-        $cacheOptions = $this->helper->getCacheSystemOptions();
-        $fsCacheLabel = $cacheOptions[Constants::CACHE_SYSTEM_PHPFS] ?? __('Unknown');
-        $buttonLabel = $fsCacheLabel ? __('Refresh CrowdSec %1 cache', $fsCacheLabel) : $originalData['button_label'];
+        $buttonLabel =  __('Test CrowdSec LAPI connection');
         $this->addData(
             [
                 'button_label' => $buttonLabel,
                 'html_id' => $element->getHtmlId(),
-                'ajax_url' => $this->_urlBuilder->getUrl('crowdsec/system_config_cache/refresh'),
+                'ajax_url' => $this->_urlBuilder->getUrl('crowdsec/system_config_connection/ping'),
             ]
         );
 

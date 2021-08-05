@@ -26,14 +26,14 @@
  */
 namespace Crowdsec\Bouncer\Controller\Adminhtml\System\Config;
 
-use Magento\Backend\App\Action;
+use Magento\Backend\App\Action as BackendAction;
 
-abstract class Cache extends Action
+abstract class Action extends BackendAction
 {
     /**
      * Authorization level of a basic admin session
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = 'Crowdsec_Bouncer::manage_cache';
+    const ADMIN_RESOURCE = 'Crowdsec_Bouncer::manage_config_actions';
 }

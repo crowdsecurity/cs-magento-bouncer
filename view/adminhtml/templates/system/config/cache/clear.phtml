@@ -53,10 +53,16 @@ require(['prototype'], function(){
                         response = response.responseText.evalJSON();
                         result = response.message;
                     }
-                    if (response.valid == 1) {
+                    if (response.cleared == 1) {
                         clearCacheMessage.removeClassName('hidden').removeClassName('admin__field-error').
                         addClassName('note');
-                        clearCacheMessage.setStyle({color:'green'});
+                        clearCacheMessage.setStyle(
+                            {
+                                color:'green',
+                                border:'1px solid #ee7d7d',
+                                padding:'.8rem 1rem .9rem'
+                             }
+                        );
                     } else {
                         clearCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
                     }

@@ -27,14 +27,16 @@
 
 namespace Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache;
 
-use Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache;
+use Crowdsec\Bouncer\Block\Adminhtml\System\Config\Button;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-class Clear extends Cache
+class Clear extends Button
 {
 
     /** @var string  */
     protected $template = 'Crowdsec_Bouncer::system/config/cache/clear.phtml';
+    /** @var string  */
+    protected $oldTemplate = 'Crowdsec_Bouncer::system/config/cache/old/clear.phtml';
 
     /**
      * Get the button and scripts contents

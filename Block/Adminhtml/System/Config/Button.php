@@ -33,41 +33,48 @@ use Crowdsec\Bouncer\Helper\Data as Helper;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
-class Cache extends Field
+class Button extends Field
 {
 
     /** @var Helper */
     protected $helper;
+
+    /** @var string  */
+    protected $template = 'Crowdsec_Bouncer::system/config/cache/clear.phtml';
+    /** @var string  */
+    protected $oldTemplate = 'Crowdsec_Bouncer::system/config/cache/old/clear.phtml';
 
     /**
      *
      * @param Helper $helper
      * @param Context $context
      * @param array $data
-     * @param SecureHtmlRenderer|null $secureRenderer
+     *
      */
     public function __construct(
         Helper $helper,
         Context $context,
-        array $data = [],
-        ?SecureHtmlRenderer $secureRenderer = null
+        array $data = []
     ) {
-        parent::__construct($context, $data, $secureRenderer);
+
+        parent::__construct($context, $data);
         $this->helper= $helper;
     }
 
     /**
      * Set template to itself
      *
-     * @return Cache
+     * @return Button
      */
-    protected function _prepareLayout(): Cache
+    protected function _prepareLayout(): Button
     {
         parent::_prepareLayout();
         if (!$this->getTemplate()) {
-            $this->setTemplate($this->template);
+            // Prior to 2.4.0, there was no SecureHtmlRenderer class
+            $this->setTemplate(class_exists(SecureHtmlRenderer::class) ?
+                $this->template :
+                $this->oldTemplate);
         }
-
         return $this;
     }
 

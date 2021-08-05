@@ -35,6 +35,8 @@ use Magento\Framework\App\Helper\Context;
 class Config extends AbstractHelper
 {
     const SECTION = 'crowdsec_bouncer';
+    const API_URL_FULL_PATH = 'groups/general/groups/connection/fields/api_url/value';
+    const API_KEY_FULL_PATH = 'groups/general/groups/connection/fields/api_key/value';
     const MEMCACHED_DSN_FULL_PATH = 'groups/advanced/groups/cache/fields/memcached_dsn/value';
     const REDIS_DSN_FULL_PATH = 'groups/advanced/groups/cache/fields/redis_dsn/value';
     const CACHE_TECHNOLOGY_FULL_PATH = 'groups/advanced/groups/cache/fields/technology/value';
@@ -140,7 +142,7 @@ class Config extends AbstractHelper
     public function getApiUrl(): string
     {
         if (!isset($this->_globals['api_url'])) {
-            $this->_globals['api_url'] = trim($this->scopeConfig->getValue(self::XML_PATH_API_URL) ?: "");
+            $this->_globals['api_url'] = trim((string)$this->scopeConfig->getValue(self::XML_PATH_API_URL));
         }
 
         return $this->_globals['api_url'];
@@ -153,7 +155,7 @@ class Config extends AbstractHelper
     public function getApiKey(): string
     {
         if (!isset($this->_globals['api_key'])) {
-            $this->_globals['api_key'] = trim($this->scopeConfig->getValue(self::XML_PATH_API_KEY) ?: "");
+            $this->_globals['api_key'] = trim((string)$this->scopeConfig->getValue(self::XML_PATH_API_KEY));
         }
 
         return $this->_globals['api_key'];

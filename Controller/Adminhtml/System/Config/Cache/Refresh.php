@@ -27,7 +27,7 @@
 
 namespace Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Cache;
 
-use Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Cache;
+use Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
@@ -36,7 +36,7 @@ use Crowdsec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use Crowdsec\Bouncer\Exception\CrowdsecException;
 use Crowdsec\Bouncer\Helper\Data as Helper;
 
-class Refresh extends Cache implements HttpPostActionInterface
+class Refresh extends Action implements HttpPostActionInterface
 {
     /**
      * @var JsonFactory
@@ -83,9 +83,9 @@ class Refresh extends Cache implements HttpPostActionInterface
                 $bouncer = $this->registryBouncer->create();
             }
 
-            $result = $bouncer->init()->refreshBlocklistCache();
-            $new = $result['new']??0;
-            $deleted = $result['deleted']??0;
+            $refresh = $bouncer->init()->refreshBlocklistCache();
+            $new = $refresh['new']??0;
+            $deleted = $refresh['deleted']??0;
             $cacheSystem = $this->helper->getCacheTechnology();
             $cacheOptions = $this->helper->getCacheSystemOptions();
             $cacheLabel = $cacheOptions[$cacheSystem] ?? __('Unknown');
@@ -95,6 +95,7 @@ class Refresh extends Cache implements HttpPostActionInterface
                 $new,
                 $deleted
             );
+            $result = 1;
         } catch (CrowdsecException $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
@@ -110,7 +111,7 @@ class Refresh extends Cache implements HttpPostActionInterface
         $resultJson = $this->resultJsonFactory->create();
 
         return $resultJson->setData([
-            'cache_refresh' => $result,
+            'refresh' => $result,
             'message' => $message,
         ]);
     }

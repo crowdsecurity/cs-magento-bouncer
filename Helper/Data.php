@@ -29,6 +29,7 @@ namespace Crowdsec\Bouncer\Helper;
 
 use Crowdsec\Bouncer\Constants;
 use Crowdsec\Bouncer\Exception\CrowdsecException;
+use CrowdSecBouncer\RestClient;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\Area;
 use Magento\Store\Model\ScopeInterface;
@@ -142,7 +143,7 @@ class Data extends Config
 
     protected function _getStringSetting($path, $scope = ScopeInterface::SCOPE_STORE): string
     {
-        return trim($this->scopeConfig->getValue($path, $scope) ?: "");
+        return trim((string)$this->scopeConfig->getValue($path, $scope));
     }
 
     public function getCaptchaWallConfigs(): array
@@ -300,5 +301,37 @@ class Data extends Config
         }
 
         return $this->_bouncerConfigs;
+    }
+
+    /**
+     * @param string $expr
+     *
+     * @throws CrowdsecException
+     * @see \Magento\Cron\Model\Schedule::setCronExpr
+     */
+    public function validateCronExpr(string $expr)
+    {
+        $e = preg_split('#\s+#', $expr, -1, PREG_SPLIT_NO_EMPTY);
+        if (count($e) < 5 || count($e) > 6) {
+            throw new CrowdsecException(__('Invalid cron expression: %1', $expr));
+        }
+    }
+
+    /**
+     * @param RestClient; $restClient
+     * @param string $baseUri
+     * @param string $userAgent
+     * @param string $apiKey
+     * @param int $timeout
+     */
+    public function ping($restClient, string $baseUri, string $userAgent, string $apiKey, $timeout = 1)
+    {
+        $restClient->configure($baseUri, [
+            'User-Agent' => $userAgent,
+            'X-Api-Key' => $apiKey,
+            'Accept' => 'application/json',
+        ], $timeout);
+
+        $restClient->request('/v1/decisions', []);
     }
 }
