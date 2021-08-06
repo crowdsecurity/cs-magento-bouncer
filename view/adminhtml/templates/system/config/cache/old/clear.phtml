@@ -50,20 +50,15 @@
                             result = response.message;
                         }
                         if (response.cleared == 1) {
-                            clearCacheMessage.removeClassName('hidden').removeClassName('admin__field-error').
-                            addClassName('note');
-                            clearCacheMessage.setStyle(
-                                {
-                                    color:'green',
-                                    border:'1px solid #ee7d7d',
-                                    padding:'.8rem 1rem .9rem'
-                                }
-                            );
+                            clearCacheMessage.removeClassName('hidden')
+                                .removeClassName('error').addClassName('success');
                         } else {
-                            clearCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                            clearCacheMessage.removeClassName('hidden').removeClassName('success')
+                                .addClassName('error');
                         }
                     } catch (e) {
-                        clearCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                        clearCacheMessage.removeClassName('hidden').removeClassName('success')
+                            .addClassName('error');
                     }
                     clearCacheMessage.update(result);
                 }
@@ -76,11 +71,11 @@
     });
 </script>
 
-<div class="actions actions-clear-cache">
+<div class="actions actions-clear-cache actions-crowdsec">
     <button onclick="javascript:clearCache(); return false;" class="action-clear-cache" type="button" id="<?=
     $block->escapeHtmlAttr($block->getHtmlId()) ?>">
         <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
-    <p class="admin__field-error hidden" id="cache_clearing_result"></p>
+    <p class="hidden" id="cache_clearing_result"></p>
 </div>
 

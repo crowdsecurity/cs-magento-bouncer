@@ -59,20 +59,15 @@ require(['prototype'], function(){
                         result = response.message;
                     }
                     if (response.connection == 1) {
-                        pingConnectionMessage.removeClassName('hidden').removeClassName('admin__field-error').
-                        addClassName('note');
-                        pingConnectionMessage.setStyle(
-                            {
-                                color:'green',
-                                border:'1px solid #ee7d7d',
-                                padding:'.8rem 1rem .9rem'
-                             }
-                        );
+                        pingConnectionMessage.removeClassName('hidden')
+                                .removeClassName('error').addClassName('success');
                     } else {
-                        pingConnectionMessage.removeClassName('hidden').addClassName('admin__field-error');
+                        pingConnectionMessage.removeClassName('hidden').removeClassName('success')
+                                .addClassName('error');
                     }
                 } catch (e) {
-                    pingConnectionMessage.removeClassName('hidden').addClassName('admin__field-error');
+                    pingConnectionMessage.removeClassName('hidden').removeClassName('success')
+                            .addClassName('error');
                 }
                 pingConnectionMessage.update(result);
             }
@@ -87,11 +82,11 @@ script;
 ?>
 <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
 
-<div class="actions actions-ping-connection">
+<div class="actions actions-ping-connection actions-crowdsec">
     <button class="action-ping-connection" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
         <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
-    <p class="admin__field-error hidden" id="cache_ping_result"></p>
+    <p class="hidden" id="cache_ping_result"></p>
 </div>
 <?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#cache_ping_result {margin-bottom: 10px;}', false); ?>
 <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(

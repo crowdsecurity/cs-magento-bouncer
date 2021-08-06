@@ -50,20 +50,15 @@
                             result = response.message;
                         }
                         if (response.refresh == 1) {
-                            refreshCacheMessage.removeClassName('hidden').removeClassName('admin__field-error').
-                            addClassName('note');
-                            refreshCacheMessage.setStyle(
-                                {
-                                    color:'green',
-                                    border:'1px solid #ee7d7d',
-                                    padding:'.8rem 1rem .9rem'
-                                }
-                            );
+                            refreshCacheMessage.removeClassName('hidden')
+                                .removeClassName('error').addClassName('success');
                         } else {
-                            refreshCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                            refreshCacheMessage.removeClassName('hidden').removeClassName('success')
+                                .addClassName('error');
                         }
                     } catch (e) {
-                        refreshCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                        refreshCacheMessage.removeClassName('hidden').removeClassName('success')
+                            .addClassName('error');
                     }
                     refreshCacheMessage.update(result);
                 }
@@ -76,10 +71,10 @@
     });
 </script>
 
-<div class="actions actions-refresh-cache">
+<div class="actions actions-refresh-cache actions-crowdsec">
     <button onclick="javascript:refreshCache(); return false;" class="action-refresh-cache" type="button" id="<?=
     $block->escapeHtmlAttr($block->getHtmlId()) ?>">
         <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
-    <p class="admin__field-error hidden" id="cache_refresh_result"></p>
+    <p class="hidden" id="cache_refresh_result"></p>
 </div>

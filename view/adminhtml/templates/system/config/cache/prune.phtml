@@ -54,20 +54,15 @@ require(['prototype'], function(){
                         result = response.message;
                     }
                     if (response.pruned == 1) {
-                        pruneCacheMessage.removeClassName('hidden').removeClassName('admin__field-error').
-                        addClassName('note');
-                        pruneCacheMessage.setStyle(
-                            {
-                                color:'green',
-                                border:'1px solid #ee7d7d',
-                                padding:'.8rem 1rem .9rem'
-                             }
-                        );
+                        pruneCacheMessage.removeClassName('hidden')
+                                .removeClassName('error').addClassName('success');
                     } else {
-                        pruneCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                        pruneCacheMessage.removeClassName('hidden').removeClassName('success')
+                                .addClassName('error');
                     }
                 } catch (e) {
-                    pruneCacheMessage.removeClassName('hidden').addClassName('admin__field-error');
+                    pruneCacheMessage.removeClassName('hidden').removeClassName('success')
+                            .addClassName('error');
                 }
                 pruneCacheMessage.update(result);
             }
@@ -82,11 +77,11 @@ script;
 ?>
 <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
 
-<div class="actions actions-prune-cache">
+<div class="actions actions-prune-cache actions-crowdsec">
     <button class="action-prune-cache" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
         <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
-    <p class="admin__field-error hidden" id="cache_pruning_result"></p>
+    <p class="hidden" id="cache_pruning_result"></p>
     <p class="note">
         <span><?= $escaper->escapeHtml(
             __('Cache pruning is the process whereby entries that have expired are removed from the cache.

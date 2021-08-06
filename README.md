@@ -15,11 +15,16 @@
 ## Description
 
 
-
-
 ## Installation
 
+### Prerequisites
+
+You must install CrowdSec prior to use this module with your Magento 2 instance.
+
 ### Requirements
+
+- Magento >= 2.3.0
+- PHP >= 7.2
 
 
 ### Installation methods
