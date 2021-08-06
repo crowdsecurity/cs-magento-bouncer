@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: technote-space/toc-generator@v4
         with:
-          MAX_HEADER_LEVEL: 4
+          MAX_HEADER_LEVEL: 5
           COMMIT_NAME: CrowdSec Dev Bot
-          TARGET_PATHS: 'README.md,doc/USER_GUIDE.md,INSTALLATION_GUIDE.md'
+          TARGET_PATHS: 'README.md,doc/USER_GUIDE.md,doc/INSTALLATION_GUIDE.md'
           CHECK_ONLY_DEFAULT_BRANCH: true

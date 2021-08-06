@@ -17,6 +17,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+
 ### Description
 
 The `CrowdSec_Bouncer` extension for Magento 2 has been designed to protect Magento 2 hosted websites from all kinds of attacks.
@@ -45,15 +46,13 @@ On the other hand, all texts are also fully customizable. This will allow you, f
 
 This module comes with configurations that you will find under `Stores → Configurations → Security → CrowdSec Bouncer` admin section.
 
-These configuartions are divided in three main parts : 
+These configurations are divided in three main parts : `General Settings`, `Theme customizations` and `Advanced settings`.
 
-##### 1) General Settings
+##### General Settings
 
-  In the `General settings` group, you will set your connection details and refine bouncing according to your needs.
+  In the `General settings` part, you will set your connection details and refine bouncing according to your needs.
   
 ![Connection details](screenshots/config-connection-details.jpg)
-
-![Bouncing](screenshots/config-bouncing.jpg)
 
 ***
 
@@ -67,9 +66,41 @@ These configuartions are divided in three main parts :
 
 **N.B** : Even before saving configuration, you can check if your settings are correct by clicking on the test button.
 
+![Bouncing](screenshots/config-bouncing.jpg)
 
 
-##### 2) Theme customizations
+***
+
+ * `Bouncing → Enable bouncer on Frontend area` (`store view` scope) : Choose which store views you want to protect
+ 
+***
+
+***
+
+ * `Bouncing → Enable bouncer on Adminhtml area` (`global` scope) : Choose if you want to protect admin too
+ 
+***
+
+***
+
+ * `Bouncing → Enable bouncer on API areas` (`global` scope) : Choose if you want to protect REST, SOAP and GraphQL endpoints
+ 
+***
+
+**N.B** : For API calls, there will be no ban or captcha wall. User will receive a `401` (ban) or `403` (captcha) response code.
+
+***
+
+ * `Bouncing → Bouncing level` (`store view` scope) : Choose if you want to apply CrowdSec directives (Normal bouncing) or be more permissive (Flex bouncing).
+ 
+***
+
+
+
+
+##### Theme customizations
+
+ In the `Theme customizations` part, you are able to modify texts and colors of ban and captcha walls. All fields here are store view scoped, so you can use different languages and designs.
 
 ![Captcha customization](screenshots/config-captcha-wall.jpg)
 
@@ -79,7 +110,7 @@ These configuartions are divided in three main parts :
 
 
 
-##### 3) Advanced settings
+##### Advanced settings
 
 ![Captcha customization](screenshots/config-communication-mode.jpg)
 
