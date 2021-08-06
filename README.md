@@ -12,6 +12,9 @@
   
 ```
 
+<!-- START doctoc -->
+<!-- END doctoc -->
+
 ## Description
 
 
@@ -19,12 +22,17 @@
 
 ### Prerequisites
 
-You must install CrowdSec prior to use this module with your Magento 2 instance.
+This bouncer has been designed to protect Magento 2 hosted websites from all kinds of attacks. To be able to use this 
+blocker,
+the first step is to install [CrowdSec v1](https://doc.crowdsec.net/Crowdsec/v1/getting_started/installation/).
+
+Please note that first and foremost CrowdSec must be installed on a server that is accessible via the Magento 2 site. 
+Remember: CrowdSec detects, bouncers deter.
 
 ### Requirements
 
-- Magento >= 2.3.0
-- PHP >= 7.2
+- CrowdSec v1
+- Magento >= 2.3
 
 
 ### Installation methods

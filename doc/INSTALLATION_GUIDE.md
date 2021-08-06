@@ -5,6 +5,9 @@
 
 ---------------------------------------------
 
+<!-- START doctoc -->
+<!-- END doctoc -->
+
 ### Installation
 
 Use `Composer` by simply adding `crowdsec/magento2-module-bouncer` as a dependency:
