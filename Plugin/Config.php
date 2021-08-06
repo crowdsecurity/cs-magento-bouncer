@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -18,22 +18,22 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
  */
 
-namespace Crowdsec\Bouncer\Plugin;
+namespace CrowdSec\Bouncer\Plugin;
 
-use Crowdsec\Bouncer\Exception\CrowdsecException;
-use Crowdsec\Bouncer\Helper\Data as Helper;
-use Crowdsec\Bouncer\Model\Bouncer;
-use Crowdsec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSec\Bouncer\Helper\Data as Helper;
+use CrowdSec\Bouncer\Model\Bouncer;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use Exception;
 use Magento\Framework\Message\ManagerInterface;
-use Crowdsec\Bouncer\Constants;
+use CrowdSec\Bouncer\Constants;
 use Magento\Framework\Phrase;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use CrowdSecBouncer\RestClient;
@@ -86,10 +86,10 @@ class Config
     }
 
     /**
-     * Handle admin Crowdsec section changes
+     * Handle admin CrowdSec section changes
      * @param \Magento\Config\Model\Config $subject
      * @return null
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     public function beforeSave(
         \Magento\Config\Model\Config $subject
@@ -201,7 +201,7 @@ class Config
      * @param string $newRedisDsn
      * @param string $newMemcachedDsn
      * @param Phrase $newCacheLabel
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     public function _handleStreamMode(
         bool $oldStreamMode,
@@ -245,7 +245,7 @@ class Config
      * @param string $newRedisDsn
      * @param string $newMemcachedDsn
      * @param Phrase $newCacheLabel
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     protected function _handleWarmUp(
         bool $oldStreamMode,
@@ -280,7 +280,7 @@ class Config
     }
 
     /**
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     protected function _handleRefreshCronExpr(
         bool $oldStreamMode,
@@ -298,13 +298,13 @@ class Config
                 $cronMessage = __('Cache refresh cron has been disabled.');
                 $this->messageManager->addNoticeMessage($cronMessage);
             } catch (Exception $e) {
-                throw new CrowdsecException(__('Disabled refresh expression cron can\'t be saved: ', $e->getMessage()));
+                throw new CrowdSecException(__('Disabled refresh expression cron can\'t be saved: ', $e->getMessage()));
             }
         } elseif ($refreshCronExprChanged) {
             try {
                 $this->helper->validateCronExpr($newRefreshCronExpr);
             } catch (Exception $e) {
-                throw new CrowdsecException(__(
+                throw new CrowdSecException(__(
                     'Refresh expression cron (%1) is not valid.',
                     $newRefreshCronExpr
                 ));
@@ -317,7 +317,7 @@ class Config
      * @param string $newUrl
      * @param string $oldKey
      * @param string $newKey
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     protected function _handleConnectionChanges(
         string $oldUrl,
@@ -330,7 +330,7 @@ class Config
             try {
                 $this->helper->ping($this->restClient, $newUrl, Constants::BASE_USER_AGENT, $newKey);
             } catch (Exception $e) {
-                throw new CrowdsecException(__('Connection test failed with url "%1" and key "%2"', $newUrl, $newKey));
+                throw new CrowdSecException(__('Connection test failed with url "%1" and key "%2"', $newUrl, $newKey));
             }
         }
     }
@@ -399,7 +399,7 @@ class Config
      * @param string $memcachedDsn
      * @param string $redisDsn
      * @param Phrase $cacheLabel
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     protected function _handleTestCache(
         bool $cacheChanged,
@@ -433,7 +433,7 @@ class Config
                 ]);
                 $cacheMessage =
                     __('Technical error while testing the %1 cache: ' . $e->getMessage(), $cacheLabel);
-                throw new CrowdsecException(__($cacheMessage));
+                throw new CrowdSecException(__($cacheMessage));
             }
         }
     }
@@ -465,7 +465,7 @@ class Config
                     ]
                 )->clearCache();
             $this->displayCacheClearMessage($clearCacheResult, $cacheLabel, $preMessage);
-        } catch (CrowdsecException $e) {
+        } catch (CrowdSecException $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_CLEARING_CACHE',
                 'message' => $e->getMessage(),
@@ -485,7 +485,7 @@ class Config
      * @param $memcachedDsn
      * @param $redisDsn
      * @param $cacheLabel
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     protected function _warmUpCache(Bouncer $bouncer, $cacheSystem, $memcachedDsn, $redisDsn, $cacheLabel): void
     {
@@ -499,7 +499,7 @@ class Config
                     ]
                 )->warmBlocklistCacheUp();
             $this->displayCacheWarmUpMessage($warmUpCacheResult, $cacheLabel);
-        } catch (CrowdsecException $e) {
+        } catch (CrowdSecException $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_WARMING_UP_CACHE',
                 'message' => $e->getMessage(),
@@ -510,7 +510,7 @@ class Config
 
             $cacheMessage =
                 __('Technical error while warming up the %1 cache: ' . $e->getMessage(), $cacheLabel);
-            throw new CrowdsecException(__($cacheMessage));
+            throw new CrowdSecException(__($cacheMessage));
         }
     }
 

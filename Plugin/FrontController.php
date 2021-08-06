@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -18,14 +18,14 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
  */
 
-namespace Crowdsec\Bouncer\Plugin;
+namespace CrowdSec\Bouncer\Plugin;
 
 use Closure;
 use ErrorException;
@@ -36,8 +36,8 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\App\ActionFlag;
 use Magento\Framework\App\State;
-use Crowdsec\Bouncer\Helper\Data as HelperData;
-use Crowdsec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Helper\Data as HelperData;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
@@ -95,7 +95,7 @@ class FrontController
     }
 
     /**
-     * Add Crowdsec functionality to Dispatch method
+     * Add CrowdSec functionality to Dispatch method
      *
      * @param FrontControllerInterface $subject
      * @param Closure $proceed

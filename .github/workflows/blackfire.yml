@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_COMPOSE_FILE: "./docker-compose.yml"
-      EXTENSION_NAME: "Crowdsec_Bouncer"
+      EXTENSION_NAME: "CrowdSec_Bouncer"
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"
 
     steps:
@@ -36,7 +36,7 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      - name: Prepare ExtDN performance testing
+      - name: Prepare performance testing
         uses: julienloizelet/github-actions-m2-crowdsec/magento-performance-setup@master
         env:
           BLACKFIRE_CLIENT_ID: ${{ secrets.BLACKFIRE_CLIENT_ID }}

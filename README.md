@@ -1,10 +1,10 @@
-# Crowdsec_Bouncer
+# CrowdSec_Bouncer
 
 ----------------------
 
 ```
-@category   Crowdsec  
-@package    Crowdsec_Bouncer  
+@category   CrowdSec  
+@package    CrowdSec_Bouncer  
 @author     CrowdSec team
 @see        https://crowdsec.net CrowdSec Official Website 
 @copyright  Copyright (c)  2021+ CrowdSec  
@@ -36,7 +36,7 @@ Use `Composer` by simply adding `crowdsec/magento2-module-bouncer` as a dependen
 
 After the installment of the module source code, the module has to be enabled by the Magento® 2 CLI.
 
-    bin/magento module:enable Crowdsec_Bouncer
+    bin/magento module:enable CrowdSec_Bouncer
 
 ### System Upgrade
 

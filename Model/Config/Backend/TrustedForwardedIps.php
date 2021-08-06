@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -18,23 +18,23 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
  */
 
-namespace Crowdsec\Bouncer\Model\Config\Backend;
+namespace CrowdSec\Bouncer\Model\Config\Backend;
 
-use Crowdsec\Bouncer\Helper\Config;
+use CrowdSec\Bouncer\Helper\Config;
 use Exception;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\Value;
 use Magento\Framework\Data\Collection\AbstractDb;
-use Crowdsec\Bouncer\Exception\CrowdsecException;
+use CrowdSec\Bouncer\Exception\CrowdSecException;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
@@ -89,7 +89,7 @@ class TrustedForwardedIps extends Value
      *
      * Update array config for Ips
      * @return Value
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     public function afterSave(): Value
     {
@@ -102,14 +102,14 @@ class TrustedForwardedIps extends Value
                     if (false !== strpos($stringRange, '/')) {
                         $range = Factory::rangeFromString($stringRange);
                         if (null === $range) {
-                            throw new CrowdsecException(__('Invalid IP List format.'));
+                            throw new CrowdSecException(__('Invalid IP List format.'));
                         }
                         $bounds = [$range->getComparableStartString(), $range->getComparableEndString()];
                         $comparableIpBoundsList = [$bounds];
                     } else {
                         $address = Factory::addressFromString($stringRange);
                         if (null === $address) {
-                            throw new CrowdsecException(__('Invalid IP List format.'));
+                            throw new CrowdSecException(__('Invalid IP List format.'));
                         }
                         $comparableString = $address->getComparableString();
                         $comparableIpBoundsList[] = [$comparableString, $comparableString];
@@ -127,7 +127,7 @@ class TrustedForwardedIps extends Value
                 );
             } catch (Exception $e) {
                 $this->_logger->error($e->getMessage());
-                throw new CrowdsecException(__('Crowdsec Trusted forward ips settings can\'t be saved'));
+                throw new CrowdSecException(__('CrowdSec Trusted forward ips settings can\'t be saved'));
             }
         }
 

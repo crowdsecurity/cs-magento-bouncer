@@ -13,7 +13,7 @@ A clear and concise description of what the bug is.
 **Preconditions**
 
 - Magento 2 version:
-- Crowdsec_Bouncer module version:
+- CrowdSec_Bouncer module version:
 - Environment (Developer or Production mode):
 - Third party modules:
 

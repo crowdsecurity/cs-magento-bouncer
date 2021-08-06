@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -19,8 +19,8 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
@@ -30,14 +30,14 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="Crowdsec_Bouncer::admin" title="CrowdSec" translate="title" sortOrder="40">
-                    <resource id="Crowdsec_Bouncer::manage_config_actions" title="Manage Config Actions" translate="title" sortOrder="40"/>
+                <resource id="CrowdSec_Bouncer::admin" title="CrowdSec" translate="title" sortOrder="40">
+                    <resource id="CrowdSec_Bouncer::manage_config_actions" title="Manage Config Actions" translate="title" sortOrder="40"/>
                 </resource>
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">
-                            <resource id="Crowdsec_Bouncer::config"
-                                      title="Crowdsec Bouncer"
+                            <resource id="CrowdSec_Bouncer::config"
+                                      title="CrowdSec Bouncer"
                                       translate="title"
                                       sortOrder="10"/>
                         </resource>

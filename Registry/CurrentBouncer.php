@@ -2,10 +2,10 @@
 /** @noinspection PhpUndefinedClassInspection */
 declare(strict_types=1);
 
-namespace Crowdsec\Bouncer\Registry;
+namespace CrowdSec\Bouncer\Registry;
 
-use Crowdsec\Bouncer\Model\Bouncer as BouncerModel;
-use Crowdsec\Bouncer\Model\BouncerFactory;
+use CrowdSec\Bouncer\Model\Bouncer as BouncerModel;
+use CrowdSec\Bouncer\Model\BouncerFactory;
 
 /**
  * Class CurrentBouncer

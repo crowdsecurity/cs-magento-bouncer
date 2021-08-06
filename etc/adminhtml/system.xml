@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -19,8 +19,8 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
@@ -54,7 +54,7 @@
                     </field>
                     <field id="test"  translate="button_label" sortOrder="300" showInDefault="1">
                         <button_label>Test connection</button_label>
-                        <frontend_model>Crowdsec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping</frontend_model>
+                        <frontend_model>CrowdSec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping</frontend_model>
                     </field>
                 </group>
                 <group id="bouncing" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -76,7 +76,7 @@
                     </field>
                     <field id="level" translate="label,comment,tooltip" type="select" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Bouncing level</label>
-                        <source_model>Crowdsec\Bouncer\Model\Config\Source\Level</source_model>
+                        <source_model>CrowdSec\Bouncer\Model\Config\Source\Level</source_model>
                         <tooltip><![CDATA[<ul>
         <li><strong>Flex bouncing</strong>: Display Captcha only, even if CrowdSec advises to ban the IP.</li>
         <li><strong>Normal bouncing</strong>: Follow CrowdSec advice (Ban or Captcha).</li>
@@ -196,7 +196,7 @@
                     </field>
                     <field id="background_button_hover" translate="label,comment,tooltip" type="text" sortOrder="2000" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Button background color (hover)</label>
-                        <comment><![CDATA[The background color used for the captcha validation button when it\'s hover.]]></comment>
+                        <comment><![CDATA[The background color used for the captcha validation button when it's hover.]]></comment>
                         <validate>required-entry</validate>
                     </field>
                 </group>
@@ -245,7 +245,7 @@
                     </field>
                     <field id="refresh_cache"  translate="button_label" sortOrder="300" showInDefault="1">
                         <button_label>Refresh cache</button_label>
-                        <frontend_model>Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Refresh</frontend_model>
+                        <frontend_model>CrowdSec\Bouncer\Block\Adminhtml\System\Config\Cache\Refresh</frontend_model>
                         <depends>
                             <field id="crowdsec_bouncer/advanced/mode/stream">1</field>
                         </depends>
@@ -258,16 +258,16 @@
                     <comment><![CDATA[Polish the decisions cache settings by selecting the best technology or the cache durations best suited to your use.]]></comment>
                     <field id="technology" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
                         <label>Technology</label>
-                        <source_model>Crowdsec\Bouncer\Model\Config\Source\Cache</source_model>
+                        <source_model>CrowdSec\Bouncer\Model\Config\Source\Cache</source_model>
                         <comment><![CDATA[The File system cache is faster than calling LAPI. Redis or Memcached is faster than the File System cache.]]></comment>
                     </field>
                     <field id="clear_cache"  translate="button_label" sortOrder="200" showInDefault="1">
                         <button_label>Clear cache</button_label>
-                        <frontend_model>Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Clear</frontend_model>
+                        <frontend_model>CrowdSec\Bouncer\Block\Adminhtml\System\Config\Cache\Clear</frontend_model>
                     </field>
                     <field id="prune_cache"  translate="button_label" sortOrder="300" showInDefault="1">
                         <button_label>Prune Filesystem cache</button_label>
-                        <frontend_model>Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Prune</frontend_model>
+                        <frontend_model>CrowdSec\Bouncer\Block\Adminhtml\System\Config\Cache\Prune</frontend_model>
                         <depends>
                             <field id="crowdsec_bouncer/advanced/cache/technology">phpfs</field>
                         </depends>
@@ -316,12 +316,12 @@
                     <comment><![CDATA[Configure some details about remediations.]]></comment>
                     <field id="fallback" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
                         <label>Fallback to</label>
-                        <source_model>Crowdsec\Bouncer\Model\Config\Source\Fallback</source_model>
+                        <source_model>CrowdSec\Bouncer\Model\Config\Source\Fallback</source_model>
                         <comment><![CDATA[Which remediation to apply when CrowdSec advises unhandled remediation.]]></comment>
                     </field>
                     <field id="trust_ip_forward_list" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
                         <label><![CDATA[Trust these CDN IPs<br>(or Load Balancer, HTTP Proxy)]]></label>
-                        <backend_model>Crowdsec\Bouncer\Model\Config\Backend\TrustedForwardedIps</backend_model>
+                        <backend_model>CrowdSec\Bouncer\Model\Config\Backend\TrustedForwardedIps</backend_model>
                         <tooltip><![CDATA[Example: 1.2.3.4/24, 2.3.4.5, 3.4.5.6/27.]]></tooltip>
                         <comment><![CDATA[The <em><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For" target="_blank">X-forwarded-For</a></em> HTTP Header will be trust only when the client IP is in this list.<br><strong>Comma (,)</strong> separated ips or ips ranges.
 <br>Some common CDN IP list: <a href="https://www.cloudflare.com/fr-fr/ips/" target="_blank">Cloudflare</a>, <a href="https://api.fastly.com/public-ip-list" target="_blank">Fastly</a>.]]></comment>

@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -18,23 +18,23 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
  */
 
-namespace Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Cache;
+namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Cache;
 
-use Crowdsec\Bouncer\Controller\Adminhtml\System\Config\Action;
+use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Crowdsec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
-use Crowdsec\Bouncer\Exception\CrowdsecException;
-use Crowdsec\Bouncer\Helper\Data as Helper;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSec\Bouncer\Helper\Data as Helper;
 
 class Refresh extends Action implements HttpPostActionInterface
 {
@@ -96,7 +96,7 @@ class Refresh extends Action implements HttpPostActionInterface
                 $deleted
             );
             $result = 1;
-        } catch (CrowdsecException $e) {
+        } catch (CrowdSecException $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                 'message' => $e->getMessage(),

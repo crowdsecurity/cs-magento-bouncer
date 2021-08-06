@@ -5,11 +5,9 @@
 
 ---------------------------------------------
 
-### Installation methods
+### Installation
 
-There are at least 3 ways to install this extension:
-
--  Use `Composer` by simply adding `crowdsec/magento2-module-bouncer` as a dependency:
+Use `Composer` by simply adding `crowdsec/magento2-module-bouncer` as a dependency:
 
        composer require crowdsec/magento2-module-bouncer 
 
@@ -19,7 +17,7 @@ There are at least 3 ways to install this extension:
 
 After the installment of the module source code, the module has to be enabled by the Magento 2 CLI.
 
-    bin/magento module:enable Crowdsec_Bouncer
+    bin/magento module:enable CrowdSec_Bouncer
 
 #### System Upgrade
 

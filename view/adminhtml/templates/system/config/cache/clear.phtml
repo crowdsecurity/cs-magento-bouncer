@@ -1,14 +1,14 @@
 <?php
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -18,14 +18,14 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
  */
 
-/** @var \Crowdsec\Bouncer\Block\Adminhtml\System\Config\Cache\Clear $block */
+/** @var \CrowdSec\Bouncer\Block\Adminhtml\System\Config\Cache\Clear $block */
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 /**  @var \Magento\Framework\Escaper $escaper */
 ?>
@@ -33,7 +33,7 @@
 <?php
 
  $ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
- $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during Crowdsec Cache clearing.')));
+ $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Cache clearing.')));
 
  $scriptString = <<<script
 require(['prototype'], function(){

@@ -11,5 +11,5 @@ jobs:
           MAGENTO_VERSION: '2.4.2'
           MAGENTO_MARKETPLACE_USERNAME: ${{ secrets.MAGENTO_MARKETPLACE_USERNAME }}
           MAGENTO_MARKETPLACE_PASSWORD: ${{ secrets.MAGENTO_MARKETPLACE_PASSWORD }}
-          MODULE_NAME: Crowdsec_Bouncer
+          MODULE_NAME: CrowdSec_Bouncer
           COMPOSER_NAME: crowdsec/magento2-module-bouncer

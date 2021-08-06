@@ -1,14 +1,14 @@
 <?php
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -18,8 +18,8 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
@@ -27,7 +27,7 @@
 ?>
 
 <?php
-/** @var \Crowdsec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping $block */
+/** @var \CrowdSec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping $block */
 ?>
 <script>
     require(['prototype'], function(){
@@ -45,7 +45,7 @@
                 parameters: params,
                 onSuccess: function(response) {
                     var result =
-                        '<?= $block->escapeJs($block->escapeHtml(__('Error during Crowdsec Connection ping.'))) ?>';
+                        '<?= $block->escapeJs($block->escapeHtml(__('Error during CrowdSec Connection ping.'))) ?>';
                     try {
                         if (response.responseText.isJSON()) {
                             response = response.responseText.evalJSON();

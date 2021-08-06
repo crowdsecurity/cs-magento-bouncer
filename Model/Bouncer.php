@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -18,21 +18,21 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
  */
 
-namespace Crowdsec\Bouncer\Model;
+namespace CrowdSec\Bouncer\Model;
 
-use Crowdsec\Bouncer\Exception\CrowdsecException;
+use CrowdSec\Bouncer\Exception\CrowdSecException;
 use Exception;
 use Magento\Framework\App\Response\Http;
 use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
 use Magento\Framework\App\Request\Http as Request;
-use Crowdsec\Bouncer\Helper\Data as Helper;
+use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSecBouncer\AbstractBounce;
 use CrowdSecBouncer\IBounce;
 use CrowdSecBouncer\Bouncer as BouncerInstance;
@@ -126,7 +126,7 @@ class Bouncer extends AbstractBounce implements IBounce
      * Get the bouncer instance
      * @param array $forcedConfigs
      * @return BouncerInstance
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     public function getBouncerInstance($forcedConfigs = []): BouncerInstance
     {
@@ -150,7 +150,7 @@ class Bouncer extends AbstractBounce implements IBounce
                     $configs['forced_cache_system']
                 );
             } catch (Exception $e) {
-                throw new CrowdsecException(__($e->getMessage()));
+                throw new CrowdSecException(__($e->getMessage()));
             }
 
             try {
@@ -169,7 +169,7 @@ class Bouncer extends AbstractBounce implements IBounce
                     'cache_expiration_for_bad_ip' => $configs['bad_ip_duration'],
                 ]);
             } catch (Exception $e) {
-                throw new CrowdsecException(__($e->getMessage()));
+                throw new CrowdSecException(__($e->getMessage()));
             }
 
             $this->bouncerInstance = $bouncerInstance;
@@ -181,7 +181,7 @@ class Bouncer extends AbstractBounce implements IBounce
     /**
      * Initialize the bouncer instance
      * @param array $forcedConfigs
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     public function init($forcedConfigs = []): BouncerInstance
     {
@@ -298,7 +298,7 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Send HTTP response.
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     public function sendResponse(?string $body, int $statusCode = 200): void
     {
@@ -319,7 +319,7 @@ class Bouncer extends AbstractBounce implements IBounce
                 $this->response->setHeader('cache-control', $noCacheControl);
                 break;
             default:
-                throw new CrowdsecException(__("Unhandled code $statusCode"));
+                throw new CrowdSecException(__("Unhandled code $statusCode"));
         }
         if (null !== $body) {
             $this->setRemediationDisplay(true);

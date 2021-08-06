@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Crowdsec\Bouncer\Cron;
+namespace CrowdSec\Bouncer\Cron;
 
-use Crowdsec\Bouncer\Exception\CrowdsecException;
-use Crowdsec\Bouncer\Helper\Data as Helper;
-use Crowdsec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSec\Bouncer\Helper\Data as Helper;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 
 class RefreshCache
 {
@@ -34,7 +34,7 @@ class RefreshCache
             try {
                 $bouncer = $this->registryBouncer->create();
                 $bouncer->init()->refreshBlocklistCache();
-            } catch (CrowdsecException $e) {
+            } catch (CrowdSecException $e) {
                 $this->helper->error('', [
                     'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                     'message' => $e->getMessage(),

@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -18,13 +18,13 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
  */
-namespace Crowdsec\Bouncer\Controller\Adminhtml\System\Config;
+namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config;
 
 use Magento\Backend\App\Action as BackendAction;
 
@@ -35,5 +35,5 @@ abstract class Action extends BackendAction
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = 'Crowdsec_Bouncer::manage_config_actions';
+    const ADMIN_RESOURCE = 'CrowdSec_Bouncer::manage_config_actions';
 }

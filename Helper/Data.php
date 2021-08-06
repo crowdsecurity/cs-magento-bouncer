@@ -1,14 +1,14 @@
 <?php declare(strict_types=1);
 /**
- * Crowdsec_Bouncer Extension
+ * CrowdSec_Bouncer Extension
  *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the MIT LICENSE
  * that is bundled with this package in the file LICENSE
  *
- * @category   Crowdsec
- * @package    Crowdsec_Bouncer
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
  * @copyright  Copyright (c)  2021+ CrowdSec
  * @author     CrowdSec team
  * @see        https://crowdsec.net CrowdSec Official Website
@@ -18,23 +18,23 @@
 
 /**
  *
- * @category Crowdsec
- * @package  Crowdsec_Bouncer
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
  * @module   Bouncer
  * @author   CrowdSec team
  *
  */
 
-namespace Crowdsec\Bouncer\Helper;
+namespace CrowdSec\Bouncer\Helper;
 
-use Crowdsec\Bouncer\Constants;
-use Crowdsec\Bouncer\Exception\CrowdsecException;
+use CrowdSec\Bouncer\Constants;
+use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSecBouncer\RestClient;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\Area;
 use Magento\Store\Model\ScopeInterface;
-use Crowdsec\Bouncer\Logger\Logger;
-use Crowdsec\Bouncer\Logger\Handlers\DebugFactory as DebugHandler;
+use CrowdSec\Bouncer\Logger\Logger;
+use CrowdSec\Bouncer\Logger\Handlers\DebugFactory as DebugHandler;
 use Magento\Framework\Serialize\Serializer\Json;
 
 class Data extends Config
@@ -261,7 +261,7 @@ class Data extends Config
     /**
      * Generate a config array in order to instantiate a bouncer
      * @return array
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      */
     public function getBouncerConfigs(): array
     {
@@ -278,7 +278,7 @@ class Data extends Config
                     $maxRemediationLevel = Constants::REMEDIATION_BAN;
                     break;
                 default:
-                    throw new CrowdsecException(__("Unknown $bouncingLevel"));
+                    throw new CrowdSecException(__("Unknown $bouncingLevel"));
             }
 
             $this->_bouncerConfigs = [
@@ -306,14 +306,14 @@ class Data extends Config
     /**
      * @param string $expr
      *
-     * @throws CrowdsecException
+     * @throws CrowdSecException
      * @see \Magento\Cron\Model\Schedule::setCronExpr
      */
     public function validateCronExpr(string $expr)
     {
         $e = preg_split('#\s+#', $expr, -1, PREG_SPLIT_NO_EMPTY);
         if (count($e) < 5 || count($e) > 6) {
-            throw new CrowdsecException(__('Invalid cron expression: %1', $expr));
+            throw new CrowdSecException(__('Invalid cron expression: %1', $expr));
         }
     }
 
