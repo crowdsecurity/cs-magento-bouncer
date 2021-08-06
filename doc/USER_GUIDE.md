@@ -14,6 +14,9 @@
 - [Usage](#usage)
   - [Features](#features)
   - [Configurations](#configurations)
+    - [General Settings](#general-settings)
+    - [Theme customizations](#theme-customizations)
+    - [Advanced settings](#advanced-settings)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

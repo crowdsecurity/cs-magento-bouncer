@@ -5,8 +5,18 @@
 
 ---------------------------------------------
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+- [Installation](#installation)
+- [Post Installation](#post-installation)
+  - [Enable the module](#enable-the-module)
+  - [System Upgrade](#system-upgrade)
+  - [Clear Cache](#clear-cache)
+  - [Deploy static content](#deploy-static-content)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ### Installation
 
