@@ -1,0 +1,139 @@
+name: CrowdSec Bouncer tests suite
+on: [ push, pull_request ]
+
+jobs:
+  magento2-tests-suite:
+    strategy:
+      matrix:
+        m2-version: [ 2.3.0, 2.4.3 ]
+        php-version: [7.2, 7.3, 7.4]
+        exclude:
+          - { php-version: 7.4, m2-version: 2.3.0}
+          - { php-version: 7.3, m2-version: 2.3.0}
+          - { php-version: 7.2, m2-version: 2.4.3}
+          # Remove after debug
+          - { php-version: 7.2, m2-version: 2.3.0}
+          - { php-version: 7.3, m2-version: 2.4.3}
+
+    name: Magento 2 tests suite
+    runs-on: ubuntu-18.04
+    env:
+      EXTENSION_NAME: "CrowdSec_Bouncer"
+      EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"
+
+    steps:
+
+      - name: Configure sysctl limits (for Elasticsearch)
+        run: |
+          sudo swapoff -a
+          sudo sysctl -w vm.swappiness=1
+          sudo sysctl -w fs.file-max=262144
+          sudo sysctl -w vm.max_map_count=262144
+
+      - name: Clone DDEV files
+        uses: actions/checkout@v2
+        with:
+          path: .ddev
+          repository: julienloizelet/ddev-m2
+
+      - name: Install DDEV
+        uses: julienloizelet/github-action-setup-ddev@master
+        with:
+          autostart: false
+
+      - name: Set M2_VERSION_CODE env
+        run: |
+           # 2.4.2 => m242
+           echo "M2_VERSION_CODE=$(echo m${{ matrix.m2-version }} | sed 's/\.//g' )" >> $GITHUB_ENV
+
+      - name: Remove ELASTIC_INSTALL_STRING env for 2.3
+        if: ${{ matrix.m2-version == '2.3.0' }}
+        run: echo "ELASTIC_INSTALL_STRING=''" >> $GITHUB_ENV
+
+      - name: Add ELASTIC_INSTALL_STRING env for 2.4
+        if: ${{ matrix.m2-version != '2.3.0' }}
+        run: echo "ELASTIC_INSTALL_STRING='--elasticsearch-host=elasticsearch'" >> $GITHUB_ENV
+
+      - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
+        run: |
+          cp .ddev/config-overrides/config.${{ env.M2_VERSION_CODE }}.yaml .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
+          sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
+          ddev start
+          ddev composer config --global http-basic.repo.magento.com ${{ secrets.MAGENTO_MARKETPLACE_USERNAME }} ${{ secrets.MAGENTO_MARKETPLACE_PASSWORD }}
+          # Do not use "ddev composer create" as it creates bad files and restart all
+          ddev exec composer create --repository=https://repo.magento.com/ magento/project-community-edition ${{ env.M2_VERSION_CODE }} ${{ matrix.m2-version }}
+          cp -r ${{ env.M2_VERSION_CODE }}/. ./
+          rm -rf ${{ env.M2_VERSION_CODE }}
+
+      - name: Setup Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
+        run: |
+          ddev magento setup:install \
+                           --base-url=https://${{ env.M2_VERSION_CODE }}.ddev.site \
+                           --db-host=db \
+                           --db-name=db \
+                           --db-user=db \
+                           --db-password=db \
+                           --backend-frontname=admin \
+                           --admin-firstname=admin \
+                           --admin-lastname=admin \
+                           --admin-email=admin@admin.com \
+                           --admin-user=admin \
+                           --admin-password=admin123 \
+                           --language=en_US \
+                           --currency=USD \
+                           --timezone=America/Chicago \
+                           --use-rewrites=1 \
+                           ${{ env.ELASTIC_INSTALL_STRING }}
+
+      - name: Clone M2 Crowdsec Bouncer files
+        uses: actions/checkout@v2
+        with:
+          path: my-own-modules/crowdsec-bouncer
+
+      - name: Clone CrowdSec PHP Lib files
+        uses: actions/checkout@v2
+        with:
+          path: my-own-modules/crowdsec-php-lib
+          repository: julienloizelet/php-cs-bouncer
+          ref: 0.14.0.2
+
+      - name: Add CrowdSec Bouncer as composer dependency
+        run: |
+          ddev composer config --global http-basic.repo.magento.com ${{ secrets.MAGENTO_MARKETPLACE_USERNAME }} ${{ secrets.MAGENTO_MARKETPLACE_PASSWORD }}
+          ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
+          ddev composer config repositories.crowdsec-lib path my-own-modules/crowdsec-php-lib/
+          ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
+
+      - name: Add Coding Standard for Magento 2.3
+        if: ${{ matrix.m2-version == '2.3.0' }}
+        run: |
+          ddev composer require squizlabs/php_codesniffer:^3.4
+          ddev composer require magento/magento-coding-standard
+          ddev exec vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/
+
+      - name: PHP CODE SNIFFER
+        run: |
+          ddev phpcs vendor/${{ env.EXTENSION_PACKAGE_NAME }}
+
+      - name: Add PhpStan for Magento 2.3
+        if: ${{ matrix.m2-version == '2.3.0' }}
+        run: |
+           ddev composer require --dev phpstan/phpstan
+           ddev composer require --dev bitexpert/phpstan-magento
+           mkdir dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan
+           cp .ddev/custom_files/phpstan.neon dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon
+
+      - name: PHP MESS DETECTOR
+        run: |
+          ddev phpmd vendor/${{ env.EXTENSION_PACKAGE_NAME }}
+
+      - name: PHPSTAN
+        run: |
+          ddev phpstan vendor/${{ env.EXTENSION_PACKAGE_NAME }}
+
+      - name: PHP UNIT
+        run: |
+          ddev phpunit vendor/${{ env.EXTENSION_PACKAGE_NAME }}/Test/Unit
+
+
+

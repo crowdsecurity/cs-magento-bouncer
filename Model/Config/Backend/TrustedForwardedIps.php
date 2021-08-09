@@ -120,10 +120,7 @@ class TrustedForwardedIps extends Value
             try {
                 $this->configWriter->save(
                     Config::TRUSTED_FORWARD_IPS_PATH,
-                    $this->serializer->serialize(($comparableIpBoundsList)),
-                    $this->getScope() ?:
-                        ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
-                    $this->getScopeCode()
+                    $this->serializer->serialize(($comparableIpBoundsList))
                 );
             } catch (Exception $e) {
                 $this->_logger->error($e->getMessage());

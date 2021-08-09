@@ -27,8 +27,9 @@
 namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config;
 
 use Magento\Backend\App\Action as BackendAction;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 
-abstract class Action extends BackendAction
+abstract class Action extends BackendAction implements HttpPostActionInterface
 {
     /**
      * Authorization level of a basic admin session
