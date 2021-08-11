@@ -31,7 +31,7 @@
         <section id="crowdsec_bouncer" translate="label,comment,tooltip" type="text" sortOrder="520" showInDefault="1"
                  showInWebsite="1" showInStore="1">
             <tab>security</tab>
-            <resource>Crowsec_Bouncer::config</resource>
+            <resource>CrowdSec_Bouncer::config</resource>
             <class>separator-top</class>
             <label>CrowdSec Bouncer</label>
             <!-- General -->
@@ -218,7 +218,7 @@
                     <label><![CDATA[Communication mode to the API]]></label>
                     <attribute type="expanded">1</attribute>
                     <field id="stream" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
-                        <label>Enable the "Stream" Mode</label>
+                        <label>Enable the stream mode</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment><![CDATA[With the stream mode, every decision is retrieved in an asynchronous way. 3 advantages: <br>&nbsp;1) Invisible latency when loading pages<br>&nbsp;2) The IP verifications works even if your CrowdSec is not reachable.<br>&nbsp;3) The API can never be overloaded by the Magento traffic]]></comment>
                         <tooltip><![CDATA[Note: This method has one limit: all the decisions updates since the previous refresh will not be taken in account until the next refresh.]]></tooltip>

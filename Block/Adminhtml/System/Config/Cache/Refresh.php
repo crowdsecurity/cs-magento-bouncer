@@ -47,9 +47,10 @@ class Refresh extends Button
     protected function _getElementHtml(AbstractElement $element): string
     {
         $originalData = $element->getOriginalData();
+        $oldCacheSystem = $this->helper->getCacheTechnology();
         $cacheOptions = $this->helper->getCacheSystemOptions();
-        $fsCacheLabel = $cacheOptions[Constants::CACHE_SYSTEM_PHPFS] ?? __('Unknown');
-        $buttonLabel = $fsCacheLabel ? __('Refresh CrowdSec %1 cache', $fsCacheLabel) : $originalData['button_label'];
+        $oldCacheLabel = $cacheOptions[$oldCacheSystem] ?? __('Unknown');
+        $buttonLabel = $oldCacheLabel ? __('Refresh CrowdSec %1 cache', $oldCacheLabel) : $originalData['button_label'];
         $this->addData(
             [
                 'button_label' => $buttonLabel,

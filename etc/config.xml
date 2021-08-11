@@ -69,8 +69,8 @@
                 </remediation>
                 <cache>
                     <technology>phpfs</technology>
-                    <clean_ip_cache_duration>1</clean_ip_cache_duration>
-                    <bad_ip_cache_duration>1</bad_ip_cache_duration>
+                    <clean_ip_cache_duration>60</clean_ip_cache_duration>
+                    <bad_ip_cache_duration>120</bad_ip_cache_duration>
                 </cache>
             </advanced>
         </crowdsec_bouncer>
