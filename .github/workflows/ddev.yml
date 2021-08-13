@@ -12,8 +12,9 @@ jobs:
           - { php-version: 7.3, m2-version: 2.3.0}
           - { php-version: 7.2, m2-version: 2.4.3}
           # Remove after debug
-          # - { php-version: 7.2, m2-version: 2.3.0}
-          # - { php-version: 7.3, m2-version: 2.4.3}
+          # { php-version: 7.2, m2-version: 2.3.0}
+          - { php-version: 7.3, m2-version: 2.4.3}
+          - { php-version: 7.4, m2-version: 2.4.3}
 
     name: Magento 2 tests suite
     runs-on: ubuntu-18.04
@@ -22,8 +23,8 @@ jobs:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"
 
     steps:
-
       - name: Configure sysctl limits (for Elasticsearch)
+        # @see https://github.com/elastic/elastic-github-actions/tree/master/elasticsearch#usage
         run: |
           sudo swapoff -a
           sudo sysctl -w vm.swappiness=1
@@ -109,29 +110,22 @@ jobs:
 
       - name: Add CrowdSec Bouncer as composer dependency
         run: |
-          ddev composer config --global http-basic.repo.magento.com ${{ secrets.MAGENTO_MARKETPLACE_USERNAME }} ${{ secrets.MAGENTO_MARKETPLACE_PASSWORD }}
           ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
           ddev composer config repositories.crowdsec-lib path my-own-modules/crowdsec-php-lib/
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
-      - name: Add Coding Standard for Magento 2.3
+      - name: Add Coding Standard and PHPStan for Magento 2.3
         if: ${{ matrix.m2-version == '2.3.0' }}
         run: |
-          ddev composer require squizlabs/php_codesniffer:^3.4
-          ddev composer require magento/magento-coding-standard
+          ddev composer require squizlabs/php_codesniffer:^3.4 magento/magento-coding-standard
           ddev exec vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/
+          ddev composer require --dev phpstan/phpstan bitexpert/phpstan-magento
+          mkdir dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan
+          cp .ddev/custom_files/phpstan.neon dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon
 
       - name: PHP CODE SNIFFER
         run: |
           ddev phpcs vendor/${{ env.EXTENSION_PACKAGE_NAME }}
-
-      - name: Add PhpStan for Magento 2.3
-        if: ${{ matrix.m2-version == '2.3.0' }}
-        run: |
-           ddev composer require --dev phpstan/phpstan
-           ddev composer require --dev bitexpert/phpstan-magento
-           mkdir dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan
-           cp .ddev/custom_files/phpstan.neon dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon
 
       - name: PHP MESS DETECTOR
         run: |
