@@ -23,12 +23,12 @@
 
 ## Description
 
-The `CrowdSec Bouncer` extension for Magento 2 has been designed to protect Magento 2 websites from all kinds of 
-attacks by using [CrowdSec](https://crowdsec.net/) technology.
+The `CrowdSec Bouncer` extension for Magento 2 has been designed to protect Magento 2 websites from all kinds of attacks by using [CrowdSec](https://crowdsec.net/) technology.
 
 ## Prerequisites
 
-To be able to use this blocker, the first step is to install [CrowdSec v1](https://doc.crowdsec.net/Crowdsec/v1/getting_started/installation/).
+To be able to use this bouncer, the first step is to install [CrowdSec v1](https://doc.crowdsec.
+net/Crowdsec/v1/getting_started/installation/).
 
 Please note that first and foremost CrowdSec must be installed on a server that is accessible via the Magento 2 site.
 
@@ -198,8 +198,7 @@ Only if you choose Memcached cache as technology. Example of DSN: memcached://lo
 
 The duration between re-asking LAPI about an already checked clean IP.
 
-Minimum 1 second.  Note that this setting 
-can not be apply in stream mode.
+Minimum 1 second.  Note that this setting can not be apply in stream mode.
 
 ***
 
@@ -207,8 +206,7 @@ can not be apply in stream mode.
 
 The duration between re-asking LAPI about an already checked bad IP.
 
-Minimum 1 second.  Note that this setting
-can not be apply in stream mode.
+Minimum 1 second.  Note that this setting can not be apply in stream mode.
 
 ***
 
