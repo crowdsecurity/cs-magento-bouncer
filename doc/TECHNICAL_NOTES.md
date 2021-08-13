@@ -8,10 +8,8 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
-- [Magento 2 Plugin usage](#magento-2-plugin-usage)
-- [Varnish limitation](#varnish-limitation)
-- [Coding Standards](#coding-standards)
-- [Local development](#local-development)
+- [Full Page Cache](#full-page-cache)
+- [Varnish](#varnish)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
