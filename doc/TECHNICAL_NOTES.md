@@ -15,15 +15,30 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## Magento 2 Plugin usage
+## Full Page Cache
 
-## Varnish limitation
+In Magento 2, the full page cache is implemented via a plugin on the front controller (`vendor/magento/module-page-cache/Model/App/FrontController/BuiltinPlugin.php::aroundDispatch`). 
 
+As we want to 
+check IPs before this FPC process, we use also an `aroundDispatch` plugin, and we adjust the `sortOrder` so that 
+the 
+CrowdSec_Bouncer plugin is called before the FPC plugin: 
 
-## Coding Standards
+* In `vendor/crowdsec/magento2-module-bouncer/etc/frontend/di.xml` we change the `sortOrder` of the Magento FPC plugin.
+* In `vendor/crowdsec/magento2-module-bouncer/etc/di.xml` we declare our plugin with a lower `sortOrder`.
 
-This extension has been checked with the [Magento Extension Quality Program Coding Standard](https://github.com/magento/magento-coding-standard).
+Note that our plugin acts on every Magento areas while the FPC plugin is just active on the frontend area.
 
+## Varnish
 
-## Local development
+This extension works with a Varnish cached Magento 2 instance but, as the cached content of page are delivered by 
+Varnish itself, we adopt the following strategy : 
+
+* If the first visit of a non cached page comes from a bad IP, we display the captcha or ban wall, but we do not add 
+  this 
+  content to the cache. See `vendor/crowdsec/magento2-module-bouncer/Model/Bouncer.php::sendResponse`.
+
+* If the first visit of a non cached page comes from a clean IP, we let it pass, so Magento will cache the content 
+  as usual. As a result, if a bad IP user visits this page after the clean IP one, he will see the cached content.
+
 

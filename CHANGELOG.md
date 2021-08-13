@@ -7,9 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 - Standalone mode using php auto_prepend_file
-- Additional Magento CLI command for CrowdSec Bouncer
-- Cron task to prune File system cache 
-- Other language localization
+- Cron task to prune File system cache
 
 ## [1.0.0] - 2021-??-??
 

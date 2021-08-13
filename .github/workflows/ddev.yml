@@ -12,8 +12,8 @@ jobs:
           - { php-version: 7.3, m2-version: 2.3.0}
           - { php-version: 7.2, m2-version: 2.4.3}
           # Remove after debug
-          - { php-version: 7.2, m2-version: 2.3.0}
-          - { php-version: 7.3, m2-version: 2.4.3}
+          # - { php-version: 7.2, m2-version: 2.3.0}
+          # - { php-version: 7.3, m2-version: 2.4.3}
 
     name: Magento 2 tests suite
     runs-on: ubuntu-18.04
