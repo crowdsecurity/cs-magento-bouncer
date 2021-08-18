@@ -17,6 +17,7 @@
   - [Extension quality](#extension-quality)
   - [Cron](#cron)
 - [Commit message](#commit-message)
+  - [Allowed <type> values](#allowed-type-values)
 - [Release process](#release-process)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
