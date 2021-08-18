@@ -12,9 +12,9 @@ jobs:
           - { php-version: 7.3, m2-version: 2.3.0}
           - { php-version: 7.2, m2-version: 2.4.3}
           # Remove after debug
-          # { php-version: 7.2, m2-version: 2.3.0}
+          - { php-version: 7.2, m2-version: 2.3.0}
           - { php-version: 7.3, m2-version: 2.4.3}
-          - { php-version: 7.4, m2-version: 2.4.3}
+          # - { php-version: 7.4, m2-version: 2.4.3}
 
     name: Magento 2 tests suite
     runs-on: ubuntu-18.04
@@ -54,11 +54,11 @@ jobs:
            echo "M2_VERSION_CODE=$(echo m${{ matrix.m2-version }} | sed 's/\.//g' )" >> $GITHUB_ENV
 
       - name: Set ELASTIC_INSTALL_STRING env for 2.3
-        if: ${{ matrix.m2-version == '2.3.0' }}
+        if: startsWith(matrix.m2-version, '2.3')
         run: echo "ELASTIC_INSTALL_STRING=''" >> $GITHUB_ENV
 
       - name: Set ELASTIC_INSTALL_STRING env for 2.4
-        if: ${{ matrix.m2-version != '2.3.0' }}
+        if: startsWith(matrix.m2-version, '2.4')
         run: echo "ELASTIC_INSTALL_STRING='--elasticsearch-host=elasticsearch'" >> $GITHUB_ENV
 
       - name: Start DDEV for ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
@@ -115,7 +115,7 @@ jobs:
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
       - name: Add Coding Standard and PHPStan for Magento 2.3
-        if: ${{ matrix.m2-version == '2.3.0' }}
+        if: startsWith(matrix.m2-version, '2.3')
         run: |
           ddev composer require squizlabs/php_codesniffer:^3.4 magento/magento-coding-standard
           ddev exec vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/

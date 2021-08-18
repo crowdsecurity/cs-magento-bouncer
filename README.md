@@ -13,9 +13,13 @@ See [User Guide](doc/USER_GUIDE.md)
 See [Installation Guide](doc/INSTALLATION_GUIDE.md)
 
 
-## Technical Notes
+## Technical notes
 
 See [Technical notes](doc/TECHNICAL_NOTES.md)
+
+## Developer guide
+
+See [Developer guide](doc/DEVELOPER.md)
 
 
 ## License

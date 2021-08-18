@@ -1,0 +1,115 @@
+name: Prepare Release
+# example: gh workflow run release.yml -f tag_name=v1.1.4 -f draft=false
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        default: ""
+      draft:
+        default: true
+      prerelease:
+        default: false
+
+jobs:
+  prepare-release:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    env:
+      EXTENSION_ZIP_NAME: "crowdsec-magento2-module-bouncer"
+    steps:
+      - name: Check naming convention
+        run: |
+          VERIF=$(echo ${{ github.event.inputs.tag_name }} | grep -E "^v([0-9]{1,}\.)([0-9]{1,}\.)([0-9]{1,})$")
+          if [ ! ${VERIF} ]
+          then
+            echo "Tag name '${{ github.event.inputs.tag_name }}' does not comply with naming convention vX.Y.Z"
+            exit 1
+          fi
+
+      - name: Set version number without v
+        run: |
+          echo "VERSION_NUMBER=$(echo ${{ github.event.inputs.tag_name }} | sed 's/v//g' )" >> $GITHUB_ENV
+
+      - name: Set version sources
+        run: |
+          echo "VERSION_SOURCES=$(echo ${{ env.EXTENSION_ZIP_NAME }}-${{ env.VERSION_NUMBER }} )" >> $GITHUB_ENV
+
+      - name: Clone sources
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.VERSION_SOURCES }}
+
+      - name: Check version ${{ env.VERSION_NUMBER }} consistency in files
+        # Check composer.json, Constants.php and CHANGELOG.md
+        run: |
+          cd ${{ env.VERSION_SOURCES }}
+          COMPOSER_VERSION=$(grep -E '\"version\": \"(.*)\",'  composer.json | sed 's/ //g')
+          if [[ $COMPOSER_VERSION == "\"version\":\"${{ env.VERSION_NUMBER }}\"," ]]
+          then
+              echo "COMPOSER VERSION OK"
+          else
+              echo "COMPOSER VERSION KO"
+              exit 1
+          fi
+          CONSTANT_VERSION=$(grep -E "public const VERSION = 'v(.*)';"  Constants.php | sed 's/ //g')
+          if [[ $CONSTANT_VERSION == "publicconstVERSION='v${{ env.VERSION_NUMBER }}';" ]]
+          then
+              echo "CONSTANT VERSION OK"
+          else
+              echo "CONSTANT VERSION KO"
+              exit 1
+          fi
+
+          CURRENT_DATE=$(date +'%Y-%m-%d')
+          CHANGELOG_VERSION=$(grep -E "## \[(.*)\] - $CURRENT_DATE"  CHANGELOG.md | sed 's/ //g')
+          if [[ $CHANGELOG_VERSION == "##[${{ env.VERSION_NUMBER }}]-$CURRENT_DATE" ]]
+          then
+              echo "CHANGELOG VERSION OK"
+          else
+              echo "CHANGELOG VERSION KO"
+              exit 1
+          fi
+
+      - name: Create zip
+        run: |
+          zip -r ${{ env.VERSION_SOURCES }}.zip ${{ env.VERSION_SOURCES }}/ -x '${{ env.VERSION_SOURCES }}/.git*'
+
+
+      - name: Clone zip validator
+        uses: actions/checkout@v2
+        with:
+          repository: julienloizelet/m2-extension-zip-validator
+          path: zip-validator
+
+      - name: Validate zip ${{ env.VERSION_SOURCES }}.zip
+        run: |
+          chmod +x zip-validator/validate_m2_package.php
+          php zip-validator/validate_m2_package.php  ${{ env.VERSION_SOURCES }}.zip
+
+      - name: Create Tag ${{ github.event.inputs.tag_name }}
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{ github.event.inputs.tag_name }}",
+              sha: context.sha
+            })
+
+      - name: Prepare release notes
+        run: |
+          VERSION_RELEASE_NOTES=$(awk -v ver="[${{ env.VERSION_NUMBER }}]" '/^## / { if (p) { exit }; if ($2 == ver) { p=1; next} } p && NF' ${{ env.VERSION_SOURCES }}/CHANGELOG.md)
+          echo "$VERSION_RELEASE_NOTES" >> CHANGELOG.txt
+
+
+      - name: Create release ${{ env.VERSION_NUMBER }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.VERSION_SOURCES }}.zip
+          body_path: CHANGELOG.txt
+          name: ${{ env.VERSION_NUMBER }}
+          tag_name: ${{ github.event.inputs.tag_name }}
+          draft: ${{ github.event.inputs.draft }}
+          prerelease: ${{ github.event.inputs.prerelease }}
