@@ -126,7 +126,7 @@ a new terminal:
 ## Commit message
 
 In order to have an explicit commit history, we are using some commits message convention. 
-See [conventionalcommits.org](https://www.conventionalcommits.org) for more information.
+See [here](https://karma-runner.github.io/6.3/dev/git-commit-msg.html) for more information.
 
 You can use the `commit-msg` git hook that you will find in the `.githooks` folder : 
 
@@ -135,8 +135,17 @@ cp .githooks/commit-msg .git/hooks/commit-msg
 chmod +x .git/hooks/commit-msg
 ```
 
-This will ensure that your commit message complies with our convention.
+### Allowed <type> values
 
+- chore (automatic tasks; no production code change)
+- ci (updating continuous integration process; no production code change)
+- comment (commenting;no production code change)
+- docs (changes to the documentation)
+- feat (new feature for the user)
+- fix (bug fix for the user)
+- refactor (refactoring production code)
+- style (formatting; no production code change)
+- test (adding missing tests, refactoring tests; no production code change)
 
 ## Release process
 

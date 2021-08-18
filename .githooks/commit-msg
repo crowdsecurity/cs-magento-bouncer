@@ -14,10 +14,10 @@ if echo "$commitTitle" | grep -qE "^Merge branch"; then
 fi
 
 # check commit message
-REGEX='^(feat|fix|docs|style|refactor|perf|test|chore)\(.*\)\:.*'
+REGEX='^(feat|fix|docs|style|refactor|ci|test|chore|comment)\(.*\)\:.*'
 if ! echo "$commitTitle" | grep -qE ${REGEX}; then
-	echo "Your commit title did not follow semantic versioning: $commitTitle"
+	echo "Your commit title '$commitTitle' did not follow conventional commit message rules:"
 	echo "Please comply with the regex ${REGEX}"
-	echo "See https://www.conventionalcommits.org/ for more information on conventional commits"
+	echo "See https://karma-runner.github.io/6.3/dev/git-commit-msg.html for more information on conventional commits"
 	exit 1
 fi
