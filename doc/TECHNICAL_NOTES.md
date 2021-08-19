@@ -13,6 +13,11 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## CrowdSec Bouncer PHP Library
+
+This extension is mainly based on the CrowdSec Bouncer PHP library. It is an open source library whose code you can find
+[here](https://github.com/crowdsecurity/php-cs-bouncer).
+
 ## Full Page Cache
 
 In Magento 2, the full page cache is implemented via a plugin on the front controller (`vendor/magento/module-page-cache/Model/App/FrontController/BuiltinPlugin.php::aroundDispatch`). 
