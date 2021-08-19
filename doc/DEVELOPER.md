@@ -16,8 +16,9 @@
   - [CrowdSec Bouncer extension installation](#crowdsec-bouncer-extension-installation)
   - [Extension quality](#extension-quality)
   - [Cron](#cron)
+  - [CrowdSec CSCLI command](#crowdsec-cscli-command)
 - [Commit message](#commit-message)
-  - [Allowed <type> values](#allowed-type-values)
+  - [Allowed message `type` values](#allowed-message-type-values)
 - [Release process](#release-process)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
