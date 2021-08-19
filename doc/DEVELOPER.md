@@ -45,7 +45,7 @@ distribution, this should be as simple as
 
 ### Prepare DDEV Magento 2 environment
 
-- Create an empty folder that will contains all necessary sources (Magento 2 and this extension):
+- Create an empty folder that will contain all necessary sources (Magento 2 and this extension):
 
          
     mkdir m2-sources
@@ -59,6 +59,7 @@ distribution, this should be as simple as
 
       
     cp .ddev/config_overrides/config.m243.yaml .ddev/config.m243.yaml
+    cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
 
 - Launch DDEV
 
@@ -94,8 +95,6 @@ You will need your Magento 2 credentials to install the source code.
                            --use-rewrites=1 \
                            --elasticsearch-host=elasticsearch
 
-This should take ages.
-
 ### CrowdSec Bouncer extension installation
 
      mkdir m2-sources/my-own-modules
@@ -124,6 +123,15 @@ a new terminal:
 
      ddev cron
 
+### CrowdSec CSCLI command
+
+You can run every CSCLI command by prefixing it with `ddev exec -s crowdsec`. For example:
+
+
+    ddev exec -s crowdsec cscli decisions add --ip 172.21.0.12 --duration 4h --type ban
+
+    ddev exec -s crowdsec cscli bouncers add magento2-bouncer
+
 ## Commit message
 
 In order to have an explicit commit history, we are using some commits message convention. 
@@ -136,7 +144,7 @@ cp .githooks/commit-msg .git/hooks/commit-msg
 chmod +x .git/hooks/commit-msg
 ```
 
-### Allowed <type> values
+### Allowed message `type` values
 
 - chore (automatic tasks; no production code change)
 - ci (updating continuous integration process; no production code change)
@@ -163,6 +171,8 @@ Then, using the [Github CLI](https://github.com/cli/cli), you can:
 - create a draft release: `gh workflow run release.yml -f tag_name=vx.y.z`
 - create a prerelease:  `gh workflow run release.yml -f tag_name=vx.y.z   -f prerelease=true -f draft=false`
 - publish a release: `gh workflow run release.yml -f tag_name=vx.y.z  -f draft=false`
+
+Note that the Github action will fail if the tag `tag_name` already exits.
 
 At the end of the Github action process, you will find a `crowdsec-magento2-module-bouncer-x.y.z.zip` file in the 
 Github release assets.
