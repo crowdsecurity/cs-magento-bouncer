@@ -47,26 +47,24 @@ distribution, this should be as simple as
 ### Prepare DDEV Magento 2 environment
 
 - Create an empty folder that will contain all necessary sources (Magento 2 and this extension):
-
-         
-    mkdir m2-sources
-
+``` 
+mkdir m2-sources
+```
 - Create an empty `.ddev` folder for DDEV and clone our pre-configured DDEV repo:
-
-       
-    mkdir m2-sources/.ddev && cd m2-sources/.ddev && git clone git@github.com:julienloizelet/ddev-m2.git ./
-
+```
+mkdir m2-sources/.ddev && cd m2-sources/.ddev && git clone git@github.com:julienloizelet/ddev-m2.git ./
+```
 - Copy some configurations file:
 
-      
-    cp .ddev/config_overrides/config.m243.yaml .ddev/config.m243.yaml
-    cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
+```      
+cp .ddev/config_overrides/config.m243.yaml .ddev/config.m243.yaml
+cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
+```
 
 - Launch DDEV
-
-
-    cd .ddev && ddev start
-
+```
+cd .ddev && ddev start`
+```
  This should take some times on the first launch as this will download all necessary docker images.
 
 
