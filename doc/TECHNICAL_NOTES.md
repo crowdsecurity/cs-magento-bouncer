@@ -8,6 +8,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**
 
+- [CrowdSec Bouncer PHP Library](#crowdsec-bouncer-php-library)
 - [Full Page Cache](#full-page-cache)
 - [Varnish](#varnish)
 
