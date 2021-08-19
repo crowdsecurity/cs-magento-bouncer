@@ -41,11 +41,11 @@ When a user is suspected to be malevolent, CrowdSec will either send him/her a C
 
 By default, the ban wall is displayed as below:
 
-![Ban wall](/home/julien/workspace/magento2/243/my-own-modules/crowdsec-bouncer/doc/images/screenshots/front-ban.jpg) 
+![Ban wall](images/screenshots/front-ban.jpg)
 
 By default, the captcha wall is displayed as below:
 
-![Captcha wall](/home/julien/workspace/magento2/243/my-own-modules/crowdsec-bouncer/doc/images/screenshots/front-captcha.jpg) 
+![Captcha wall](images/screenshots/front-captcha.jpg)
 
 Please note that it is possible to customize all the colors of these pages in a few clicks so that they integrate best with your design. 
 
