@@ -167,9 +167,9 @@ Before publishing a new release, there are some manual steps to take:
 
 
 Then, using the [Github CLI](https://github.com/cli/cli), you can: 
-- create a draft release: `gh workflow run release.yml -f tag_name=vx.y.z`
-- create a prerelease:  `gh workflow run release.yml -f tag_name=vx.y.z   -f prerelease=true -f draft=false`
-- publish a release: `gh workflow run release.yml -f tag_name=vx.y.z  -f draft=false`
+- create a draft release: `gh workflow run release.yml -f tag_name=vx.y.z -f draft=true`
+- publish a prerelease:  `gh workflow run release.yml -f tag_name=vx.y.z -f prerelease=true`
+- publish a release: `gh workflow run release.yml -f tag_name=vx.y.z`
 
 Note that the Github action will fail if the tag `tag_name` already exits.
 
