@@ -9,11 +9,12 @@
 **Table of Contents**
 
 - [Local development](#local-development)
-  - [DDEV installation](#ddev-installation)
-  - [Prepare DDEV Magento 2 environment](#prepare-ddev-magento-2-environment)
-  - [Magento 2 installation](#magento-2-installation)
-  - [Set up Magento 2](#set-up-magento-2)
-  - [CrowdSec Bouncer extension installation](#crowdsec-bouncer-extension-installation)
+  - [DDEV-Local setup](#ddev-local-setup)
+    - [DDEV installation](#ddev-installation)
+    - [DDEV Magento 2 environment](#ddev-magento-2-environment)
+    - [Magento 2 installation](#magento-2-installation)
+    - [Set up Magento 2](#set-up-magento-2)
+    - [CrowdSec Bouncer extension installation](#crowdsec-bouncer-extension-installation)
   - [Extension quality](#extension-quality)
   - [Cron](#cron)
   - [CrowdSec CSCLI command](#crowdsec-cscli-command)
@@ -30,12 +31,14 @@
 There are many ways to install this extension on a local Magento 2 environment.
 
 
+### DDEV-Local setup
+
 For a quick start, you can use [DDEV-Local](https://ddev.readthedocs.io/en/stable/) and follow the below steps.
 
 _We will suppose that you want to test on a Magento 2.4.3 instance. Change the version number if you prefer another 
 release._
 
-### DDEV installation
+#### DDEV installation
 
 Please follow the [official instructions](https://ddev.readthedocs.io/en/stable/#installation). On a Linux 
 distribution, this should be as simple as
@@ -44,7 +47,28 @@ distribution, this should be as simple as
     brew tap drud/ddev && brew install ddev
 
 
-### Prepare DDEV Magento 2 environment
+#### DDEV Magento 2 environment
+
+The final structure of the project will look like below.
+
+```
+m2-sources
+│   
+│ (Magento 2 sources installed with composer)    
+│
+└───.ddev
+│   │   
+│   │ (Cloned sources of a Magento 2 specific ddev repo)
+│   
+└───my-own-modules
+    │   
+    │
+    └───crowdsec-bouncer
+       │   
+       │ (Cloned sources of this repo)
+         
+```
+
 
 - Create an empty folder that will contain all necessary sources (Magento 2 and this extension):
 ``` 
@@ -69,13 +93,13 @@ cd .ddev && ddev start`
  This should take some times on the first launch as this will download all necessary docker images.
 
 
-### Magento 2 installation
+#### Magento 2 installation
 You will need your Magento 2 credentials to install the source code.
 
      ddev composer create --repository=https://repo.magento.com/ magento/project-community-edition:2.4.3
 
 
-### Set up Magento 2
+#### Set up Magento 2
 
      ddev magento setup:install \
                            --base-url=https://m243.ddev.site \
@@ -95,7 +119,7 @@ You will need your Magento 2 credentials to install the source code.
                            --use-rewrites=1 \
                            --elasticsearch-host=elasticsearch
 
-### CrowdSec Bouncer extension installation
+#### CrowdSec Bouncer extension installation
 
      mkdir m2-sources/my-own-modules
      mkdir m2-sources/my-own-modules/crowdsec-bouncer
