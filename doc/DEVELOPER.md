@@ -59,6 +59,7 @@ mkdir m2-sources/.ddev && cd m2-sources/.ddev && git clone git@github.com:julien
 ```      
 cp .ddev/config_overrides/config.m243.yaml .ddev/config.m243.yaml
 cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
+cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-compose.playwright.yaml
 ```
 
 - Launch DDEV
