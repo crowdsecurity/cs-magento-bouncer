@@ -64,6 +64,7 @@ jobs:
         run: |
           cp .ddev/config_overrides/config.${{ env.M2_VERSION_CODE }}.yaml .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
+          cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-compose.playwright.yaml
           sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           ddev start
 
