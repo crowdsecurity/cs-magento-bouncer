@@ -1,0 +1,286 @@
+name: CrowdSec Bouncer Varnish validation
+on:
+  push:
+  pull_request:
+
+jobs:
+  magento2-varnish-validation:
+    strategy:
+      matrix:
+        m2-version: [ 2.4.3 ]
+        php-version: [7.4]
+
+    name: Magento 2 Varnish validation
+    # @see https://devdocs.magento.com/marketplace/sellers/installation-and-varnish-tests.html
+    runs-on: ubuntu-latest
+    env:
+      EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"
+      EXTENSION_NAME: "CrowdSec_Bouncer"
+      EXTENSION_PATH: "crowdsec-bouncer"
+
+    steps:
+
+      - name: Clone DDEV files
+        uses: actions/checkout@v2
+        with:
+          path: .ddev
+          repository: julienloizelet/ddev-m2
+
+      - name: Install DDEV
+        run: |
+          # @see https://ddev.readthedocs.io/en/stable/#installationupgrade-script-linux-and-macos-armarm64-and-amd64-architectures
+          sudo apt-get -qq update
+          sudo apt-get -qq -y install libnss3-tools
+          curl -LO https://raw.githubusercontent.com/drud/ddev/master/scripts/install_ddev.sh
+          bash install_ddev.sh
+          ddev config global --instrumentation-opt-in=false --omit-containers=dba,ddev-ssh-agent
+          rm install_ddev.sh
+
+      - name: Set M2_VERSION_CODE env
+        # used in some directory path and conventional file naming
+        # Example : 2.4.3 => m243
+        run: |
+           echo "M2_VERSION_CODE=$(echo m${{ matrix.m2-version }} | sed 's/\.//g' )" >> $GITHUB_ENV
+
+      - name: Set ELASTIC_INSTALL_STRING env for 2.3
+        if: startsWith(matrix.m2-version, '2.3')
+        run: echo "ELASTIC_INSTALL_STRING=''" >> $GITHUB_ENV
+
+      - name: Set ELASTIC_INSTALL_STRING env for 2.4
+        if: startsWith(matrix.m2-version, '2.4')
+        run: echo "ELASTIC_INSTALL_STRING='--elasticsearch-host=elasticsearch'" >> $GITHUB_ENV
+
+      - name: Start DDEV for ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
+        run: |
+          cp .ddev/config_overrides/config.${{ env.M2_VERSION_CODE }}.yaml .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
+          cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
+          cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-compose.playwright.yaml
+          cp .ddev/custom_files/varnish-profile.xml varnish-profile.xml
+          cp .ddev/custom_files/default.vcl .ddev/varnish/default.vcl
+          cp .ddev/additional_docker_compose/docker-compose.varnish.yaml .ddev/docker-compose.varnish.yaml
+          sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
+          ddev start
+
+      - name: Handle Varnish ACL
+        run: |
+          ddev replace-acl $(ddev find-ip ddev-router)
+          ddev reload-vcl
+
+      - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
+        # We don't use "ddev composer" create as it restarts all containers
+        run: |
+          ddev composer config --global http-basic.repo.magento.com ${{ secrets.MAGENTO_MARKETPLACE_USERNAME }} ${{ secrets.MAGENTO_MARKETPLACE_PASSWORD }}
+          ddev exec composer create --repository=https://repo.magento.com/ magento/project-community-edition ${{ env.M2_VERSION_CODE }} ${{ matrix.m2-version }}
+          cp -r ${{ env.M2_VERSION_CODE }}/. ${{ github.workspace }}
+          rm -rf ${{ env.M2_VERSION_CODE }}
+
+      - name: Setup Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
+        run: |
+          ddev magento setup:install \
+                           --base-url=https://${{ env.M2_VERSION_CODE }}.ddev.site \
+                           --db-host=db \
+                           --db-name=db \
+                           --db-user=db \
+                           --db-password=db \
+                           --backend-frontname=admin \
+                           --admin-firstname=admin \
+                           --admin-lastname=admin \
+                           --admin-email=admin@admin.com \
+                           --admin-user=admin \
+                           --admin-password=admin123 \
+                           --language=en_US \
+                           --currency=USD \
+                           --timezone=America/Chicago \
+                           --use-rewrites=1 \
+                           ${{ env.ELASTIC_INSTALL_STRING }}
+
+      - name: Clone M2 ${{ env.EXTENSION_NAME }} files
+        uses: actions/checkout@v2
+        with:
+          path: my-own-modules/${{ env.EXTENSION_PATH }}
+
+      - name: Clone CrowdSec PHP Lib files
+        uses: actions/checkout@v2
+        with:
+          path: my-own-modules/crowdsec-php-lib
+          repository: julienloizelet/php-cs-bouncer
+          ref: 0.14.0.2
+
+      - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
+        run: |
+          ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/${{ env.EXTENSION_PATH }}/
+          ddev composer config repositories.crowdsec-lib path my-own-modules/crowdsec-php-lib/
+          ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
+
+      - name: Installation tests
+        run: |
+          ddev magento module:enable ${{ env.EXTENSION_NAME }}
+          ddev magento setup:upgrade
+          ddev magento setup:di:compile
+          ddev magento setup:static-content:deploy -f
+          ddev magento deploy:mode:set production
+          ddev magento indexer:reindex
+
+      - name: Prepare for Varnish tests
+        run: |
+          ddev magento module:disable Magento_TwoFactorAuth
+          ddev magento setup:di:compile
+          ddev magento config:set system/full_page_cache/caching_application 2
+          ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
+
+      - name: Varnish MISS and HIT test
+        run: |
+          ddev magento cache:flush
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
+          then
+            echo "Test 1 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
+          then
+            echo "Test 2 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
+          then
+            echo "Test 3 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
+          then
+            echo "Test 4 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
+          then
+            echo "Test 5 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
+          then
+            echo "Test 6 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/category-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
+          then
+            echo "Test 7 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/category-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
+          then
+            echo "Test 8 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/category-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
+          then
+            echo "Test 9 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/category-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
+          then
+            echo "Test 10 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
+          then
+            echo "Test 11 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
+          then
+            echo "Test 12 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+
+      - name: Varnish product update test
+        run: |
+          cp .ddev/custom_scripts/update-product-price.sh update-product-price.sh
+          chmod +x update-product-price.sh
+          ddev exec ./update-product-price.sh https://${{ env.M2_VERSION_CODE }}.ddev.site product_dynamic_1
+          ddev exec ./update-product-price.sh https://${{ env.M2_VERSION_CODE }}.ddev.site product_dynamic_2
+          ddev exec ./update-product-price.sh https://${{ env.M2_VERSION_CODE }}.ddev.site product_dynamic_3
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
+          then
+            echo "Test 1 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
+          then
+            echo "Test 2 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
+          then
+            echo "Test 3 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
+          then
+            echo "Test 4 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
+          then
+            echo $VERIF
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
+          then
+            echo "Test 5 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+
+      - name: Varnish FPC clean test
+        run: |
+          ddev magento cache:clean full_page
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
+          then
+            echo "Test 1 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+          VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
+          then
+            echo "Test 2 failed"
+            echo "Bad Varnish x-eqp-cache : ${VERIF}"
+            exit 1
+          fi
+
