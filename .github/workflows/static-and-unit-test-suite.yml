@@ -1,8 +1,12 @@
-name: CrowdSec Bouncer tests suite
-on: [ push, pull_request ]
+name: Static and unit test suite
+on:
+  push:
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  magento2-tests-suite:
+  static-and-unit-test-suite:
     strategy:
       matrix:
         m2-version: [ 2.3.0, 2.4.3 ]
@@ -11,25 +15,13 @@ jobs:
           - { php-version: 7.4, m2-version: 2.3.0}
           - { php-version: 7.3, m2-version: 2.3.0}
           - { php-version: 7.2, m2-version: 2.4.3}
-          # Remove after debug
-          - { php-version: 7.2, m2-version: 2.3.0}
-          - { php-version: 7.3, m2-version: 2.4.3}
-          # - { php-version: 7.4, m2-version: 2.4.3}
 
-    name: Magento 2 tests suite
+    name: Static and unit test suite
     runs-on: ubuntu-18.04
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"
 
     steps:
-      - name: Configure sysctl limits (for Elasticsearch)
-        # @see https://github.com/elastic/elastic-github-actions/tree/master/elasticsearch#usage
-        run: |
-          sudo swapoff -a
-          sudo sysctl -w vm.swappiness=1
-          sudo sysctl -w fs.file-max=262144
-          sudo sysctl -w vm.max_map_count=262144
-
       - name: Clone DDEV files
         uses: actions/checkout@v2
         with:
