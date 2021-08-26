@@ -147,6 +147,8 @@ a new terminal:
 
      ddev cron
 
+You should find a `var/log/magento.cron.log` for debug.
+
 ### CrowdSec CSCLI command
 
 You can run every CSCLI command by prefixing it with `ddev exec -s crowdsec`. For example:
@@ -155,6 +157,88 @@ You can run every CSCLI command by prefixing it with `ddev exec -s crowdsec`. Fo
     ddev exec -s crowdsec cscli decisions add --ip 172.21.0.12 --duration 4h --type ban
 
     ddev exec -s crowdsec cscli bouncers add magento2-bouncer
+
+
+### Varnish
+
+If you want to test with Varnish, please follow these instructions:
+
+First, you should configure your Magento 2 instance to use Varnish as full page cache:
+
+```
+ddev magento config:set system/full_page_cache/caching_application 2
+```
+
+Then, you can add specific files for Varnish and restart:
+
+```
+cp .ddev/additional_docker_compose/docker-compose.varnish.yml .ddev/docker-compose.varnish.yml
+cp .ddev/custom_files/default.vcl .ddev/varnish/default.vcl
+ddev restart
+```
+
+Finally, we need to change the ACL part for purge process:
+
+```
+ddev replace-acl $(ddev find-ip ddev-router)
+ddev reload-vcl
+```
+
+
+For information, here are the differences between the back office generated `default.vcl` and the `default.vcl` we use:
+
+- We removed the following part:
+
+```
+ .probe = {
+    .url = "/pub/health_check.php";
+    .timeout = 2s;
+    .interval = 5s;
+    .window = 10;
+    .threshold = 5;
+    }
+```
+
+
+- We added this part for Marketplace EQP Varnish test simulation:
+
+```
+if (resp.http.x-varnish ~ " ") {
+           set resp.http.X-EQP-Cache = "HIT";
+       } else {
+           set resp.http.X-EQP-Cache = "MISS";
+}
+```
+
+
+#### Varnish debug
+
+To see if purge works, you can do :
+
+```
+ddev exec -s varnish varnishlog -g request -q \'ReqMethod eq "PURGE"\'
+```
+
+And then, from another terminal, flush the cache :
+
+```
+ddev magento cache:flush
+```
+
+You should see in the log the following content:
+
+```
+VCL_call       RECV
+VCL_acl        MATCH purge "your-ddev-router-ip"
+VCL_return     synth
+VCL_call       HASH
+VCL_return     lookup
+RespProtocol   HTTP/1.1
+RespStatus     200
+RespReason     Purged
+```
+
+
 
 ## Commit message
 
