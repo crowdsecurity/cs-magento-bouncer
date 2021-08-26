@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const notifier = require("node-notifier");
 const path = require("path");
 const fs = require("fs");
@@ -30,6 +31,14 @@ jest.setTimeout(TIMEOUT);
 
 const waitForNavigation = page.waitForNavigation();
 
+const fillInput = async (optionId, value) => {
+    await page.fill(`[id=${optionId}]`, `${value}`);
+};
+
+const selectElement = async (selectId, valueToSelect) => {
+    await page.selectOption(`[id=${selectId}]`, `${valueToSelect}`);
+};
+
 const goToAdmin = async () => {
     await page.goto(ADMIN_URL);
     await waitForNavigation;
@@ -58,6 +67,18 @@ const onAdminGoToSettingsPage = async () => {
         "#crowdsec_bouncer_general-head",
         "General settings",
     );
+};
+
+const onAdminFlushCache = async () => {
+    await page.goto(`${ADMIN_URL}admin/cache`);
+    await waitForNavigation;
+    await page.click("#flush_magento");
+    await waitForNavigation;
+};
+
+const onAdminSaveSettings = async () => {
+    await page.click("#save");
+    await waitForNavigation;
 };
 
 const onLoginPageLoginAsAdmin = async () => {
@@ -138,10 +159,6 @@ const removeAllDecisions = async () => {
     await wait(1000);
 };
 
-const fillInput = async (optionName, value) => {
-    await page.fill(`[name=${optionName}]`, `${value}`);
-};
-
 const remediationShouldUpdate = async (
     accessibleTextInTitle,
     initialRemediation,
@@ -173,24 +190,28 @@ const remediationShouldUpdate = async (
                 if (initialPassed) {
                     resolve();
                 } else {
-                    reject({
-                        errorType: "INITIAL_REMEDIATION_NEVER_HAPPENED",
-                        type: remediation,
-                    });
+                    reject(
+                        new Error({
+                            errorType: "INITIAL_REMEDIATION_NEVER_HAPPENED",
+                            type: remediation,
+                        }),
+                    );
                 }
             } else if (remediation === initialRemediation) {
                 initialPassed = true;
             } else {
                 stopTimers();
-                reject({
-                    errorType: "WRONG_REMEDIATION_HAPPENED",
-                    type: remediation,
-                });
+                reject(
+                    new Error({
+                        errorType: "WRONG_REMEDIATION_HAPPENED",
+                        type: remediation,
+                    }),
+                );
             }
         }, intervalMs);
         checkRemediationTimeout = setTimeout(() => {
             stopTimers();
-            reject({ errorType: "NEW_REMEDIATION_NEVER_HAPPENED" });
+            reject(new Error({ errorType: "NEW_REMEDIATION_NEVER_HAPPENED" }));
         }, timeoutMs);
     });
 
@@ -214,6 +235,8 @@ module.exports = {
     goToAdmin,
     goToPublicPage,
     onAdminGoToSettingsPage,
+    onAdminSaveSettings,
+    onAdminFlushCache,
     onLoginPageLoginAsAdmin,
     publicHomepageShouldBeBanWall,
     publicHomepageShouldBeCaptchaWall,
@@ -225,6 +248,7 @@ module.exports = {
     removeAllDecisions,
     fillInput,
     remediationShouldUpdate,
+    selectElement,
     storeCookies,
     loadCookies,
 };

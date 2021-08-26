@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const { CURRENT_IP } = require("../utils/constants");
 
 const {
@@ -9,7 +10,42 @@ const {
     captchaIpForSeconds,
     loadCookies,
     removeAllDecisions,
+    selectElement,
+    onAdminSaveSettings,
+    onAdminGoToSettingsPage,
+    onLoginPageLoginAsAdmin,
+    goToAdmin,
+    storeCookies,
+    onAdminFlushCache,
 } = require("../utils/helpers");
+
+describe(`Configure Live mode`, () => {
+    beforeEach(() => notify(expect.getState().currentTestName));
+
+    it("Should login to M2 admin", async () => {
+        // "Login" page
+        await goToAdmin();
+        await onLoginPageLoginAsAdmin();
+        await storeCookies();
+    });
+
+    it("Should go on CrowdSec Bouncer section", async () => {
+        // "CrowdSec Bouncer" page
+        await onAdminGoToSettingsPage();
+    });
+
+    it("Should configure the live mode", async () => {
+        await selectElement("crowdsec_bouncer_advanced_mode_stream", "0");
+    });
+
+    it("Should save settings", async () => {
+        await onAdminSaveSettings();
+    });
+
+    it("Should flush the cache", async () => {
+        await onAdminFlushCache();
+    });
+});
 
 describe(`Run in Live mode`, () => {
     beforeEach(() => notify(expect.getState().currentTestName));

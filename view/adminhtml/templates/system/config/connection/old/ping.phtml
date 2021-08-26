@@ -34,7 +34,7 @@
 
 //<![CDATA[
         function pingConnection() {
-            var pingConnectionMessage = $('cache_ping_result');
+            var pingConnectionMessage = $('lapi_ping_result');
 
             params = {
                 api_url: $('<?= $block->escapeJs($block->getUrlField()) ?>').value,
@@ -78,5 +78,5 @@
     $block->escapeHtmlAttr($block->getHtmlId()) ?>">
         <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
-    <p class="hidden" id="cache_ping_result"></p>
+    <p class="hidden" id="lapi_ping_result"></p>
 </div>

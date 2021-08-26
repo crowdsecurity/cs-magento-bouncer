@@ -42,7 +42,7 @@ require(['prototype'], function(){
 
 //<![CDATA[
     function pingConnection() {
-        var pingConnectionMessage = $('cache_ping_result');
+        var pingConnectionMessage = $('lapi_ping_result');
 
         params = {
             api_url: $('{$urlField}').value,
@@ -86,9 +86,9 @@ script;
     <button class="action-ping-connection" type="button" id="<?= /* @noEscape */ $block->getHtmlId() ?>">
         <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
-    <p class="hidden" id="cache_ping_result"></p>
+    <p class="hidden" id="lapi_ping_result"></p>
 </div>
-<?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#cache_ping_result {margin-bottom: 10px;}', false); ?>
+<?= /* @noEscape */ $secureRenderer->renderTag('style', [], '#lapi_ping_result {margin-bottom: 10px;}', false); ?>
 <?= /* @noEscape */ $secureRenderer->renderEventListenerAsTag(
     'onclick',
     'pingConnection();event.preventDefault();',
