@@ -4,6 +4,8 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+
 jobs:
   installation-and-varnish-test-suite:
     strategy:
