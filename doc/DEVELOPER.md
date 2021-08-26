@@ -18,6 +18,8 @@
   - [Extension quality](#extension-quality)
   - [Cron](#cron)
   - [CrowdSec CSCLI command](#crowdsec-cscli-command)
+  - [Varnish](#varnish)
+    - [Varnish debug](#varnish-debug)
 - [Commit message](#commit-message)
   - [Allowed message `type` values](#allowed-message-type-values)
 - [Release process](#release-process)
