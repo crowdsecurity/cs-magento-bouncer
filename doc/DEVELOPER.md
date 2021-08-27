@@ -16,6 +16,7 @@
     - [Set up Magento 2](#set-up-magento-2)
     - [CrowdSec Bouncer extension installation](#crowdsec-bouncer-extension-installation)
   - [Extension quality](#extension-quality)
+  - [End-to-end tests](#end-to-end-tests)
   - [Cron](#cron)
   - [CrowdSec CSCLI command](#crowdsec-cscli-command)
   - [Varnish](#varnish)
