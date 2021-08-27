@@ -55,6 +55,13 @@ describe(`Set extension default configuration`, () => {
         );
     });
 
+    it("Should configure bouncing", async () => {
+        await selectElement(
+            "crowdsec_bouncer_general_bouncing_front_enabled",
+            "1",
+        );
+    });
+
     it("Should configure the live mode", async () => {
         await selectElement("crowdsec_bouncer_advanced_mode_stream", "0");
     });
@@ -90,35 +97,27 @@ describe(`Set extension default configuration`, () => {
 describe(`Modify extension configuration`, () => {
     beforeEach(() => notify(expect.getState().currentTestName));
 
-    it("Should go on CrowdSec Bouncer section", async () => {
-        // "CrowdSec Bouncer" page
-        await onAdminGoToSettingsPage();
-    });
-
-    it("Should configure the cache", async () => {
+    it("Should modify the cache", async () => {
         // Test File System
         await selectElement(
             "crowdsec_bouncer_advanced_cache_technology",
             "phpfs",
         );
         await onAdminSaveSettings();
-        await page.waitForSelector("#messages");
-        await expect(page).toHaveText(
-            "#messages",
+        await expect(page).toMatchText(
+            "#messages .messages .message:nth-of-type(1)",
             "CrowdSec new cache (File system) has been successfully tested.",
         );
         await page.waitForSelector(
             "#crowdsec_bouncer_advanced_cache_clear_cache",
         );
         await page.click("#crowdsec_bouncer_advanced_cache_clear_cache");
-        await waitForNavigation;
-        await expect(page).toHaveText(
+        await expect(page).toMatchText(
             "#cache_clearing_result",
             "CrowdSec cache (File system) has been cleared.",
         );
         await page.click("#crowdsec_bouncer_advanced_cache_prune_cache");
-        await waitForNavigation;
-        await expect(page).toHaveText(
+        await expect(page).toMatchText(
             "#cache_pruning_result",
             "CrowdSec cache (File system) has been pruned.",
         );
@@ -132,18 +131,17 @@ describe(`Modify extension configuration`, () => {
             "redis://redis:6379",
         );
         await onAdminSaveSettings();
-        await page.waitForSelector("#messages");
-        await expect(page).toHaveText(
-            "#messages",
+        await expect(page).toMatchText(
+            "#messages .messages .message:nth-of-type(1)",
             "CrowdSec new cache (Redis) has been successfully tested.",
         );
-        await expect(page).toHaveText(
-            "#messages",
+        await expect(page).toMatchText(
+            "#messages .messages .message:nth-of-type(2)",
             "File system cache has been cleared.",
         );
         await page.click("#crowdsec_bouncer_advanced_cache_clear_cache");
         await waitForNavigation;
-        await expect(page).toHaveText(
+        await expect(page).toMatchText(
             "#cache_clearing_result",
             "CrowdSec cache (Redis) has been cleared.",
         );
@@ -157,18 +155,16 @@ describe(`Modify extension configuration`, () => {
             "memcached://memcached:11211",
         );
         await onAdminSaveSettings();
-        await page.waitForSelector("#messages");
-        await expect(page).toHaveText(
-            "#messages",
+        await expect(page).toMatchText(
+            "#messages .messages .message:nth-of-type(1)",
             "CrowdSec new cache (Memcached) has been successfully tested.",
         );
-        await expect(page).toHaveText(
-            "#messages",
+        await expect(page).toMatchText(
+            "#messages .messages .message:nth-of-type(2)",
             "Redis cache has been cleared.",
         );
         await page.click("#crowdsec_bouncer_advanced_cache_clear_cache");
-        await waitForNavigation;
-        await expect(page).toHaveText(
+        await expect(page).toMatchText(
             "#cache_clearing_result",
             "CrowdSec cache (Memcached) has been cleared.",
         );
@@ -176,8 +172,7 @@ describe(`Modify extension configuration`, () => {
 
     it("Should save settings", async () => {
         await onAdminSaveSettings();
-        await page.waitForSelector("#messages");
-        await expect(page).toHaveText(
+        await expect(page).toMatchText(
             "#messages",
             "You saved the configuration.",
         );
@@ -189,8 +184,7 @@ describe(`Flush the cache`, () => {
 
     it("Should flush the cache", async () => {
         await onAdminFlushCache();
-        await page.waitForSelector("#messages");
-        await expect(page).toHaveText(
+        await expect(page).toMatchText(
             "#messages",
             "The Magento cache storage has been flushed.",
         );

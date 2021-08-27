@@ -3,8 +3,8 @@ module.exports = {
     launchOptions: {
         headless: !debug,
     },
-    connectOptions: debug ? { slowMo: 150 } : { slowMo: 50 },
-    exitOnPageError: !debug,
+    connectOptions: debug ? { slowMo: 100 } : { slowMo: 50 },
+    exitOnPageError: false,
     contextOptions: {
         ignoreHTTPSErrors: true,
         viewport: {

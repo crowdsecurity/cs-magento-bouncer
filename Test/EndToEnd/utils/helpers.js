@@ -62,11 +62,15 @@ const onAdminGoToSettingsPage = async () => {
     );
     await waitForNavigation;
     await page.click('.config-nav-block li:has-text("CrowdSec Bouncer")');
-    await waitForNavigation;
-    await expect(page).toHaveText(
+    await expect(page).toMatchText(
         "#crowdsec_bouncer_general-head",
         "General settings",
     );
+};
+
+const goToSettingsPage = async () => {
+    await goToAdmin();
+    await onAdminGoToSettingsPage();
 };
 
 const onAdminFlushCache = async () => {
@@ -79,6 +83,18 @@ const onAdminFlushCache = async () => {
 const onAdminSaveSettings = async () => {
     await page.click("#save");
     await waitForNavigation;
+};
+
+const forceCronRun = async () => {
+    await goToSettingsPage();
+    await selectElement("crowdsec_bouncer_advanced_mode_stream", "0");
+    await onAdminSaveSettings();
+    await selectElement("crowdsec_bouncer_advanced_mode_stream", "1");
+    await fillInput(
+        "crowdsec_bouncer_advanced_mode_refresh_cron_expr",
+        "* * * * *",
+    );
+    await onAdminSaveSettings();
 };
 
 const onLoginPageLoginAsAdmin = async () => {
@@ -142,6 +158,18 @@ const publicHomepageShouldBeAccessible = async () => {
     await goToPublicPage();
     const remediation = await computeCurrentPageRemediation();
     await expect(remediation).toBe("bypass");
+};
+
+const adminPageShouldBeAccessible = async () => {
+    await goToAdmin();
+    const remediation = await computeCurrentPageRemediation("Magento Admin");
+    await expect(remediation).toBe("bypass");
+};
+
+const adminPageShouldBeBanWall = async () => {
+    await goToAdmin();
+    const remediation = await computeCurrentPageRemediation("Magento Admin");
+    await expect(remediation).toBe("ban");
 };
 
 const banIpForSeconds = async (seconds, ip) => {
@@ -232,8 +260,10 @@ module.exports = {
     addDecision,
     wait,
     waitForNavigation,
+    forceCronRun,
     goToAdmin,
     goToPublicPage,
+    goToSettingsPage,
     onAdminGoToSettingsPage,
     onAdminSaveSettings,
     onAdminFlushCache,
@@ -243,6 +273,8 @@ module.exports = {
     publicHomepageShouldBeCaptchaWallWithoutMentions,
     publicHomepageShouldBeCaptchaWallWithMentions,
     publicHomepageShouldBeAccessible,
+    adminPageShouldBeAccessible,
+    adminPageShouldBeBanWall,
     banIpForSeconds,
     captchaIpForSeconds,
     removeAllDecisions,
