@@ -16,11 +16,8 @@ const {
     onAdminFlushCache,
     fillInput,
     goToSettingsPage,
-    waitForNavigation,
-    forceCronRun,
+    simulateCronRun,
 } = require("../utils/helpers");
-
-const { addDecision } = require("../utils/watcherClient");
 
 describe(`Configure Stream mode`, () => {
     beforeEach(() => notify(expect.getState().currentTestName));
@@ -80,24 +77,31 @@ describe(`Run in stream mode`, () => {
 
     it("Should display a ban wall via stream mode", async () => {
         await banIpForSeconds(15 * 60, CURRENT_IP);
-        await forceCronRun();
+        await simulateCronRun();
         await publicHomepageShouldBeBanWall();
     });
 
     it("Should display back the homepage with no remediation via stream mode", async () => {
         await removeAllDecisions();
-        await forceCronRun();
+        await simulateCronRun();
         await publicHomepageShouldBeAccessible();
     });
 
     it("Should retrieve new decision on refresh", async () => {
         await removeAllDecisions();
         await goToSettingsPage();
-        await addDecision(CURRENT_IP, "ban", 15 * 60);
+        await banIpForSeconds(15 * 60, CURRENT_IP);
         await page.click("#crowdsec_bouncer_advanced_mode_refresh_cache");
         await expect(page).toMatchText(
             "#cache_refresh_result",
             /CrowdSec cache \(.*\) has been refreshed. New decision\(s\): 1. Deleted decision\(s\): .*/,
         );
+    });
+
+    it("Should reset to Live Mode", async () => {
+        await removeAllDecisions();
+        await goToSettingsPage();
+        await selectElement("crowdsec_bouncer_advanced_mode_stream", "0");
+        await onAdminSaveSettings();
     });
 });

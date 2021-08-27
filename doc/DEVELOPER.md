@@ -32,10 +32,14 @@
 
 There are many ways to install this extension on a local Magento 2 environment.
 
+We are using [DDEV-Local](https://ddev.readthedocs.io/en/stable/) because it is quite simple to use and customize.
+
+You may use your own local stack, but we provide here some useful tools that depends on DDEV.
+
 
 ### DDEV-Local setup
 
-For a quick start, you can use [DDEV-Local](https://ddev.readthedocs.io/en/stable/) and follow the below steps.
+For a quick start, follow the below steps.
 
 _We will suppose that you want to test on a Magento 2.4.3 instance. Change the version number if you prefer another 
 release._
@@ -141,6 +145,33 @@ During development, you can run some static php tools to ensure quality code:
 - PHP Stan: `ddev phpstan my-own-modules/crowdsec-bouncer`
 
 You can also check unit tests: `ddev phpunit my-own-modules/crowdsec-bouncer/Test/Unit`
+
+### End-to-end tests
+
+We are using a Jest/Playwright Node.js stack to launch a suite of end-to-end tests. 
+
+Tests code is in the `Test/EndToEnd` folder. You should have to `chmod +x` the scripts you will find in  
+`Test/EndToEnd/__scripts__`.
+
+In order to retrieve all the required npm dependencies, run the 
+following commands : 
+
+    cd Test/EndToEnd/__scripts__
+    ./test-init.sh
+    
+Then you can use the `run-test.sh` script to run the tests:
+
+- the first parameter specifies if you want to run the test on your machine (`host`) or in the 
+docker containers (`docker`)
+- the second parameters list the test files you want to execute. If empty, all the test suite will be launched.
+
+For example: 
+
+    ./run-tests.sh host "./__tests__/1-config.js"
+    ./run-tests.sh docker "./__tests__/1-config.js" 
+    ./run-tests.sh host
+    ./run-tests.sh host "./__tests__/1-config.js  ./__tests__/4-stream-mode.js"
+
 
 ### Cron
 

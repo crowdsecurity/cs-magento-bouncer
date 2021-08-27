@@ -127,7 +127,7 @@ describe(`Run in Live mode`, () => {
         );
         await onAdminSaveSettings();
         await adminPageShouldBeAccessible();
-        await addDecision(CURRENT_IP, "ban", 15 * 60);
+        await banIpForSeconds(15 * 60, CURRENT_IP);
         await adminPageShouldBeBanWall();
         // Reset to default value
         await removeAllDecisions();

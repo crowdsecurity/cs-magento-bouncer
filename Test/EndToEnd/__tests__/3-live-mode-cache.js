@@ -17,7 +17,6 @@ const {
     wait,
     fillInput,
     goToSettingsPage,
-    waitForNavigation,
 } = require("../utils/helpers");
 
 describe(`Configure Live mode`, () => {

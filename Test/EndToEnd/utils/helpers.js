@@ -85,16 +85,10 @@ const onAdminSaveSettings = async () => {
     await waitForNavigation;
 };
 
-const forceCronRun = async () => {
+const simulateCronRun = async () => {
     await goToSettingsPage();
-    await selectElement("crowdsec_bouncer_advanced_mode_stream", "0");
-    await onAdminSaveSettings();
-    await selectElement("crowdsec_bouncer_advanced_mode_stream", "1");
-    await fillInput(
-        "crowdsec_bouncer_advanced_mode_refresh_cron_expr",
-        "* * * * *",
-    );
-    await onAdminSaveSettings();
+    await page.click("#crowdsec_bouncer_advanced_mode_refresh_cache");
+    await wait(1000);
 };
 
 const onLoginPageLoginAsAdmin = async () => {
@@ -260,7 +254,7 @@ module.exports = {
     addDecision,
     wait,
     waitForNavigation,
-    forceCronRun,
+    simulateCronRun,
     goToAdmin,
     goToPublicPage,
     goToSettingsPage,
