@@ -89,6 +89,7 @@ mkdir m2-sources/.ddev && cd m2-sources/.ddev && git clone git@github.com:julien
 
 ```      
 cp .ddev/config_overrides/config.m243.yaml .ddev/config.m243.yaml
+cp .ddev/config_overrides/config.crowdsec.yaml .ddev/config.crowdsec.yaml
 cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
 cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-compose.playwright.yaml
 ```
@@ -137,6 +138,8 @@ You will need your Magento 2 credentials to install the source code.
      ddev magento setup:upgrade
      ddev magento cache:flush
 
+
+
 ### Extension quality
 
 During development, you can run some static php tools to ensure quality code:  
@@ -164,7 +167,7 @@ Then you can use the `run-test.sh` script to run the tests:
 
 - the first parameter specifies if you want to run the test on your machine (`host`) or in the 
 docker containers (`docker`)
-- the second parameters list the test files you want to execute. If empty, all the test suite will be launched.
+- the second parameter list the test files you want to execute. If empty, all the test suite will be launched.
 
 For example: 
 

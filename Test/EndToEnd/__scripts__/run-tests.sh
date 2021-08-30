@@ -38,21 +38,22 @@ HOSTNAME=$(ddev exec printenv DDEV_HOSTNAME | sed 's/\r//g')
 M2VERSION=$(ddev exec printenv DDEV_PROJECT | sed 's/\r//g')
 M2_URL=https://$HOSTNAME
 PROXY_IP=$(ddev find-ip ddev-router)
-BOUNCER_KEY=$(ddev get-bouncer-key magento2)
+BOUNCER_KEY=$(ddev exec bin/magento config:show crowdsec_bouncer/general/connection/api_key | sed 's/\r//g')
 
 if [ "${TYPE}" = "host" ]
 then
     cd "../"
     DEBUG_STRING="DEBUG=1"
-    COMMAND="npx cross-env"
     YARN_PATH="./"
+    COMMAND="yarn --cwd ${YARN_PATH} cross-env"
+
     LAPI_URL_FROM_PLAYWRIGHT=http://$HOSTNAME:8080
     CURRENT_IP=$(ddev find-ip host)
 
 else
     DEBUG_STRING=""
-    COMMAND="ddev exec -s playwright npx cross-env"
     YARN_PATH="./var/www/html/my-own-modules/crowdsec-bouncer/Test/EndToEnd"
+    COMMAND="ddev exec -s playwright yarn --cwd ${YARN_PATH} cross-env"
     LAPI_URL_FROM_PLAYWRIGHT=http://crowdsec:8080
     CURRENT_IP=$(ddev find-ip playwright)
 fi

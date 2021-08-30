@@ -67,6 +67,14 @@ describe(`Set extension default configuration`, () => {
     });
 
     it("Should configure the cache", async () => {
+        await selectElement(
+            "crowdsec_bouncer_advanced_cache_technology",
+            "redis",
+        );
+        await fillInput(
+            "crowdsec_bouncer_advanced_cache_redis_dsn",
+            "redis://redis:6379",
+        );
         await fillInput(
             "crowdsec_bouncer_advanced_cache_clean_ip_cache_duration",
             1,
