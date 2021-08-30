@@ -13,7 +13,6 @@ const {
     onLoginPageLoginAsAdmin,
     goToAdmin,
     storeCookies,
-    onAdminFlushCache,
     fillInput,
     goToSettingsPage,
     simulateCronRun,
@@ -26,7 +25,6 @@ describe(`Configure Stream mode`, () => {
         await goToAdmin();
         await onLoginPageLoginAsAdmin();
         await storeCookies();
-        await onAdminFlushCache();
         await removeAllDecisions();
     });
 
@@ -43,10 +41,10 @@ describe(`Configure Stream mode`, () => {
             "crowdsec_bouncer_advanced_mode_refresh_cron_expr",
             "bad",
         );
-        await onAdminSaveSettings();
+        await onAdminSaveSettings(false);
         await expect(page).toMatchText(
-            "#messages .messages .message:nth-of-type(1)",
-            "Refresh expression cron (bad) is not valid.",
+            "#messages",
+            /Refresh expression cron \(bad\) is not valid./,
         );
         await expect(page).toMatchValue(
             "#crowdsec_bouncer_advanced_mode_stream",
@@ -62,7 +60,7 @@ describe(`Configure Stream mode`, () => {
         );
         await onAdminSaveSettings();
         await expect(page).toMatchText(
-            "#messages .messages .message:nth-of-type(1)",
+            "#messages",
             /As the stream mode is enabled, the cache \(.*\) has been warmed up. There is now 0 decision in cache./,
         );
     });

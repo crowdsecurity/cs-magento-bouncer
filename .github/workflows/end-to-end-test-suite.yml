@@ -72,7 +72,7 @@ jobs:
       - name: Setup Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
         run: |
           ddev magento setup:install \
-                           --base-url=https://${{ env.M2_VERSION_CODE }}.ddev.site \
+                           --base-url=https://${{ env.M2_VERSION_CODE }}.ddev.site/ \
                            --db-host=db \
                            --db-name=db \
                            --db-user=db \
@@ -112,9 +112,12 @@ jobs:
           ddev magento deploy:mode:set developer
           ddev magento module:enable ${{ env.EXTENSION_NAME }}
           ddev magento module:disable Magento_TwoFactorAuth
+          ddev magento module:disable Magento_AdminNotification
           ddev magento setup:upgrade
           ddev magento setup:static-content:deploy -f
           ddev crowdsec-config
+          ddev magento cache:flush
+
 
       - name: Prepare for playwright test
         run: |
@@ -126,22 +129,22 @@ jobs:
       - name: Run config test
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh docker "./__tests__/1-config.js"
+          ./run-tests.sh ci "./__tests__/1-config.js"
 
       - name: Run live mode remediation test
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh docker "./__tests__/2-live-mode-remediation.js"
+          ./run-tests.sh ci "./__tests__/2-live-mode-remediation.js"
 
       - name: Run live mode cache test
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh docker "./__tests__/3-live-mode-cache.js"
+          ./run-tests.sh ci "./__tests__/3-live-mode-cache.js"
 
       - name: Run stream mode test
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh docker "./__tests__/4-stream-mode.js"
+          ./run-tests.sh ci "./__tests__/4-stream-mode.js"
 
 
 

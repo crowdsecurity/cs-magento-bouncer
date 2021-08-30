@@ -2,22 +2,21 @@ const PlaywrightEnvironment =
     require("jest-playwright-preset/lib/PlaywrightEnvironment").default;
 
 class CustomEnvironment extends PlaywrightEnvironment {
-    async setup() {
-        await super.setup();
-    }
-
-    async teardown() {
-        await super.teardown();
-    }
-
     async handleTestEvent(event) {
-        if (event.name === "test_done" && event.test.errors.length > 0) {
-            const parentName = event.test.parent.name.replace(/\W/g, "-");
-            const specName = event.test.name.replace(/\W/g, "-");
+        if (process.env.FAIL_FAST) {
+            if (
+                event.name === "hook_failure" ||
+                event.name === "test_fn_failure"
+            ) {
+                this.failedTest = true;
+            } else if (this.failedTest && event.name === "test_start") {
+                // eslint-disable-next-line no-param-reassign
+                event.test.mode = "skip";
+            }
+        }
 
-            await this.global.page.screenshot({
-                path: `screenshots/${parentName}_${specName}.png`,
-            });
+        if (super.handleTestEvent) {
+            await super.handleTestEvent(event);
         }
     }
 }

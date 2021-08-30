@@ -1,11 +1,9 @@
 /* eslint-disable no-undef */
-const notifier = require("node-notifier");
-const path = require("path");
 const fs = require("fs");
 const { addDecision, deleteAllDecisions } = require("./watcherClient");
 const {
     ADMIN_URL,
-    BASE_URL,
+    M2_URL,
     ADMIN_LOGIN,
     ADMIN_PASSWORD,
     DEBUG,
@@ -17,19 +15,12 @@ const COOKIES_FILE_PATH = `${__dirname}/../.cookies.json`;
 const notify = (message) => {
     if (DEBUG) {
         console.debug(message);
-        notifier.notify({
-            title: "CrowdSec automation",
-            message,
-            icon: path.join(__dirname, "./icon.png"),
-        });
     }
 };
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 jest.setTimeout(TIMEOUT);
-
-const waitForNavigation = page.waitForNavigation();
 
 const fillInput = async (optionId, value) => {
     await page.fill(`[id=${optionId}]`, `${value}`);
@@ -40,28 +31,30 @@ const selectElement = async (selectId, valueToSelect) => {
 };
 
 const goToAdmin = async () => {
-    await page.goto(ADMIN_URL);
-    await waitForNavigation;
+    await page.goto(ADMIN_URL, { waitUntil: "networkidle" });
 };
 
 const goToPublicPage = async () => {
-    await page.goto(`${BASE_URL}`);
-    await waitForNavigation;
+    await page.goto(`${M2_URL}`);
 };
 
 const onAdminGoToSettingsPage = async () => {
     // CrowdSec Menu
+
     await page.click("#menu-magento-backend-stores > a");
-    await waitForNavigation;
+    await page.waitForLoadState("networkidle");
+
     await page.click(
         '#menu-magento-backend-stores .item-system-config:has-text("Configuration") ',
     );
-    await waitForNavigation;
+    await page.waitForLoadState("networkidle");
+
     await page.click(
         '#system_config_tabs .config-nav-block:has-text("Security")',
     );
-    await waitForNavigation;
+    await page.waitForLoadState("networkidle");
     await page.click('.config-nav-block li:has-text("CrowdSec Bouncer")');
+    await page.waitForLoadState("networkidle");
     await expect(page).toMatchText(
         "#crowdsec_bouncer_general-head",
         "General settings",
@@ -73,30 +66,54 @@ const goToSettingsPage = async () => {
     await onAdminGoToSettingsPage();
 };
 
-const onAdminFlushCache = async () => {
-    await page.goto(`${ADMIN_URL}admin/cache`);
-    await waitForNavigation;
+const flushCache = async () => {
+    await goToAdmin();
+    await page.click("#menu-magento-backend-system > a");
+    await page.waitForLoadState("networkidle");
+
+    await page.click(
+        '#menu-magento-backend-system .item-system-cache:has-text("Cache Management") ',
+    );
+    await page.waitForLoadState("networkidle");
+    await expect(page).toMatchTitle(/Cache Management/);
     await page.click("#flush_magento");
-    await waitForNavigation;
+    await page.waitForLoadState("networkidle");
+    await expect(page).toMatchText(
+        "#messages",
+        "The Magento cache storage has been flushed.",
+    );
 };
 
-const onAdminSaveSettings = async () => {
+const onAdminSaveSettings = async (successExpected = true) => {
     await page.click("#save");
-    await waitForNavigation;
+    await page.waitForLoadState("networkidle");
+    if (successExpected) {
+        await expect(page).toMatchText(
+            "#messages",
+            /You saved the configuration./,
+        );
+    }
 };
 
 const simulateCronRun = async () => {
     await goToSettingsPage();
     await page.click("#crowdsec_bouncer_advanced_mode_refresh_cache");
-    await wait(1000);
+    await page.waitForLoadState("networkidle");
 };
 
 const onLoginPageLoginAsAdmin = async () => {
     await page.fill("#username", ADMIN_LOGIN);
     await page.fill("#login", ADMIN_PASSWORD);
-    await page.waitForSelector(".action-login");
     await page.click(".action-login");
-    await waitForNavigation;
+    await page.waitForLoadState("networkidle");
+    // On first login only, there is a modal to allow admin usage statistics
+    adminUsage = await page.isVisible(".admin-usage-notification");
+    if (adminUsage) {
+        await page.click(".admin-usage-notification .action-secondary");
+        await page.waitForLoadState("networkidle");
+    }
+
+    await expect(page).toMatchTitle(/Dashboard/);
 };
 
 const computeCurrentPageRemediation = async (
@@ -202,8 +219,7 @@ const remediationShouldUpdate = async (
         };
 
         checkRemediationInterval = setInterval(async () => {
-            await page.reload();
-            await waitForNavigation;
+            await page.reload({ waitUntil: "networkidle" });
             const remediation = await computeCurrentPageRemediation(
                 accessibleTextInTitle,
             );
@@ -253,14 +269,13 @@ module.exports = {
     notify,
     addDecision,
     wait,
-    waitForNavigation,
     simulateCronRun,
     goToAdmin,
     goToPublicPage,
     goToSettingsPage,
     onAdminGoToSettingsPage,
     onAdminSaveSettings,
-    onAdminFlushCache,
+    flushCache,
     onLoginPageLoginAsAdmin,
     publicHomepageShouldBeBanWall,
     publicHomepageShouldBeCaptchaWall,

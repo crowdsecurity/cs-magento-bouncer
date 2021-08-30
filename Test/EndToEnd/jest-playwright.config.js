@@ -1,17 +1,13 @@
-const debug = process.env.DEBUG;
+const headless = process.env.HEADLESS;
 module.exports = {
     launchOptions: {
-        headless: !debug,
+        headless,
     },
-    connectOptions: debug ? { slowMo: 100 } : { slowMo: 50 },
+    connectOptions: { slowMo: 150 },
     exitOnPageError: false,
     contextOptions: {
         ignoreHTTPSErrors: true,
-        viewport: {
-            width: 1920,
-            height: 1080,
-        },
     },
     browsers: ["chromium"],
-    devices: [],
+    devices: ["Desktop Chrome"],
 };

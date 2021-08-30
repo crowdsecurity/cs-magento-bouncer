@@ -13,7 +13,6 @@ const {
     onLoginPageLoginAsAdmin,
     goToAdmin,
     storeCookies,
-    onAdminFlushCache,
     wait,
     fillInput,
     goToSettingsPage,
@@ -26,7 +25,6 @@ describe(`Configure Live mode`, () => {
         await goToAdmin();
         await onLoginPageLoginAsAdmin();
         await storeCookies();
-        await onAdminFlushCache();
         await removeAllDecisions();
     });
 
@@ -71,7 +69,6 @@ describe(`Test cache in Live mode`, () => {
             60,
         );
         await onAdminSaveSettings();
-        await onAdminFlushCache();
     });
 
     it("Should clear the cache on demand", async () => {

@@ -2,13 +2,13 @@
 const {
     notify,
     goToAdmin,
-    onAdminGoToSettingsPage,
+    goToSettingsPage,
     onLoginPageLoginAsAdmin,
     storeCookies,
     fillInput,
     selectElement,
     onAdminSaveSettings,
-    onAdminFlushCache,
+    flushCache,
 } = require("../utils/helpers");
 
 const {
@@ -17,41 +17,72 @@ const {
     PROXY_IP,
 } = require("../utils/constants");
 
-const waitForNavigation = page.waitForNavigation();
-
-describe(`Set extension default configuration`, () => {
+describe(`Extension configuration`, () => {
     beforeEach(() => notify(expect.getState().currentTestName));
 
     it("Should login to M2 admin", async () => {
-        // "Login" page
         await goToAdmin();
         await onLoginPageLoginAsAdmin();
         await storeCookies();
     });
 
     it("Should go on CrowdSec Bouncer section", async () => {
-        // "CrowdSec Bouncer" page
-        await onAdminGoToSettingsPage();
+        await goToSettingsPage();
     });
 
-    it("Should configure the connection details", async () => {
+    it("Should open each settings tab", async () => {
+        let visible = await page.isVisible("#crowdsec_bouncer_general");
+        if (!visible) {
+            await page.click("#crowdsec_bouncer_general-head");
+        }
+        visible = await page.isVisible("#crowdsec_bouncer_theme");
+        if (!visible) {
+            await page.click("#crowdsec_bouncer_theme-head");
+        }
+        visible = await page.isVisible("#crowdsec_bouncer_advanced");
+        if (!visible) {
+            await page.click("#crowdsec_bouncer_advanced-head");
+        }
+
+        visible = await page.isVisible("#crowdsec_bouncer_general");
+        expect(visible).toBeTruthy();
+        visible = await page.isVisible("#crowdsec_bouncer_theme");
+        expect(visible).toBeTruthy();
+        visible = await page.isVisible("#crowdsec_bouncer_advanced");
+        expect(visible).toBeTruthy();
+    });
+
+    it("Should test connection with error", async () => {
         await fillInput(
             "crowdsec_bouncer_general_connection_api_url",
             LAPI_URL_FROM_M2,
         );
+
         await fillInput(
             "crowdsec_bouncer_general_connection_api_key",
-            BOUNCER_KEY,
+            "bad-key",
+        );
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Technical error while testing connection/,
         );
     });
 
     it("Should test connection with success", async () => {
-        await page.waitForSelector("#crowdsec_bouncer_general_connection_test");
+        await fillInput(
+            "crowdsec_bouncer_general_connection_api_url",
+            LAPI_URL_FROM_M2,
+        );
+
+        await fillInput(
+            "crowdsec_bouncer_general_connection_api_key",
+            BOUNCER_KEY,
+        );
         await page.click("#crowdsec_bouncer_general_connection_test");
-        await waitForNavigation;
-        await expect(page).toHaveText(
+        await expect(page).toMatchText(
             "#lapi_ping_result",
-            "Connection test result: success.",
+            /Connection test result: success./,
         );
     });
 
@@ -94,15 +125,10 @@ describe(`Set extension default configuration`, () => {
 
     it("Should save settings", async () => {
         await onAdminSaveSettings();
-        await page.waitForSelector("#messages");
-        await expect(page).toHaveText(
-            "#messages",
-            "You saved the configuration.",
-        );
     });
 });
 
-describe(`Modify extension configuration`, () => {
+describe(`Extension configuration modification`, () => {
     beforeEach(() => notify(expect.getState().currentTestName));
 
     it("Should modify the cache", async () => {
@@ -113,8 +139,8 @@ describe(`Modify extension configuration`, () => {
         );
         await onAdminSaveSettings();
         await expect(page).toMatchText(
-            "#messages .messages .message:nth-of-type(1)",
-            "CrowdSec new cache (File system) has been successfully tested.",
+            "#messages",
+            /CrowdSec new cache \(File system\) has been successfully tested./,
         );
         await page.waitForSelector(
             "#crowdsec_bouncer_advanced_cache_clear_cache",
@@ -140,18 +166,27 @@ describe(`Modify extension configuration`, () => {
         );
         await onAdminSaveSettings();
         await expect(page).toMatchText(
-            "#messages .messages .message:nth-of-type(1)",
-            "CrowdSec new cache (Redis) has been successfully tested.",
+            "#messages",
+            /CrowdSec new cache \(Redis\) has been successfully tested./,
         );
         await expect(page).toMatchText(
-            "#messages .messages .message:nth-of-type(2)",
-            "File system cache has been cleared.",
+            "#messages",
+            /File system cache has been cleared./,
         );
         await page.click("#crowdsec_bouncer_advanced_cache_clear_cache");
-        await waitForNavigation;
         await expect(page).toMatchText(
             "#cache_clearing_result",
             "CrowdSec cache (Redis) has been cleared.",
+        );
+        await fillInput("crowdsec_bouncer_advanced_cache_redis_dsn", "bad-dns");
+        await onAdminSaveSettings(false);
+        await expect(page).toMatchText(
+            "#messages",
+            /Technical error while testing the Redis cache/,
+        );
+        await expect(page).toMatchValue(
+            "#crowdsec_bouncer_advanced_cache_redis_dsn",
+            "redis://redis:6379",
         );
         // Test Memcached
         await selectElement(
@@ -164,37 +199,38 @@ describe(`Modify extension configuration`, () => {
         );
         await onAdminSaveSettings();
         await expect(page).toMatchText(
-            "#messages .messages .message:nth-of-type(1)",
-            "CrowdSec new cache (Memcached) has been successfully tested.",
+            "#messages",
+            /CrowdSec new cache \(Memcached\) has been successfully tested./,
         );
         await expect(page).toMatchText(
-            "#messages .messages .message:nth-of-type(2)",
-            "Redis cache has been cleared.",
+            "#messages",
+            /Redis cache has been cleared./,
         );
         await page.click("#crowdsec_bouncer_advanced_cache_clear_cache");
         await expect(page).toMatchText(
             "#cache_clearing_result",
             "CrowdSec cache (Memcached) has been cleared.",
         );
+        await fillInput(
+            "crowdsec_bouncer_advanced_cache_memcached_dsn",
+            "memcached://memcached:18579",
+        );
+        await onAdminSaveSettings(false);
+        await expect(page).toMatchText(
+            "#messages",
+            /Technical error while testing the Memcached cache/,
+        );
+        await expect(page).toMatchValue(
+            "#crowdsec_bouncer_advanced_cache_memcached_dsn",
+            "memcached://memcached:11211",
+        );
     });
 
     it("Should save settings", async () => {
         await onAdminSaveSettings();
-        await expect(page).toMatchText(
-            "#messages",
-            "You saved the configuration.",
-        );
     });
-});
-
-describe(`Flush the cache`, () => {
-    beforeEach(() => notify(expect.getState().currentTestName));
 
     it("Should flush the cache", async () => {
-        await onAdminFlushCache();
-        await expect(page).toMatchText(
-            "#messages",
-            "The Magento cache storage has been flushed.",
-        );
+        await flushCache();
     });
 });

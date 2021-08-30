@@ -5,6 +5,7 @@ const {
     notify,
     publicHomepageShouldBeBanWall,
     publicHomepageShouldBeCaptchaWallWithMentions,
+    publicHomepageShouldBeCaptchaWallWithoutMentions,
     publicHomepageShouldBeAccessible,
     publicHomepageShouldBeCaptchaWall,
     adminPageShouldBeAccessible,
@@ -19,13 +20,12 @@ const {
     goToAdmin,
     goToSettingsPage,
     storeCookies,
-    onAdminFlushCache,
     wait,
     fillInput,
 } = require("../utils/helpers");
 const { addDecision } = require("../utils/watcherClient");
 
-describe(`Configure Live mode`, () => {
+describe(`Live mode configuration`, () => {
     beforeEach(() => notify(expect.getState().currentTestName));
 
     beforeAll(async () => {
@@ -65,13 +65,9 @@ describe(`Configure Live mode`, () => {
     it("Should save settings", async () => {
         await onAdminSaveSettings();
     });
-
-    it("Should flush the cache", async () => {
-        await onAdminFlushCache();
-    });
 });
 
-describe(`Run in Live mode`, () => {
+describe(`Live mode run`, () => {
     beforeEach(() => notify(expect.getState().currentTestName));
 
     beforeAll(async () => {
@@ -83,9 +79,19 @@ describe(`Run in Live mode`, () => {
         await publicHomepageShouldBeAccessible();
     });
 
-    it("Should display a captcha wall", async () => {
+    it("Should display a captcha wall with mentions", async () => {
         await captchaIpForSeconds(15 * 60, CURRENT_IP);
         await publicHomepageShouldBeCaptchaWallWithMentions();
+    });
+
+    it("Should display a captcha wall without mentions", async () => {
+        await goToSettingsPage();
+        await selectElement(
+            "crowdsec_bouncer_advanced_remediation_hide_mentions",
+            "1",
+        );
+        await onAdminSaveSettings();
+        await publicHomepageShouldBeCaptchaWallWithoutMentions();
     });
 
     it("Should display a ban wall", async () => {
@@ -94,15 +100,12 @@ describe(`Run in Live mode`, () => {
     });
 
     it("Should display a captcha wall instead of a ban wall in Flex mode", async () => {
-        // set Flex mode
         await goToSettingsPage();
         await selectElement(
             "crowdsec_bouncer_general_bouncing_level",
             "flex_bouncing",
         );
         await onAdminSaveSettings();
-
-        // Should be a captcha wall
         await publicHomepageShouldBeCaptchaWall();
 
         // Reset to default value

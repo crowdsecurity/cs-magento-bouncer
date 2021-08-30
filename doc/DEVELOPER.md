@@ -15,6 +15,7 @@
     - [Magento 2 installation](#magento-2-installation)
     - [Set up Magento 2](#set-up-magento-2)
     - [CrowdSec Bouncer extension installation](#crowdsec-bouncer-extension-installation)
+    - [CrowdSec configuration on start](#crowdsec-configuration-on-start)
   - [Extension quality](#extension-quality)
   - [End-to-end tests](#end-to-end-tests)
   - [Cron](#cron)
@@ -89,7 +90,6 @@ mkdir m2-sources/.ddev && cd m2-sources/.ddev && git clone git@github.com:julien
 
 ```      
 cp .ddev/config_overrides/config.m243.yaml .ddev/config.m243.yaml
-cp .ddev/config_overrides/config.crowdsec.yaml .ddev/config.crowdsec.yaml
 cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
 cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-compose.playwright.yaml
 ```
@@ -110,7 +110,7 @@ You will need your Magento 2 credentials to install the source code.
 #### Set up Magento 2
 
      ddev magento setup:install \
-                           --base-url=https://m243.ddev.site \
+                           --base-url=https://m243.ddev.site/ \
                            --db-host=db \
                            --db-name=db \
                            --db-user=db \
@@ -138,6 +138,18 @@ You will need your Magento 2 credentials to install the source code.
      ddev magento setup:upgrade
      ddev magento cache:flush
 
+#### CrowdSec configuration on start
+
+We use a post-start DDEV hook to:
+- Create a bouncer
+- Set bouncer key (and api url) in CrowdSec_Bouncer extension configuration
+- Create a watcher that we use in end-to-end tests
+
+Just copy the file and restart:
+
+     
+    cp .ddev/config_overrides/config.crowdsec.yaml .ddev/config.crowdsec.yaml
+    ddev restart
 
 
 ### Extension quality
@@ -156,17 +168,11 @@ We are using a Jest/Playwright Node.js stack to launch a suite of end-to-end tes
 
 Tests code is in the `Test/EndToEnd` folder. You should have to `chmod +x` the scripts you will find in  
 `Test/EndToEnd/__scripts__`.
-
-In order to retrieve all the required npm dependencies, run the 
-following commands : 
-
-    cd Test/EndToEnd/__scripts__
-    ./test-init.sh
     
 Then you can use the `run-test.sh` script to run the tests:
 
 - the first parameter specifies if you want to run the test on your machine (`host`) or in the 
-docker containers (`docker`)
+docker containers (`docker`). You can also use `ci` if you want to have the same behavior as in Github action.
 - the second parameter list the test files you want to execute. If empty, all the test suite will be launched.
 
 For example: 
@@ -176,6 +182,18 @@ For example:
     ./run-tests.sh host
     ./run-tests.sh host "./__tests__/1-config.js  ./__tests__/4-stream-mode.js"
 
+If you want to test with the `docker` or `ci` parameter, you have to install all the required dependencies 
+before with this command :
+
+    ./test-init.sh
+
+If you want to test with the `host` parameter, you will have to install manually all the required dependencies: 
+
+```
+yarn --cwd ./Test/EndToEnd --force
+yarn global add cross-env
+```
+ 
 
 ### Cron
 
