@@ -326,7 +326,7 @@ class Config
         string $newKey
     ) {
         // Test connection if params changed
-        if ($oldUrl !== $newUrl || $oldKey !== $newKey) {
+        if (($newUrl && $newKey) && ($oldUrl !== $newUrl || $oldKey !== $newKey)) {
             try {
                 $this->helper->ping($this->restClient, $newUrl, Constants::BASE_USER_AGENT, $newKey);
             } catch (Exception $e) {
