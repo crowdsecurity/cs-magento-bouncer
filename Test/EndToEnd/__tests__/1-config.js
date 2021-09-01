@@ -43,7 +43,6 @@ describe(`Extension configuration`, () => {
         if (!visible) {
             await page.click("#crowdsec_bouncer_advanced-head");
         }
-
         visible = await page.isVisible("#crowdsec_bouncer_general");
         expect(visible).toBeTruthy();
         visible = await page.isVisible("#crowdsec_bouncer_theme");

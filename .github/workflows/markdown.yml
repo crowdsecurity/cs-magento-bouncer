@@ -1,0 +1,39 @@
+on:
+  workflow_dispatch:
+
+name: Markdown files test and update
+jobs:
+  markdown-test-and-update:
+    name: Markdown files test and update
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Clone sources
+        uses: actions/checkout@v2
+        with:
+          path: extension
+
+      - name: Lauch localhost server
+        run: |
+          sudo npm install --global http-server
+          http-server ./extension &
+
+      - name: Set up Ruby 2.6
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.6
+
+      - name: Check links in Mardown files
+        run: |
+          gem install awesome_bot
+          cd extension
+          awesome_bot README.md --skip-save-results --base-url http://localhost:8080/
+          awesome_bot doc/*.md --skip-save-results --white-list repo.magento.com,ddev.site --base-url http://localhost:8080/doc/
+
+      - name: Generate table of contents
+        uses: technote-space/toc-generator@v4
+        with:
+          MAX_HEADER_LEVEL: 5
+          COMMIT_NAME: CrowdSec Dev Bot
+          TARGET_PATHS: 'doc/*.md'
+          CHECK_ONLY_DEFAULT_BRANCH: true
