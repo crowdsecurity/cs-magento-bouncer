@@ -31,10 +31,6 @@ class RefreshCache
     public function execute(): void
     {
         if ($this->helper->isStreamModeEnabled()) {
-            \Magento\Framework\App\ObjectManager::getInstance()
-                ->get(\Psr\Log\LoggerInterface::class)->debug('ici '.__CLASS__.__LINE__);
-
-
             try {
                 $bouncer = $this->registryBouncer->create();
                 $bouncer->init()->refreshBlocklistCache();
