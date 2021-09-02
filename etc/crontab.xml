@@ -28,7 +28,7 @@
  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="crowdsec_bouncer">
-        <job name="crowdsec_bouncer_refresh_cache" instance="CrowdSec\Bouncer\Cron\RefreshCache" method="refreshCache">
+        <job name="crowdsec_bouncer_refresh_cache" instance="CrowdSec\Bouncer\Cron\RefreshCache" method="execute">
             <config_path>crowdsec_bouncer/advanced/mode/refresh_cron_expr</config_path>
         </job>
     </group>

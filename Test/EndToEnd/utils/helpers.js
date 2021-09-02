@@ -95,10 +95,11 @@ const onAdminSaveSettings = async (successExpected = true) => {
     }
 };
 
-const simulateCronRun = async () => {
-    await goToSettingsPage();
-    await page.click("#crowdsec_bouncer_advanced_mode_refresh_cache");
+const runCron = async (cronClass) => {
+    await page.goto(`${M2_URL}/cronLaunch.php?job=${cronClass}`);
     await page.waitForLoadState("networkidle");
+    await expect(page).not.toMatchTitle(/404/);
+    await expect(page).toMatchText("");
 };
 
 const onLoginPageLoginAsAdmin = async () => {
@@ -269,7 +270,7 @@ module.exports = {
     notify,
     addDecision,
     wait,
-    simulateCronRun,
+    runCron,
     goToAdmin,
     goToPublicPage,
     goToSettingsPage,

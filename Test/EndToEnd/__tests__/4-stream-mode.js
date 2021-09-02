@@ -15,7 +15,7 @@ const {
     storeCookies,
     fillInput,
     goToSettingsPage,
-    simulateCronRun,
+    runCron,
 } = require("../utils/helpers");
 
 describe(`Configure Stream mode`, () => {
@@ -75,13 +75,13 @@ describe(`Run in stream mode`, () => {
 
     it("Should display a ban wall via stream mode", async () => {
         await banIpForSeconds(15 * 60, CURRENT_IP);
-        await simulateCronRun();
+        await runCron("CrowdSec\\Bouncer\\Cron\\RefreshCache");
         await publicHomepageShouldBeBanWall();
     });
 
     it("Should display back the homepage with no remediation via stream mode", async () => {
         await removeAllDecisions();
-        await simulateCronRun();
+        await runCron("CrowdSec\\Bouncer\\Cron\\RefreshCache");
         await publicHomepageShouldBeAccessible();
     });
 

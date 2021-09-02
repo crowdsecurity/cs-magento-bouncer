@@ -168,6 +168,11 @@ We are using a Jest/Playwright Node.js stack to launch a suite of end-to-end tes
 
 Tests code is in the `Test/EndToEnd` folder. You should have to `chmod +x` the scripts you will find in  
 `Test/EndToEnd/__scripts__`.
+
+To run a specific cron job from browser, we created a `launchCron.php` script that you have to copy before testing 
+cron dependent feature (stream mode for example):
+
+    cp .ddev/custom_scripts/cronLaunch.php m2-sources/pub/cronLaunch.php
     
 Then you can use the `run-test.sh` script to run the tests:
 
