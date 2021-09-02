@@ -2,11 +2,12 @@
 
 namespace CrowdSec\Bouncer\Cron;
 
+use CrowdSec\Bouncer\Constants;
 use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 
-class RefreshCache
+class PruneCache
 {
     /**
      * @var Helper
@@ -23,18 +24,18 @@ class RefreshCache
     }
 
     /**
-     * Refresh cache in Stream Mode
+     * Prune file system cache
      *
      */
     public function execute(): void
     {
-        if ($this->helper->isStreamModeEnabled()) {
+        if ($this->helper->getCacheTechnology() === Constants::CACHE_SYSTEM_PHPFS) {
             try {
                 $bouncer = $this->registryBouncer->create();
-                $bouncer->init()->refreshBlocklistCache();
+                $bouncer->init()->pruneCache();
             } catch (CrowdSecException $e) {
                 $this->helper->error('', [
-                    'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
+                    'type' => 'M2_EXCEPTION_WHILE_PRUNING_CACHE',
                     'message' => $e->getMessage(),
                     'code' => $e->getCode(),
                     'file' => $e->getFile(),

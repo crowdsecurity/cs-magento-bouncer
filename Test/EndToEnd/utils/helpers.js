@@ -266,6 +266,20 @@ const loadCookies = async (context) => {
     await context.addCookies(deserializedCookies);
 };
 
+const getFileContent = async (filePath) => {
+    if (fs.existsSync(filePath)) {
+        return fs.readFileSync(filePath, "utf8");
+    }
+    return "";
+};
+
+const deleteFileContent = async (filePath) => {
+    if (fs.existsSync(filePath)) {
+        return fs.writeFileSync(filePath, "");
+    }
+    return false;
+};
+
 module.exports = {
     notify,
     addDecision,
@@ -293,4 +307,6 @@ module.exports = {
     selectElement,
     storeCookies,
     loadCookies,
+    getFileContent,
+    deleteFileContent,
 };

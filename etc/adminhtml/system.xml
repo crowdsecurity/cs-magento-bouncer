@@ -272,7 +272,25 @@
                             <field id="crowdsec_bouncer/advanced/cache/technology">phpfs</field>
                         </depends>
                     </field>
-                    <field id="redis_dsn" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
+                    <field id="prune_cron_expr" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
+                        <label><![CDATA[Cron expression for file system cache pruning]]></label>
+                        <tooltip><![CDATA[
+                        Examples:
+                        <ul>
+                            <li>Every minute : * * * * * </li>
+                            <li>At midnight : 0 0 * * * </li>
+                            <li>At every 5th minute : */5 * * * *</li>
+                            <li>At minute 15 and 45 past every hour from 7 through 23 : 15,45 7-23 * * * </li>
+                        </ul>
+                        ]]>
+                        </tooltip>
+                        <comment><![CDATA[To disable this cron job, you can set 0 0 30 2 * ]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/cache/technology">phpfs</field>
+                        </depends>
+                        <validate>required-entry</validate>
+                    </field>
+                    <field id="redis_dsn" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
                         <label><![CDATA[Redis DSN ]]></label>
                         <tooltip><![CDATA[Example of DSN: redis://localhost:6379/0]]></tooltip>
                         <comment><![CDATA[Fill in this field only if you have chosen the Redis cache.]]></comment>
@@ -281,7 +299,7 @@
                         </depends>
                         <validate>required-entry</validate>
                     </field>
-                    <field id="memcached_dsn" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
+                    <field id="memcached_dsn" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
                         <label><![CDATA[Memcached DSN ]]></label>
                         <tooltip><![CDATA[Example of DSN: memcached://localhost:11211]]></tooltip>
                         <comment><![CDATA[Fill in this field only if you have chosen the Memcached cache.]]></comment>
@@ -290,7 +308,7 @@
                         </depends>
                         <validate>required-entry</validate>
                     </field>
-                    <field id="clean_ip_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="600" showInDefault="1">
+                    <field id="clean_ip_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
                         <label><![CDATA[Clean IPs cache duration  (in seconds)]]></label>
                         <tooltip><![CDATA[Live mode only]]></tooltip>
                         <comment><![CDATA[The duration between re-asking LAPI about an already checked clean IP.<br>Minimum 1 second.]]></comment>
@@ -299,7 +317,7 @@
                         </depends>
                         <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
                     </field>
-                    <field id="bad_ip_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
+                    <field id="bad_ip_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="800" showInDefault="1">
                         <label><![CDATA[Bad IPs cache duration  (in seconds)]]></label>
                         <tooltip><![CDATA[Live mode only]]></tooltip>
                         <comment><![CDATA[The duration between re-asking LAPI about an already checked bad IP.<br>Minimum 1 second.]]></comment>

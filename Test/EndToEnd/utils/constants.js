@@ -12,11 +12,13 @@ const { DEBUG } = process.env;
 const { TIMEOUT } = process.env;
 const { CURRENT_IP } = process.env;
 const { PROXY_IP } = process.env;
+const DEBUG_LOG_PATH = "/var/www/html/var/log/crowdsec-bouncer-debug.log";
 
 module.exports = {
     ADMIN_URL,
     ADMIN_LOGIN,
     ADMIN_PASSWORD,
+    DEBUG_LOG_PATH,
     M2_URL,
     BOUNCER_KEY,
     CURRENT_IP,

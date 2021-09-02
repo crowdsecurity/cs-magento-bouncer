@@ -42,6 +42,7 @@ class Config extends AbstractHelper
     const CACHE_TECHNOLOGY_FULL_PATH = 'groups/advanced/groups/cache/fields/technology/value';
     const STREAM_MODE_FULL_PATH = 'groups/advanced/groups/mode/fields/stream/value';
     const REFRESH_CRON_EXPR_FULL_PATH = 'groups/advanced/groups/mode/fields/refresh_cron_expr/value';
+    const PRUNE_CRON_EXPR_FULL_PATH = 'groups/advanced/groups/cache/fields/prune_cron_expr/value';
 
     // General configs
     const XML_PATH_API_URL = self::SECTION . '/general/connection/api_url';
@@ -77,6 +78,7 @@ class Config extends AbstractHelper
     const XML_PATH_ADVANCED_REMEDIATION_FALLBACK = self::SECTION . '/advanced/remediation/fallback';
     const XML_PATH_ADVANCED_MODE_STREAM = self::SECTION . '/advanced/mode/stream';
     const XML_PATH_ADVANCED_REFRESH_CRON_EXPR = self::SECTION . '/advanced/mode/refresh_cron_expr';
+    const XML_PATH_ADVANCED_PRUNE_CRON_EXPR = self::SECTION . '/advanced/cache/prune_cron_expr';
     const XML_PATH_ADVANCED_CACHE_TECHNOLOGY = self::SECTION . '/advanced/cache/technology';
     const XML_PATH_ADVANCED_CACHE_REDIS_DSN = self::SECTION . '/advanced/cache/redis_dsn';
     const XML_PATH_ADVANCED_CACHE_MEMCACHED_DSN = self::SECTION . '/advanced/cache/memcached_dsn';
@@ -108,6 +110,7 @@ class Config extends AbstractHelper
         'is_prod_log_disabled' => null,
         'is_stream_mode' => null,
         'refresh_cron_expr' => null,
+        'prune_cron_expr' => null,
         'cache_technology' => null,
         'redis_dsn' => null,
         'memcached_dsn' => null,
@@ -286,6 +289,21 @@ class Config extends AbstractHelper
         }
 
         return $this->_globals['refresh_cron_expr'];
+    }
+
+    /**
+     * Get pruning cron schedule expression config
+     * @return string
+     */
+    public function getPruneCronExpr(): string
+    {
+        if (!isset($this->_globals['prune_cron_expr'])) {
+            $this->_globals['prune_cron_expr'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_ADVANCED_PRUNE_CRON_EXPR
+            );
+        }
+
+        return $this->_globals['prune_cron_expr'];
     }
 
     /**

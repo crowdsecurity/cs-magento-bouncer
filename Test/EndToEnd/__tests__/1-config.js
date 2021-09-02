@@ -42,6 +42,10 @@ describe(`Extension configuration`, () => {
         visible = await page.isVisible("#crowdsec_bouncer_advanced");
         if (!visible) {
             await page.click("#crowdsec_bouncer_advanced-head");
+            visible = await page.isVisible("#crowdsec_bouncer_advanced_debug");
+            if (!visible) {
+                await page.click("#crowdsec_bouncer_advanced_debug-head");
+            }
         }
         visible = await page.isVisible("#crowdsec_bouncer_general");
         expect(visible).toBeTruthy();
@@ -120,6 +124,10 @@ describe(`Extension configuration`, () => {
             "crowdsec_bouncer_advanced_remediation_trust_ip_forward_list",
             PROXY_IP,
         );
+    });
+
+    it("Should configure debug log", async () => {
+        await selectElement("crowdsec_bouncer_advanced_debug_log", "1");
     });
 
     it("Should save settings", async () => {

@@ -44,7 +44,7 @@ M2VERSION=$(ddev exec printenv DDEV_PROJECT | sed 's/\r//g')
 M2_URL=https://$HOSTNAME
 PROXY_IP=$(ddev find-ip ddev-router)
 BOUNCER_KEY=$(ddev exec bin/magento config:show crowdsec_bouncer/general/connection/api_key | sed 's/\r//g')
-JEST_PARAMS="--detectOpenHandles --runInBand"
+JEST_PARAMS="--bail=true --detectOpenHandles --runInBand"
 # If FAIL_FAST, will exit on first individual test fail
 # @see CustomEnvironment.js
 FAIL_FAST=true

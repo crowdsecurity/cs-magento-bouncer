@@ -31,5 +31,8 @@
         <job name="crowdsec_bouncer_refresh_cache" instance="CrowdSec\Bouncer\Cron\RefreshCache" method="execute">
             <config_path>crowdsec_bouncer/advanced/mode/refresh_cron_expr</config_path>
         </job>
+        <job name="crowdsec_bouncer_prune_fs_cache" instance="CrowdSec\Bouncer\Cron\PruneCache" method="execute">
+            <config_path>crowdsec_bouncer/advanced/cache/prune_cron_expr</config_path>
+        </job>
     </group>
 </config>

@@ -35,23 +35,6 @@ describe(`Configure Stream mode`, () => {
         await onAdminSaveSettings();
     });
 
-    it("Should not save bad settings", async () => {
-        await selectElement("crowdsec_bouncer_advanced_mode_stream", "1");
-        await fillInput(
-            "crowdsec_bouncer_advanced_mode_refresh_cron_expr",
-            "bad",
-        );
-        await onAdminSaveSettings(false);
-        await expect(page).toMatchText(
-            "#messages",
-            /Refresh expression cron \(bad\) is not valid./,
-        );
-        await expect(page).toMatchValue(
-            "#crowdsec_bouncer_advanced_mode_stream",
-            "0",
-        );
-    });
-
     it("Should save good settings", async () => {
         await selectElement("crowdsec_bouncer_advanced_mode_stream", "1");
         await fillInput(

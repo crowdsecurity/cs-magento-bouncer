@@ -178,6 +178,12 @@ file system cache.
 
 ***
 
+`Cache configuration → Cron expression for file system cache pruning` (`global` scope)
+
+If you chose file system as cache technology, you can schedule here an automatic cache pruning cron task.
+
+***
+
 
 `Cache configuration → Redis DSN` (`global` scope)
 
