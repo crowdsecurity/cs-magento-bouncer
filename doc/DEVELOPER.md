@@ -84,7 +84,9 @@ mkdir m2-sources
 ```
 - Create an empty `.ddev` folder for DDEV and clone our pre-configured DDEV repo:
 ```
-mkdir m2-sources/.ddev && cd m2-sources/.ddev && git clone git@github.com:julienloizelet/ddev-m2.git ./
+mkdir m2-sources/.ddev
+cd m2-sources/.ddev
+git clone git@github.com:julienloizelet/ddev-m2.git ./
 ```
 - Copy some configurations file:
 
@@ -131,7 +133,8 @@ You will need your Magento 2 credentials to install the source code.
 
      mkdir m2-sources/my-own-modules
      mkdir m2-sources/my-own-modules/crowdsec-bouncer
-     cd m2-sources/my-own-modules/crowdsec-bouncer && git clone git@github.com:crowdsecurity/cs-magento-bouncer.git ./
+     cd m2-sources/my-own-modules/crowdsec-bouncer
+     git clone git@github.com:crowdsecurity/cs-magento-bouncer.git ./
      ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
      ddev composer require crowdsec/magento2-module-bouncer:@dev
      ddev magento module:enable CrowdSec_Bouncer
@@ -187,8 +190,8 @@ For example:
     ./run-tests.sh host
     ./run-tests.sh host "./__tests__/1-config.js  ./__tests__/4-stream-mode.js"
 
-If you want to test with the `docker` or `ci` parameter, you have to install all the required dependencies 
-before with this command :
+Before testing with the `docker` or `ci` parameter, you have to install all the required dependencies 
+in the playwright container with this command :
 
     ./test-init.sh
 

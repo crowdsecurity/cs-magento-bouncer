@@ -14,6 +14,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+
 ## CrowdSec Bouncer PHP Library
 
 This extension is mainly based on the CrowdSec Bouncer PHP library. It is an open source library whose code you can find
@@ -44,5 +45,11 @@ Varnish itself, we adopt the following strategy :
 
 * If the first visit of a non cached page comes from a clean IP, we let it pass, so Magento will cache the content 
   as usual. As a result, if a bad IP user visits this page after the clean IP one, he will see the cached content.
+
+
+## Magento 2.2
+
+As Magento 2.2 is not compatible with PHP 7.2 until [2.2.9](https://github.com/magento/magento2/blob/2.2.9/composer.json#L11) and has reached end of support in [2019](https://devdocs.magento.com/release/released-versions.html#22), we did not try
+to make this extension compatible with it.
 
 
