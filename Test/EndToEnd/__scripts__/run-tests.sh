@@ -44,7 +44,7 @@ M2VERSION=$(ddev exec printenv DDEV_PROJECT | sed 's/\r//g')
 M2_URL=https://$HOSTNAME
 PROXY_IP=$(ddev find-ip ddev-router)
 BOUNCER_KEY=$(ddev exec bin/magento config:show crowdsec_bouncer/general/connection/api_key | sed 's/\r//g')
-JEST_PARAMS="--bail=true --detectOpenHandles --runInBand"
+JEST_PARAMS="--bail=true  --runInBand --verbose"
 # If FAIL_FAST, will exit on first individual test fail
 # @see CustomEnvironment.js
 FAIL_FAST=true
@@ -60,6 +60,7 @@ case $TYPE in
     CURRENT_IP=$(ddev find-ip host)
     TIMEOUT=31000
     HEADLESS=false
+    SLOWMO=150
     ;;
 
   "docker")
@@ -70,6 +71,7 @@ case $TYPE in
     CURRENT_IP=$(ddev find-ip playwright)
     TIMEOUT=31000
     HEADLESS=true
+    SLOWMO=0
     ;;
 
   "ci")
@@ -80,6 +82,7 @@ case $TYPE in
     CURRENT_IP=$(ddev find-ip playwright)
     TIMEOUT=31000
     HEADLESS=true
+    SLOWMO=0
     ;;
 
   *)
@@ -103,6 +106,7 @@ CURRENT_IP=$CURRENT_IP \
 TIMEOUT=$TIMEOUT \
 HEADLESS=$HEADLESS \
 FAIL_FAST=$FAIL_FAST \
+SLOWMO=$SLOWMO \
 yarn --cwd $YARN_PATH test \
     $JEST_PARAMS \
     --json \

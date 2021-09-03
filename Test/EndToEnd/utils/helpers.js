@@ -1,24 +1,19 @@
 /* eslint-disable no-undef */
 const fs = require("fs");
+
 const { addDecision, deleteAllDecisions } = require("./watcherClient");
 const {
     ADMIN_URL,
     M2_URL,
     ADMIN_LOGIN,
     ADMIN_PASSWORD,
-    DEBUG,
     TIMEOUT,
+    LAPI_URL_FROM_M2,
+    BOUNCER_KEY,
+    PROXY_IP,
 } = require("./constants");
 
-const COOKIES_FILE_PATH = `${__dirname}/../.cookies.json`;
-
-const notify = (message) => {
-    if (DEBUG) {
-        console.debug(message);
-    }
-};
-
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const wait = async (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 jest.setTimeout(TIMEOUT);
 
@@ -39,11 +34,8 @@ const goToPublicPage = async () => {
 };
 
 const onAdminGoToSettingsPage = async () => {
-    // CrowdSec Menu
-
     await page.click("#menu-magento-backend-stores > a");
     await page.waitForLoadState("networkidle");
-
     await page.click(
         '#menu-magento-backend-stores .item-system-config:has-text("Configuration") ',
     );
@@ -59,11 +51,99 @@ const onAdminGoToSettingsPage = async () => {
         "#crowdsec_bouncer_general-head",
         "General settings",
     );
+    // Open al tabs
+    let visible = await page.isVisible("#crowdsec_bouncer_general");
+    if (!visible) {
+        await page.click("#crowdsec_bouncer_general-head");
+    }
+    visible = await page.isVisible("#crowdsec_bouncer_theme");
+    if (!visible) {
+        await page.click("#crowdsec_bouncer_theme-head");
+    }
+    visible = await page.isVisible("#crowdsec_bouncer_advanced");
+    if (!visible) {
+        await page.click("#crowdsec_bouncer_advanced-head");
+    }
+    visible = await page.isVisible("#crowdsec_bouncer_general");
+    await expect(visible).toBeTruthy();
+    visible = await page.isVisible("#crowdsec_bouncer_theme");
+    await expect(visible).toBeTruthy();
+    visible = await page.isVisible("#crowdsec_bouncer_advanced");
+    await expect(visible).toBeTruthy();
+};
+
+const onAdminSaveSettings = async (successExpected = true) => {
+    await page.click("#save");
+    await page.waitForLoadState("networkidle");
+    if (successExpected) {
+        await expect(page).toMatchText(
+            "#messages",
+            /You saved the configuration./,
+        );
+    }
 };
 
 const goToSettingsPage = async () => {
     await goToAdmin();
     await onAdminGoToSettingsPage();
+};
+
+const setDefaultConfig = async (save = true) => {
+    await goToSettingsPage();
+    // Connexion details
+    await fillInput(
+        "crowdsec_bouncer_general_connection_api_url",
+        LAPI_URL_FROM_M2,
+    );
+    await fillInput("crowdsec_bouncer_general_connection_api_key", BOUNCER_KEY);
+    await page.click("#crowdsec_bouncer_general_connection_test");
+    await expect(page).toMatchText(
+        "#lapi_ping_result",
+        /Connection test result: success./,
+    );
+    // Bouncing normal
+    await selectElement(
+        "crowdsec_bouncer_general_bouncing_level",
+        "normal_bouncing",
+    );
+    // Enable on front
+    await selectElement("crowdsec_bouncer_general_bouncing_front_enabled", "1");
+    // Disable on admin
+    await selectElement("crowdsec_bouncer_general_bouncing_admin_enabled", "0");
+    // Live mode
+    await selectElement("crowdsec_bouncer_advanced_mode_stream", "0");
+    // Redis cache
+    await selectElement("crowdsec_bouncer_advanced_cache_technology", "redis");
+    await fillInput(
+        "crowdsec_bouncer_advanced_cache_redis_dsn",
+        "redis://redis:6379",
+    );
+    await fillInput(
+        "crowdsec_bouncer_advanced_cache_clean_ip_cache_duration",
+        1,
+    );
+    await fillInput("crowdsec_bouncer_advanced_cache_bad_ip_cache_duration", 1);
+    // Remediation
+    await selectElement(
+        "crowdsec_bouncer_advanced_remediation_fallback",
+        "bypass",
+    );
+    await fillInput(
+        "crowdsec_bouncer_advanced_remediation_trust_ip_forward_list",
+        PROXY_IP,
+    );
+    // Show mentions
+    await selectElement(
+        "crowdsec_bouncer_advanced_remediation_hide_mentions",
+        "0",
+    );
+    // Debug
+    await selectElement("crowdsec_bouncer_advanced_debug_log", "1");
+    await selectElement("crowdsec_bouncer_advanced_debug_display_errors", "1");
+
+    if (save) {
+        await onAdminSaveSettings();
+    }
 };
 
 const flushCache = async () => {
@@ -82,17 +162,6 @@ const flushCache = async () => {
         "#messages",
         "The Magento cache storage has been flushed.",
     );
-};
-
-const onAdminSaveSettings = async (successExpected = true) => {
-    await page.click("#save");
-    await page.waitForLoadState("networkidle");
-    if (successExpected) {
-        await expect(page).toMatchText(
-            "#messages",
-            /You saved the configuration./,
-        );
-    }
 };
 
 const runCron = async (cronClass) => {
@@ -199,73 +268,6 @@ const removeAllDecisions = async () => {
     await wait(1000);
 };
 
-const remediationShouldUpdate = async (
-    accessibleTextInTitle,
-    initialRemediation,
-    newRemediation,
-    timeoutMs,
-    intervalMs = 1000,
-) =>
-    new Promise((resolve, reject) => {
-        let checkRemediationTimeout;
-        let checkRemediationInterval;
-        let initialPassed = false;
-        const stopTimers = () => {
-            if (checkRemediationInterval) {
-                clearInterval(checkRemediationInterval);
-            }
-            if (checkRemediationTimeout) {
-                clearTimeout(checkRemediationTimeout);
-            }
-        };
-
-        checkRemediationInterval = setInterval(async () => {
-            await page.reload({ waitUntil: "networkidle" });
-            const remediation = await computeCurrentPageRemediation(
-                accessibleTextInTitle,
-            );
-            if (remediation === newRemediation) {
-                stopTimers();
-                if (initialPassed) {
-                    resolve();
-                } else {
-                    reject(
-                        new Error({
-                            errorType: "INITIAL_REMEDIATION_NEVER_HAPPENED",
-                            type: remediation,
-                        }),
-                    );
-                }
-            } else if (remediation === initialRemediation) {
-                initialPassed = true;
-            } else {
-                stopTimers();
-                reject(
-                    new Error({
-                        errorType: "WRONG_REMEDIATION_HAPPENED",
-                        type: remediation,
-                    }),
-                );
-            }
-        }, intervalMs);
-        checkRemediationTimeout = setTimeout(() => {
-            stopTimers();
-            reject(new Error({ errorType: "NEW_REMEDIATION_NEVER_HAPPENED" }));
-        }, timeoutMs);
-    });
-
-const storeCookies = async () => {
-    const cookies = await context.cookies();
-    const cookieJson = JSON.stringify(cookies);
-    fs.writeFileSync(COOKIES_FILE_PATH, cookieJson);
-};
-
-const loadCookies = async (context) => {
-    const cookies = fs.readFileSync(COOKIES_FILE_PATH, "utf8");
-    const deserializedCookies = JSON.parse(cookies);
-    await context.addCookies(deserializedCookies);
-};
-
 const getFileContent = async (filePath) => {
     if (fs.existsSync(filePath)) {
         return fs.readFileSync(filePath, "utf8");
@@ -281,7 +283,6 @@ const deleteFileContent = async (filePath) => {
 };
 
 module.exports = {
-    notify,
     addDecision,
     wait,
     runCron,
@@ -303,10 +304,8 @@ module.exports = {
     captchaIpForSeconds,
     removeAllDecisions,
     fillInput,
-    remediationShouldUpdate,
     selectElement,
-    storeCookies,
-    loadCookies,
     getFileContent,
     deleteFileContent,
+    setDefaultConfig,
 };

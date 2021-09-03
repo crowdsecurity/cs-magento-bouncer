@@ -167,7 +167,9 @@ You can also check unit tests: `ddev phpunit my-own-modules/crowdsec-bouncer/Tes
 
 ### End-to-end tests
 
-We are using a Jest/Playwright Node.js stack to launch a suite of end-to-end tests. 
+We are using a Jest/Playwright Node.js stack to launch a suite of end-to-end tests.
+
+**Please note** that those tests modify local configurations and log content on the fly.
 
 Tests code is in the `Test/EndToEnd` folder. You should have to `chmod +x` the scripts you will find in  
 `Test/EndToEnd/__scripts__`.
@@ -188,7 +190,7 @@ For example:
     ./run-tests.sh host "./__tests__/1-config.js"
     ./run-tests.sh docker "./__tests__/1-config.js" 
     ./run-tests.sh host
-    ./run-tests.sh host "./__tests__/1-config.js  ./__tests__/4-stream-mode.js"
+    ./run-tests.sh host "./__tests__/1-config.js  ./__tests__/3-stream-mode.js"
 
 Before testing with the `docker` or `ci` parameter, you have to install all the required dependencies 
 in the playwright container with this command :

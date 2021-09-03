@@ -1,38 +1,30 @@
 /* eslint-disable no-undef */
-const { CURRENT_IP } = require("../utils/constants");
 
 const {
-    notify,
-    publicHomepageShouldBeBanWall,
-    publicHomepageShouldBeAccessible,
-    banIpForSeconds,
-    loadCookies,
     removeAllDecisions,
     selectElement,
     onAdminSaveSettings,
     onLoginPageLoginAsAdmin,
     goToAdmin,
-    storeCookies,
     fillInput,
     goToSettingsPage,
     runCron,
     deleteFileContent,
     getFileContent,
+    setDefaultConfig,
 } = require("../utils/helpers");
 
 const { DEBUG_LOG_PATH } = require("../utils/constants");
 
 describe(`Configure crons`, () => {
-    beforeEach(() => notify(expect.getState().currentTestName));
-
     beforeAll(async () => {
         await goToAdmin();
         await onLoginPageLoginAsAdmin();
-        await storeCookies();
         await removeAllDecisions();
+        await setDefaultConfig(false);
     });
 
-    it("Should go on CrowdSec Bouncer section and prepare configs", async () => {
+    it("Should go on CrowdSec Bouncer section and prepare configurations", async () => {
         await goToSettingsPage();
         await selectElement("crowdsec_bouncer_advanced_mode_stream", "1");
         await fillInput(
@@ -86,18 +78,18 @@ describe(`Configure crons`, () => {
     it("Should log that pruning cron is running", async () => {
         await deleteFileContent(DEBUG_LOG_PATH);
         let logContent = await getFileContent(DEBUG_LOG_PATH);
-        expect(logContent).toBe("");
+        await expect(logContent).toBe("");
         await runCron("CrowdSec\\Bouncer\\Cron\\PruneCache");
         logContent = await getFileContent(DEBUG_LOG_PATH);
-        expect(logContent).toMatch("CACHE_PRUNED");
+        await expect(logContent).toMatch("CACHE_PRUNED");
     });
 
     it("Should log that refresh cron is running", async () => {
         await deleteFileContent(DEBUG_LOG_PATH);
         let logContent = await getFileContent(DEBUG_LOG_PATH);
-        expect(logContent).toBe("");
+        await expect(logContent).toBe("");
         await runCron("CrowdSec\\Bouncer\\Cron\\RefreshCache");
         logContent = await getFileContent(DEBUG_LOG_PATH);
-        expect(logContent).toMatch("CACHE_UPDATED");
+        await expect(logContent).toMatch("CACHE_UPDATED");
     });
 });

@@ -2,37 +2,26 @@
 const { CURRENT_IP } = require("../utils/constants");
 
 const {
-    notify,
     publicHomepageShouldBeBanWall,
     publicHomepageShouldBeAccessible,
     banIpForSeconds,
-    loadCookies,
     removeAllDecisions,
     selectElement,
     onAdminSaveSettings,
     onLoginPageLoginAsAdmin,
     goToAdmin,
-    storeCookies,
     fillInput,
     goToSettingsPage,
     runCron,
+    setDefaultConfig,
 } = require("../utils/helpers");
 
 describe(`Configure Stream mode`, () => {
-    beforeEach(() => notify(expect.getState().currentTestName));
-
     beforeAll(async () => {
         await goToAdmin();
         await onLoginPageLoginAsAdmin();
-        await storeCookies();
         await removeAllDecisions();
-    });
-
-    it("Should go on CrowdSec Bouncer section and prepare configs", async () => {
-        // "CrowdSec Bouncer" page
-        await goToSettingsPage();
-        await selectElement("crowdsec_bouncer_advanced_mode_stream", "0");
-        await onAdminSaveSettings();
+        await setDefaultConfig();
     });
 
     it("Should save good settings", async () => {
@@ -50,12 +39,6 @@ describe(`Configure Stream mode`, () => {
 });
 
 describe(`Run in stream mode`, () => {
-    beforeEach(() => notify(expect.getState().currentTestName));
-
-    beforeAll(async () => {
-        await loadCookies(context);
-    });
-
     it("Should display a ban wall via stream mode", async () => {
         await banIpForSeconds(15 * 60, CURRENT_IP);
         await runCron("CrowdSec\\Bouncer\\Cron\\RefreshCache");

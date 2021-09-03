@@ -1,9 +1,10 @@
 const headless = process.env.HEADLESS;
+const slowMo = process.env.SLOWMO;
 module.exports = {
     launchOptions: {
         headless,
     },
-    connectOptions: { slowMo: 150 },
+    connectOptions: { slowMo },
     exitOnPageError: false,
     contextOptions: {
         ignoreHTTPSErrors: true,

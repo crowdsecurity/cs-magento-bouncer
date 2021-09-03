@@ -353,6 +353,7 @@
                 <!-- Debug mode -->
                 <group id="debug" translate="label,comment,tooltip" showInDefault="1">
                     <label><![CDATA[Configure the debug mode]]></label>
+                    <attribute type="expanded">1</attribute>
                     <field id="log" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
                         <label>Enable debug log</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
