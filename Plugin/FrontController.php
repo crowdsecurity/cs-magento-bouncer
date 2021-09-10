@@ -109,6 +109,10 @@ class FrontController
         Closure $proceed,
         RequestInterface $request
     ) {
+        // Check if we are in prepend mode
+        if (defined('CROWDSEC_PREPEND_RUNNING_CONTEXT')) {
+            return $proceed($request);
+        }
         // Check if feature is enabled
         if (!$this->helper->isEnabled($this->state->getAreaCode())) {
             return $proceed($request);

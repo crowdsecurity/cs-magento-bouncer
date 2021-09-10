@@ -36,7 +36,8 @@ Please note that first and foremost CrowdSec must be installed on a server that 
 
 ### Features
 
-When a user is suspected to be malevolent, CrowdSec will either send him/her a Captcha to resolve or simply a page notifying that access is denied. 
+When a user is suspected by CrowdSec to be malevolent, this bouncer will either send him/her a captcha to resolve or 
+simply a page notifying that access is denied. If the user is considered as a clean user, he will access the page as normal.
 
 By default, the ban wall is displayed as below:
 
@@ -260,9 +261,44 @@ The prod log is lighter than the debug log. But you can disable it here.
 
 ***
 
+### Auto Prepend File mode
+
+By default, this extension will bounce every web requests: e.g requests called from webroot `index.php`.
+This implies that if another php public script is called (`cron.php` if accessible for example, or any of your 
+custom public php script) bouncing will not be effective.
+To ensure that any php script will be bounced if called from a browser, you should try the `auto prepend file` mode.
+
+In this mode, every browser access to a php script will be bounced.
+
+To enable the `auto prepend file` mode, you have to configure your server by adding an `auto_prepend_file` directive 
+for your php setup. This can be done in different ways:
+
+#### PHP
+
+You should add this line to a `.ini` file :
+
+    auto_prepend_file = /magento2-root-directory/vendor/crowdsec/magento2-module-bouncer/prepend.php
 
 
-  
+#### Nginx
 
+
+If you are using Nginx, you should modify your Magento 2 nginx configuration file by adding a `fastcgi_param` 
+directive. The php block should look like below:
+
+```
+location ~ \.php$ {
+        ...
+        ...
+        ...
+        fastcgi_param PHP_VALUE "/magento2-root-directory/vendor/crowdsec/magento2-module-bouncer/prepend.php";
+    }
+```
+
+#### Apache
+
+If you are using Apache, you should add this line to your `.htaccess` file:
+
+    php_value auto_prepend_file "/magento2-root-directory/vendor/crowdsec/magento2-module-bouncer/prepend.php"
 
  
