@@ -148,6 +148,13 @@ jobs:
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/4-cron.js"
 
+      - name: Run auto prepend mode test suite
+        run: |
+          cd ${{ github.workspace }}/.ddev
+          ddev crowdsec-prepend-nginx
+          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
+          ./run-tests.sh ci
+
 
 
 
