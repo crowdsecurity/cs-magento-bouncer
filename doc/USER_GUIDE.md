@@ -16,6 +16,10 @@
     - [General Settings](#general-settings)
     - [Theme customizations](#theme-customizations)
     - [Advanced settings](#advanced-settings)
+  - [Auto Prepend File mode](#auto-prepend-file-mode)
+    - [PHP](#php)
+    - [Nginx](#nginx)
+    - [Apache](#apache)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
