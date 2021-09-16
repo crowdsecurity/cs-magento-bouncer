@@ -27,7 +27,8 @@ The `CrowdSec Bouncer` extension for Magento 2 has been designed to protect Mage
 
 ## Prerequisites
 
-To be able to use this bouncer, the first step is to install [CrowdSec v1](https://doc.crowdsec.net/Crowdsec/v1/getting_started/installation/).
+To be able to use this bouncer, the first step is to install [CrowdSec v1](https://doc.crowdsec.net/docs/getting_started/install_crowdsec/).
+CrowdSec is only in charge of the "detection", and won't block anything on its own. You need to deploy a bouncer to "apply" decisions.
 
 Please note that first and foremost CrowdSec must be installed on a server that is accessible via the Magento 2 site.
 
