@@ -16,7 +16,7 @@ const {
 
 const { DEBUG_LOG_PATH } = require("../utils/constants");
 
-describe(`Configure crons`, () => {
+describe(`Configure and run crons`, () => {
     beforeAll(async () => {
         await goToAdmin();
         await onLoginPageLoginAsAdmin();

@@ -29,8 +29,8 @@ const goToAdmin = async () => {
     await page.goto(ADMIN_URL, { waitUntil: "networkidle" });
 };
 
-const goToPublicPage = async () => {
-    await page.goto(`${M2_URL}`);
+const goToPublicPage = async (endpoint = "") => {
+    return page.goto(`${M2_URL}${endpoint}`);
 };
 
 const onAdminGoToSettingsPage = async () => {
@@ -110,6 +110,8 @@ const setDefaultConfig = async (save = true) => {
     await selectElement("crowdsec_bouncer_general_bouncing_front_enabled", "1");
     // Disable on admin
     await selectElement("crowdsec_bouncer_general_bouncing_admin_enabled", "0");
+    // Disable on API
+    await selectElement("crowdsec_bouncer_general_bouncing_api_enabled", "0");
     // Live mode
     await selectElement("crowdsec_bouncer_advanced_mode_stream", "0");
     // Redis cache
