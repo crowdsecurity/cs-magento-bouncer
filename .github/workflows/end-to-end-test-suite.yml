@@ -148,6 +148,11 @@ jobs:
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/4-cron.js"
 
+      - name: Run api test
+        run: |
+          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
+          ./run-tests.sh ci "./__tests__/5-api.js"
+
       - name: Run auto prepend mode test suite
         run: |
           cd ${{ github.workspace }}/.ddev
