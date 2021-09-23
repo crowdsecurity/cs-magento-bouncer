@@ -154,6 +154,9 @@ Just copy the file and restart:
     cp .ddev/config_overrides/config.crowdsec.yaml .ddev/config.crowdsec.yaml
     ddev restart
 
+You can also add the ddev-router IP as trusted proxy IP:
+
+    ddev magento config:set crowdsec_bouncer/advanced/remediation/trust_ip_forward_list $(ddev find-ip ddev-router)
 
 ### Extension quality
 
@@ -234,6 +237,10 @@ First, you should configure your Magento 2 instance to use Varnish as full page 
 ddev magento config:set system/full_page_cache/caching_application 2
 ```
 
+You can also add the varnish IP as trusted proxy IP:
+
+    ddev magento config:set crowdsec_bouncer/advanced/remediation/trust_ip_forward_list $(ddev find-ip varnish)
+
 Then, you can add specific files for Varnish and restart:
 
 ```
@@ -252,11 +259,12 @@ ddev reload-vcl
 
 For information, here are the differences between the back office generated `default.vcl` and the `default.vcl` we use:
 
-- We removed the following part:
+- We changed the probe url from `"/pub/health_check.php"` to `"/health_check.php"` as explained in the [official
+  documentation](https://devdocs.magento.com/guides/v2.4/config-guide/varnish/config-varnish-advanced.html):
 
 ```
  .probe = {
-    .url = "/pub/health_check.php";
+    .url = "/health_check.php";
     .timeout = 2s;
     .interval = 5s;
     .window = 10;
@@ -265,7 +273,7 @@ For information, here are the differences between the back office generated `def
 ```
 
 
-- We added this part for Marketplace EQP Varnish test simulation:
+- We added this part for Marketplace EQP Varnish test simulation as explained in the [official documentation](https://devdocs.magento.com/marketplace/sellers/installation-and-varnish-tests.html#additional-magento-configuration):
 
 ```
 if (resp.http.x-varnish ~ " ") {
@@ -303,7 +311,11 @@ RespStatus     200
 RespReason     Purged
 ```
 
+### Auto Prepend File mode
 
+To enable the `auto prepend file` mode, you can run the following command that will modify nginx configuration: 
+
+    ddev crowdsec-prepend-nginx
 
 ## Commit message
 
