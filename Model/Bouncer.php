@@ -195,7 +195,8 @@ class Bouncer extends AbstractBounce implements IBounce
      */
     public function getHttpRequestHeader(string $name): ?string
     {
-        return $this->request->getHeader($name);
+        $httpRequestHeader = $this->request->getHeader($name);
+        return $httpRequestHeader ?: null;
     }
 
     /**
@@ -277,7 +278,8 @@ class Bouncer extends AbstractBounce implements IBounce
      */
     public function getPostedVariable(string $name): ?string
     {
-        return $this->request->getPost($name);
+        $post = $this->request->getPost($name);
+        return $post?:null;
     }
 
     /**
