@@ -80,6 +80,7 @@ try {
     if ($bouncerRegistry->get()) {
         return;
     }
+    /** @var \CrowdSec\Bouncer\Model\Bouncer $bouncer */
     $bouncer = $bouncerRegistry->create();
     $bouncer->init();
     $bouncer->run();
