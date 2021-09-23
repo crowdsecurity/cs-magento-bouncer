@@ -78,6 +78,8 @@ m2-sources
          
 ```
 
+**N.B:** you can use whatever name you like for the folder `m2-sources` but, in order to use our pre-configured ddev
+commands, you must respect the sub folders naming: `.ddev`, `my-own-modules` and `crowdsec-bouncer`.
 
 - Create an empty folder that will contain all necessary sources (Magento 2 and this extension):
 ``` 
@@ -314,14 +316,30 @@ RespReason     Purged
 
 ### Auto Prepend File mode
 
-To enable the `auto prepend file` mode, you can run the following command that will modify nginx configuration: 
+To enable the `auto prepend file` mode, you can run the following command that will modify and reload nginx
+configuration:
 
     ddev crowdsec-prepend-nginx
 
+To disable the `auto prepend file` mode, please restart:
+
+    ddev restart
+
 ## Commit message
 
-In order to have an explicit commit history, we are using some commits message convention. 
-See [here](https://karma-runner.github.io/6.3/dev/git-commit-msg.html) for more information.
+In order to have an explicit commit history, we are using some commits message convention with the following format:
+
+    <type>(<scope>): <subject>
+
+Allowed `type` are defined below.
+`scope` value intends to clarify which part of the code has been modified. It can be empty or `*` if the change is a
+global or difficult to assign to a specific part.
+`subject` describes what has been done using the imperative, present tense.
+
+Example:
+
+    feat(admin): Add css for admin actions
+
 
 You can use the `commit-msg` git hook that you will find in the `.githooks` folder : 
 
