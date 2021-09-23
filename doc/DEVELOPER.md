@@ -22,6 +22,7 @@
   - [CrowdSec CSCLI command](#crowdsec-cscli-command)
   - [Varnish](#varnish)
     - [Varnish debug](#varnish-debug)
+  - [Auto Prepend File mode](#auto-prepend-file-mode)
 - [Commit message](#commit-message)
   - [Allowed message `type` values](#allowed-message-type-values)
 - [Release process](#release-process)
