@@ -128,7 +128,7 @@ class Bouncer extends AbstractBounce implements IBounce
      * @return BouncerInstance
      * @throws CrowdSecException
      */
-    public function getBouncerInstance($forcedConfigs = []): BouncerInstance
+    public function getBouncerInstance(array $forcedConfigs = []): BouncerInstance
     {
         if ($this->bouncerInstance === null || !empty($forcedConfigs)) {
             $configs = $this->helper->getBouncerConfigs();
@@ -181,9 +181,10 @@ class Bouncer extends AbstractBounce implements IBounce
     /**
      * Initialize the bouncer instance
      * @param array $forcedConfigs
+     * @return BouncerInstance
      * @throws CrowdSecException
      */
-    public function init($forcedConfigs = []): BouncerInstance
+    public function init(array $forcedConfigs = []): BouncerInstance
     {
         $this->bouncer = $this->getBouncerInstance($forcedConfigs);
 
@@ -264,7 +265,7 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * Unset a session variable, throw an error if this does not exists.
+     * Unset a session variable, throw an error if this does not exist.
      *
      * @return void;
      */

@@ -57,7 +57,7 @@ class Ping extends Button
      *
      * @return string
      */
-    public function getUrlField()
+    public function getUrlField(): string
     {
         return $this->_apiUrlField;
     }
@@ -67,7 +67,7 @@ class Ping extends Button
      *
      * @return string
      */
-    public function getKeyField()
+    public function getKeyField(): string
     {
         return $this->_bouncerKeyField;
     }

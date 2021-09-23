@@ -26,7 +26,6 @@
  */
 namespace CrowdSec\Bouncer\Model\Config\Source;
 
-use CrowdSec\Bouncer\Constants;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use Magento\Framework\Data\OptionSourceInterface;
 

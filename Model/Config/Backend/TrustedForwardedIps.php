@@ -100,14 +100,14 @@ class TrustedForwardedIps extends Value
                 foreach ($stringRangeArray as $stringRange) {
                     $stringRange = trim($stringRange);
                     if (false !== strpos($stringRange, '/')) {
-                        $range = Factory::rangeFromString($stringRange);
+                        $range = Factory::parseRangeString($stringRange);
                         if (null === $range) {
                             throw new CrowdSecException(__('Invalid IP List format.'));
                         }
                         $bounds = [$range->getComparableStartString(), $range->getComparableEndString()];
                         $comparableIpBoundsList = [$bounds];
                     } else {
-                        $address = Factory::addressFromString($stringRange);
+                        $address = Factory::parseAddressString($stringRange);
                         if (null === $address) {
                             throw new CrowdSecException(__('Invalid IP List format.'));
                         }

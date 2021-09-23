@@ -27,7 +27,6 @@
 
 namespace CrowdSec\Bouncer\Block\Adminhtml\System\Config\Cache;
 
-use CrowdSec\Bouncer\Constants;
 use CrowdSec\Bouncer\Block\Adminhtml\System\Config\Button;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 

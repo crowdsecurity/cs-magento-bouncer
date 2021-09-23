@@ -113,7 +113,7 @@ class Data extends Config
      * @param string $areaCode
      * @return bool
      */
-    public function isEnabled($areaCode = Area::AREA_FRONTEND): bool
+    public function isEnabled(string $areaCode = Area::AREA_FRONTEND): bool
     {
         if (!isset($this->_isEnabled[$areaCode])) {
             switch ($areaCode) {
@@ -222,7 +222,7 @@ class Data extends Config
      * @param $message
      * @param array $context
      */
-    public function debug($message, $context = []): void
+    public function debug($message, array $context = []): void
     {
         if ($this->isDebugLog()) {
             $this->getFinalLogger()->debug($message, $context);
@@ -234,7 +234,7 @@ class Data extends Config
      * @param $message
      * @param array $context
      */
-    public function critical($message, $context = []): void
+    public function critical($message, array $context = []): void
     {
         $this->getFinalLogger()->critical($message, $context);
     }
@@ -244,7 +244,7 @@ class Data extends Config
      * @param $message
      * @param array $context
      */
-    public function error($message, $context = []): void
+    public function error($message, array $context = []): void
     {
         $this->getFinalLogger()->error($message, $context);
     }
@@ -318,13 +318,13 @@ class Data extends Config
     }
 
     /**
-     * @param RestClient; $restClient
+     * @param RestClient $restClient
      * @param string $baseUri
      * @param string $userAgent
      * @param string $apiKey
      * @param int $timeout
      */
-    public function ping($restClient, string $baseUri, string $userAgent, string $apiKey, $timeout = 1)
+    public function ping(RestClient $restClient, string $baseUri, string $userAgent, string $apiKey, int $timeout = 1)
     {
         $restClient->configure($baseUri, [
             'User-Agent' => $userAgent,

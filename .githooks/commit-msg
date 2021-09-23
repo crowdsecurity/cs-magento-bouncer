@@ -18,6 +18,5 @@ REGEX='^(feat|fix|docs|style|refactor|ci|test|chore|comment)\(.*\)\:.*'
 if ! echo "$commitTitle" | grep -qE ${REGEX}; then
 	echo "Your commit title '$commitTitle' did not follow conventional commit message rules:"
 	echo "Please comply with the regex ${REGEX}"
-	echo "See https://karma-runner.github.io/6.3/dev/git-commit-msg.html for more information on conventional commits"
 	exit 1
 fi
