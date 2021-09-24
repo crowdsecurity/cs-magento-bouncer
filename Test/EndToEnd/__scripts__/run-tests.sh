@@ -80,7 +80,7 @@ case $TYPE in
     COMMAND="ddev exec -s playwright xvfb-run --auto-servernum -- yarn --cwd ${YARN_PATH} cross-env"
     LAPI_URL_FROM_PLAYWRIGHT=http://crowdsec:8080
     CURRENT_IP=$(ddev find-ip playwright)
-    TIMEOUT=31000
+    TIMEOUT=60000
     HEADLESS=true
     SLOWMO=0
     ;;
