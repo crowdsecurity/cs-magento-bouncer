@@ -316,7 +316,11 @@ RespReason     Purged
 
 ### Auto Prepend File mode
 
-To enable the `auto prepend file` mode, you can run the following command that will modify and reload nginx
+First, you have to copy the `crowdsec-prepend.php` file to your `app/etc` folder:
+
+    cp m2-sources/my-own-modules/crowdsec-bouncer/crowdsec-prepend.php m2-sources/app/etc/crowdsec-prepend.php
+
+Then, to enable the `auto prepend file` mode, you can run the following command that will modify and reload nginx
 configuration:
 
     ddev crowdsec-prepend-nginx

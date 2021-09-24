@@ -275,14 +275,21 @@ To ensure that any php script will be bounced if called from a browser, you shou
 
 In this mode, every browser access to a php script will be bounced.
 
-To enable the `auto prepend file` mode, you have to configure your server by adding an `auto_prepend_file` directive 
-for your php setup. This can be done in different ways:
+To enable the `auto prepend file` mode, you have to:
+
+- copy the `crowdsec-prepend.php` file in your Magento 2 `app/etc` folder
+- configure your server by adding an `auto_prepend_file` directive for your php setup.
+
+**N.B:** Beware that you have to copy the file before modifying your PHP configuration,or you will get a PHP fatal
+error.
+
+Adding an `auto_prepend_file` directive can be done in different ways:
 
 #### PHP
 
 You should add this line to a `.ini` file :
 
-    auto_prepend_file = /magento2-root-directory/vendor/crowdsec/magento2-module-bouncer/prepend.php
+    auto_prepend_file = /magento2-root-directory/app/etc/crowdsec-prepend.php
 
 
 #### Nginx
@@ -296,7 +303,7 @@ location ~ \.php$ {
         ...
         ...
         ...
-        fastcgi_param PHP_VALUE "/magento2-root-directory/vendor/crowdsec/magento2-module-bouncer/prepend.php";
+        fastcgi_param PHP_VALUE "/magento2-root-directory/app/etc/crowdsec-prepend.php";
     }
 ```
 
@@ -304,6 +311,6 @@ location ~ \.php$ {
 
 If you are using Apache, you should add this line to your `.htaccess` file:
 
-    php_value auto_prepend_file "/magento2-root-directory/vendor/crowdsec/magento2-module-bouncer/prepend.php"
+    php_value auto_prepend_file "/magento2-root-directory/app/etc/crowdsec-prepend.php"
 
  

@@ -44,11 +44,8 @@ use Magento\Framework\ObjectManager\ConfigLoaderInterface;
 if (PHP_SAPI === 'cli') {
     return;
 }
-$rootPath = realpath('.');
-if (!file_exists($rootPath . '/../app/autoload.php')) {
-    return;
-}
-require_once $rootPath . '/../app/autoload.php';
+// THIS FILE MUST BE COPIED IN "app/etc" FOLDER
+require_once dirname(__DIR__)."/autoload.php";
 
 if (!defined('CROWDSEC_PREPEND_RUNNING_CONTEXT')) {
     define('CROWDSEC_PREPEND_RUNNING_CONTEXT', true);
