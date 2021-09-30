@@ -99,7 +99,7 @@ jobs:
         with:
           path: my-own-modules/crowdsec-php-lib
           repository: julienloizelet/php-cs-bouncer
-          ref: 0.14.0.2
+          ref: 0.14.0.3
 
       - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
         run: |

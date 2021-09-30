@@ -280,8 +280,23 @@ To enable the `auto prepend file` mode, you have to:
 - copy the `crowdsec-prepend.php` file in your Magento 2 `app/etc` folder
 - configure your server by adding an `auto_prepend_file` directive for your php setup.
 
-**N.B:** Beware that you have to copy the file before modifying your PHP configuration,or you will get a PHP fatal
-error.
+**N.B:**
+- Beware that you have to copy the file before modifying your PHP configuration,or you will get a PHP fatal error.
+- Note that if you upgrade the bouncer module, you should have to copy the file again. To make this copy
+  automatically, you should modify the root `composer.json` of your Magento 2 projects by adding `post-install-cmd`
+  and `post-update-cmd` to the scripts parts:
+
+```
+"scripts": {
+    "post-install-cmd": [
+        "php -r \"copy('vendor/crowdsec/magento2-module-bouncer/crowdsec-prepend.php', 'app/etc/crowdsec-prepend.php');\""
+    ],
+    "post-update-cmd": [
+        "php -r \"copy('vendor/crowdsec/magento2-module-bouncer/crowdsec-prepend.php', 'app/etc/crowdsec-prepend.php');\""
+    ]
+}
+```
+
 
 Adding an `auto_prepend_file` directive can be done in different ways:
 
