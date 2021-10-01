@@ -1,5 +1,5 @@
 const headless = process.env.HEADLESS;
-const slowMo = process.env.SLOWMO;
+const slowMo = parseFloat(process.env.SLOWMO);
 module.exports = {
     launchOptions: {
         headless,
