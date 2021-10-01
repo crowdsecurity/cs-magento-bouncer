@@ -24,7 +24,7 @@
     "require": {
         "php": "^7.2|^7.3|^7.4",
         "magento/framework": ">=102",
-        "crowdsec/bouncer": "0.14.0.3@dev"
+        "okaeli/crowdsec-bouncer-php-lib": "v0.14.0.3"
     },
     "autoload": {
         "files": [

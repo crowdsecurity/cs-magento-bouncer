@@ -94,17 +94,9 @@ jobs:
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 
-      - name: Clone CrowdSec PHP Lib files
-        uses: actions/checkout@v2
-        with:
-          path: my-own-modules/crowdsec-php-lib
-          repository: julienloizelet/php-cs-bouncer
-          ref: 0.14.0.3
-
       - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
         run: |
           ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/${{ env.EXTENSION_PATH }}/
-          ddev composer config repositories.crowdsec-lib path my-own-modules/crowdsec-php-lib/
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
       - name: Enable extension
