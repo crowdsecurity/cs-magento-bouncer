@@ -94,23 +94,10 @@ jobs:
         with:
           path: my-own-modules/crowdsec-bouncer
 
-      - name: Clone CrowdSec PHP Lib files (if composer 2 is not availaible)
-        if: startsWith(matrix.m2-version, '2.3')
-        uses: actions/checkout@v2
-        with:
-          path: my-own-modules/crowdsec-php-lib
-          repository: julienloizelet/php-cs-bouncer
-          ref: 0.14.0.3
-
       - name: Add CrowdSec Bouncer as composer dependency
         run: |
           ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
-
-      - name: Clone CrowdSec PHP lib as local repositories path (if composer 2 is not availaible)
-        if: startsWith(matrix.m2-version, '2.3')
-        run: |
-          ddev composer config repositories.crowdsec-bouncer-php-lib path my-own-modules/crowdsec-php-lib/
 
       - name: Add Coding Standard and PHPStan for Magento 2.3
         if: startsWith(matrix.m2-version, '2.3')
