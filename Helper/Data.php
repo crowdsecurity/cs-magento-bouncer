@@ -71,6 +71,11 @@ class Data extends Config
     protected $_bouncerConfigs;
 
     /**
+     * @var string
+     */
+    protected $_forwardedFroIp;
+
+    /**
      * Data constructor.
      * @param Logger $logger
      * @param DebugHandler $debugHandler
@@ -78,10 +83,10 @@ class Data extends Config
      * @param Json $serializer
      */
     public function __construct(
-        Logger $logger,
+        Logger       $logger,
         DebugHandler $debugHandler,
-        Context $context,
-        Json $serializer
+        Context      $context,
+        Json         $serializer
     ) {
         parent::__construct($context, $serializer);
         $this->_selfLogger = $logger;
@@ -215,6 +220,59 @@ class Data extends Config
         }
 
         return $this->_banWallConfigs;
+    }
+
+    /**
+     * @return string The current IP, even if it's the IP of a proxy
+     */
+    public function getRemoteIp(): string
+    {
+        return $this->_remoteAddress->getRemoteAddress();
+    }
+
+    /**
+     * @return string The X-Forwarded-For IP
+     */
+    public function getForwarderForIp(): string
+    {
+        if ($this->_forwardedFroIp === null) {
+            $this->_forwardedFroIp = false;
+            $XForwardedForHeader = $this->getHttpRequestHeader('X-Forwarded-For');
+            if (null !== $XForwardedForHeader) {
+                $ipList = array_map('trim', array_values(array_filter(explode(',', $XForwardedForHeader))));
+                $this->_forwardedFroIp = end($ipList);
+            }
+        }
+
+        return $this->_forwardedFroIp;
+    }
+
+    /**
+     * @return string The current HTTP method
+     */
+    public function getHttpMethod(): string
+    {
+        return $this->_request->getMethod();
+    }
+
+    /**
+     * Get the value of a posted field.
+     */
+    public function getPostedVariable(string $name): ?string
+    {
+        $post = $this->_request->getPost($name);
+
+        return $post ?: null;
+    }
+
+    /**
+     * @return string Ex: "X-Forwarded-For"
+     */
+    public function getHttpRequestHeader(string $name): ?string
+    {
+        $httpRequestHeader = $this->_request->getHeader($name);
+
+        return $httpRequestHeader ?: null;
     }
 
     /**

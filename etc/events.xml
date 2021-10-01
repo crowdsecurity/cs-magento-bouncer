@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CrowdSec_Bouncer Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
+ * @copyright  Copyright (c)  2021+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
+ * @module   Bouncer
+ * @author   CrowdSec team
+ *
+ */
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_order_place_after">
+        <observer name="crowdsec_bouncer_sales_order_place_after" instance="CrowdSec\Bouncer\Observer\Order\Place" />
+    </event>
+    <event name="sales_order_payment_place_end">
+        <observer name="crowdsec_bouncer_sales_order_payment_place_end" instance="CrowdSec\Bouncer\Observer\Payment\Place"/>
+    </event>
+</config>

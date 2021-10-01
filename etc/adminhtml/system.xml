@@ -371,6 +371,34 @@
                     </field>
                 </group>
             </group>
+            <!-- Events -->
+            <group id="events" translate="label,comment,tooltip" showInDefault="1">
+            <attribute type="expanded">1</attribute>
+            <label>Events</label>
+                <!-- Events logging -->
+                <group id="log" translate="label,comment,tooltip" showInDefault="1">
+                    <label><![CDATA[Logging]]></label>
+                    <attribute type="expanded">1</attribute>
+                    <field id="enabled" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                        <label>Enable events log</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Logs will be written in "var/log/crowdsec-events.log".]]></comment>
+                    </field>
+                </group>
+                <!-- Optional data -->
+                <group id="optional" translate="label,comment,tooltip" showInDefault="1">
+                    <label><![CDATA[Optional logged data]]></label>
+                    <attribute type="expanded">1</attribute>
+                    <field id="customer_email" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                        <label>Log customer email</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/events/log/enabled">1</field>
+                        </depends>
+                    </field>
+                </group>
+            </group>
         </section>
     </system>
 </config>

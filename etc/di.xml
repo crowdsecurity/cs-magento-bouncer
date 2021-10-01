@@ -42,6 +42,14 @@
             </argument>
         </arguments>
     </type>
+    <type name="CrowdSec\Bouncer\Logger\EventLogger">
+        <arguments>
+            <argument name="name" xsi:type="string">crowdsec-events</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="event" xsi:type="object">CrowdSec\Bouncer\Logger\Handlers\Event</item>
+            </argument>
+        </arguments>
+    </type>
     <!-- Plugin -->
     <type name="Magento\Framework\App\FrontControllerInterface">
         <plugin name="crowdsec-front-controller" type="CrowdSec\Bouncer\Plugin\FrontController" sortOrder="1" />
