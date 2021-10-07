@@ -20,9 +20,16 @@ jest.setTimeout(TIMEOUT);
 const fillInput = async (optionId, value) => {
     await page.fill(`[id=${optionId}]`, `${value}`);
 };
+const fillByName = async (name, value) => {
+    await page.fill(`[name=${name}]`, `${value}`);
+};
 
 const selectElement = async (selectId, valueToSelect) => {
     await page.selectOption(`[id=${selectId}]`, `${valueToSelect}`);
+};
+
+const selectByName = async (selectName, valueToSelect) => {
+    await page.selectOption(`[name=${selectName}]`, `${valueToSelect}`);
 };
 
 const goToAdmin = async () => {
@@ -66,11 +73,17 @@ const onAdminGoToSettingsPage = async () => {
     if (!visible) {
         await page.click("#crowdsec_bouncer_advanced-head");
     }
+    visible = await page.isVisible("#crowdsec_bouncer_events");
+    if (!visible) {
+        await page.click("#crowdsec_bouncer_events-head");
+    }
     visible = await page.isVisible("#crowdsec_bouncer_general");
     await expect(visible).toBeTruthy();
     visible = await page.isVisible("#crowdsec_bouncer_theme");
     await expect(visible).toBeTruthy();
     visible = await page.isVisible("#crowdsec_bouncer_advanced");
+    await expect(visible).toBeTruthy();
+    visible = await page.isVisible("#crowdsec_bouncer_events");
     await expect(visible).toBeTruthy();
 };
 
@@ -144,6 +157,9 @@ const setDefaultConfig = async (save = true) => {
     // Debug
     await selectElement("crowdsec_bouncer_advanced_debug_log", "1");
     await selectElement("crowdsec_bouncer_advanced_debug_display_errors", "1");
+    // Events
+    await selectElement("crowdsec_bouncer_events_log_enabled", "1");
+    await selectElement("crowdsec_bouncer_events_optional_customer_email", "1");
 
     if (save) {
         await onAdminSaveSettings();
@@ -308,7 +324,9 @@ module.exports = {
     captchaIpForSeconds,
     removeAllDecisions,
     fillInput,
+    fillByName,
     selectElement,
+    selectByName,
     getFileContent,
     deleteFileContent,
     setDefaultConfig,
