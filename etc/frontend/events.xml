@@ -36,7 +36,4 @@
     <event name="checkout_cart_product_add_after">
         <observer name="crowdsec_bouncer_checkout_cart_add_product_after" instance="CrowdSec\Bouncer\Observer\Quote\AddProduct" />
     </event>
-    <event name="sales_order_place_after">
-        <observer name="crowdsec_bouncer_sales_order_place_after" instance="CrowdSec\Bouncer\Observer\Order\Place" />
-    </event>
 </config>

@@ -61,7 +61,7 @@ On the other hand, all texts are also fully customizable. This will allow you, f
 
 This module comes with configurations that you will find under `Stores → Configurations → Security → CrowdSec Bouncer` admin section.
 
-These configurations are divided in three main parts : `General Settings`, `Theme customizations` and `Advanced settings`.
+These configurations are divided in four main parts : `General Settings`, `Theme customizations`, `Advanced settings` and `Events`.
 
 
 #### General Settings
@@ -265,6 +265,27 @@ When this mode is enabled, you will see every unexpected bouncing errors in the 
 The prod log is lighter than the debug log. But you can disable it here.
 
 ***
+
+#### Events
+
+In the `Events` part, you can enable and configure business events logging.
+
+***
+
+`Logging → Enable events log` (`global` scope)
+
+If enabled, logs will be written in a `var/log/crowdsec-events.log` file.
+
+***
+
+`Optional logged data → Log customer email` (`global` scope)
+
+Choose "Yes" if you allow logging customer email when possible.
+
+***
+
+
+
 
 ### Auto Prepend File mode
 
