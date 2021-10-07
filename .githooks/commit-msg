@@ -7,9 +7,9 @@ fi
 
 commitTitle="$(cat $1 | head -n1)"
 
-# ignore merge requests
-if echo "$commitTitle" | grep -qE "^Merge branch"; then
-	echo "Commit hook: ignoring branch merge"
+# ignore merge
+if echo "$commitTitle" | grep -qE "^Merge"; then
+	echo "Commit hook: ignoring merge"
 	exit 0
 fi
 

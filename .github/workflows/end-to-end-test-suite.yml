@@ -57,6 +57,7 @@ jobs:
           cp .ddev/config_overrides/config.${{ env.M2_VERSION_CODE }}.yaml .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
           cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-compose.playwright.yaml
+          cp .ddev/custom_files/varnish-profile.xml varnish-profile.xml
           sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           ddev start
 
@@ -110,9 +111,10 @@ jobs:
           ddev crowdsec-config
           ddev magento cache:flush
 
-
       - name: Prepare for playwright test
         run: |
+          ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
+          ddev magento cache:flush
           cp .ddev/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
           cp ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/crowdsec-prepend.php.example ${{ github.workspace }}/app/etc/crowdsec-prepend.php
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
@@ -130,7 +132,6 @@ jobs:
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/2-live-mode.js"
 
-
       - name: Run stream mode test
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
@@ -146,14 +147,14 @@ jobs:
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/5-api.js"
 
+      - name: Run events logging test
+        run: |
+          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
+          ./run-tests.sh ci "./__tests__/6-events.js"
+
       - name: Run auto prepend mode test suite
         run: |
           cd ${{ github.workspace }}/.ddev
           ddev crowdsec-prepend-nginx
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci
-
-
-
-
-
