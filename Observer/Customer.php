@@ -37,19 +37,11 @@ class Customer extends Event implements EventInterface, ObserverInterface
      */
     protected $type = 'M2_EVENT_CUSTOMER';
 
-    public function getOptionalData($objects): array
+
+    public function getEventData($objects): array
     {
         $customer = $objects['customer'] ?? null;
-
-        return $customer ? ['customer_email' => $this->helper->isOptionalLogEnabled('customer_email') ?
-            $customer->getEmail() :
-            self::UNAUTHORIZED] : [];
-    }
-
-    public function getAdditionalData($objects): array
-    {
-        $customer = $objects['customer'] ?? null;
-        return $customer ? ['customer_id' => $customer->getId()] : [];
+        return $customer ? ['customer_id' => $customer->getId(), 'customer_email' => $customer->getEmail()] : [];
     }
 
     public function execute(Observer $observer)
@@ -58,9 +50,9 @@ class Customer extends Event implements EventInterface, ObserverInterface
             $customer = $observer->getCustomer();
             $baseData = $this->getBaseData();
             $dataObjects = ['customer' => $customer];
-            $additionalData = $this->getAdditionalData($dataObjects);
-            $optionalData = $this->getOptionalData($dataObjects);
-            $this->helper->getEventLogger()->info('', array_merge($baseData, $additionalData, $optionalData));
+            $eventData = $this->getEventData($dataObjects);
+            $finalData = $this->hideSensitiveData(array_merge($baseData, $eventData), $this->getSensitiveData());
+            $this->helper->getEventLogger()->info('', $finalData);
         }
 
         return $this;

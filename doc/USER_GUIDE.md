@@ -278,9 +278,9 @@ If enabled, logs will be written in a `var/log/crowdsec-events.log` file.
 
 ***
 
-`Optional logged data → Log customer email` (`global` scope)
+`Logging → Hide sensitive data` (`global` scope)
 
-Choose "Yes" if you allow logging customer email when possible.
+If "Yes", sensitive data (email, ...) will be obfuscated as a sha256 hash string.
 
 ***
 

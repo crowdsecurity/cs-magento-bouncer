@@ -89,7 +89,7 @@ class Config extends AbstractHelper
     const XML_PATH_ADVANCED_DISABLE_PROD_LOG = self::SECTION . '/advanced/debug/disable_prod_log';
     // Events configs
     const XML_PATH_EVENTS_LOG_ENABLED = self::SECTION . '/events/log/enabled';
-    const XML_PATH_EVENTS_OPTIONAL_CUSTOMER_EMAIL = self::SECTION . '/events/optional/customer_email';
+    const XML_PATH_EVENTS_LOG_HIDE_SENSITIVE = self::SECTION . '/events/log/hide_sensitive';
 
     /**
      * The path of trusted forward ips as array setting
@@ -112,6 +112,7 @@ class Config extends AbstractHelper
         'can_display_errors' => null,
         'is_prod_log_disabled' => null,
         'is_events_log_enabled' => null,
+        'event_hide_sensitive' => null,
         'is_stream_mode' => null,
         'refresh_cron_expr' => null,
         'prune_cron_expr' => null,
@@ -249,6 +250,20 @@ class Config extends AbstractHelper
         }
 
         return $this->_globals['is_events_log_enabled'];
+    }
+
+    /**
+     * Get events hide sensitive data config
+     * @return bool
+     */
+    public function shouldHideSensitive(): bool
+    {
+        if (!isset($this->_globals['event_hide_sensitive'])) {
+            $this->_globals['event_hide_sensitive'] =
+                (bool)$this->scopeConfig->getValue(self::XML_PATH_EVENTS_LOG_HIDE_SENSITIVE);
+        }
+
+        return $this->_globals['event_hide_sensitive'];
     }
 
     /**

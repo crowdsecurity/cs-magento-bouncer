@@ -37,23 +37,19 @@ class Order extends Event implements EventInterface, ObserverInterface
      */
     protected $type = 'M2_EVENT_ORDER';
 
-    public function getOptionalData($objects): array
-    {
-        return [];
-    }
-
-    public function getAdditionalData($objects): array
+    public function getEventData($objects): array
     {
         $order = $objects['order'] ?? null;
 
         return $order ?
             [
                 'order_increment_id' => $order->getIncrementId(),
-                'customer_id' => $order->getCustomerId(),
-                'customer_is_guest' => $order->getCustomerIsGuest(),
+                'customer_id' => (string) $order->getCustomerId(),
+                'customer_email' => $order->getCustomerEmail(),
+                'customer_is_guest' => (string) $order->getCustomerIsGuest(),
                 'quote_id' => $order->getQuoteId(),
                 'applied_rule_ids' => $order->getAppliedRuleIds(),
-                'grand_total' => $order->getGrandTotal()
+                'grand_total' => (string) $order->getGrandTotal()
             ] : [];
     }
 
@@ -63,9 +59,9 @@ class Order extends Event implements EventInterface, ObserverInterface
             $order = $observer->getOrder();
             $baseData = $this->getBaseData();
             $dataObjects = ['order' => $order];
-            $additionalData = $this->getAdditionalData($dataObjects);
-            $optionalData = $this->getOptionalData($dataObjects);
-            $this->helper->getEventLogger()->info('', array_merge($baseData, $additionalData, $optionalData));
+            $eventData = $this->getEventData($dataObjects);
+            $finalData = $this->hideSensitiveData(array_merge($baseData, $eventData), $this->getSensitiveData());
+            $this->helper->getEventLogger()->info('', $finalData);
         }
 
         return $this;

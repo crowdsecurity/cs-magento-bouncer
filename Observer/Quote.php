@@ -37,17 +37,12 @@ class Quote extends Event implements EventInterface, ObserverInterface
      */
     protected $type = 'M2_EVENT_QUOTE';
 
-    public function getOptionalData($objects): array
-    {
-        return [];
-    }
-
-    public function getAdditionalData($objects): array
+    public function getEventData($objects): array
     {
         $product = $objects['product'] ?? null;
         $quoteItem = $objects['quote_item'] ?? null;
         $productData = $product ? ['product_id' => $product->getId()] : [];
-        $quoteItemData = $quoteItem ? ['quote_id' => $quoteItem->getQuoteId()] : [];
+        $quoteItemData = $quoteItem ? ['quote_id' => (string) $quoteItem->getQuoteId()] : [];
 
         return array_merge($productData, $quoteItemData);
     }
@@ -59,9 +54,9 @@ class Quote extends Event implements EventInterface, ObserverInterface
             $quoteItem = $observer->getQuoteItem();
             $baseData = $this->getBaseData();
             $dataObjects = ['product' => $product, 'quote_item' => $quoteItem];
-            $additionalData = $this->getAdditionalData($dataObjects);
-            $optionalData = $this->getOptionalData($dataObjects);
-            $this->helper->getEventLogger()->info('', array_merge($baseData, $additionalData, $optionalData));
+            $eventData = $this->getEventData($dataObjects);
+            $finalData = $this->hideSensitiveData(array_merge($baseData, $eventData), $this->getSensitiveData());
+            $this->helper->getEventLogger()->info('', $finalData);
         }
 
         return $this;

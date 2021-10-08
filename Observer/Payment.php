@@ -37,12 +37,7 @@ class Payment extends Event implements EventInterface, ObserverInterface
      */
     protected $type = 'M2_EVENT_PAYMENT';
 
-    public function getOptionalData($objects): array
-    {
-        return [];
-    }
-
-    public function getAdditionalData($objects): array
+    public function getEventData($objects): array
     {
         $payment = $objects['payment'] ?? null;
 
@@ -55,9 +50,9 @@ class Payment extends Event implements EventInterface, ObserverInterface
             $payment = $observer->getPayment();
             $baseData = $this->getBaseData();
             $dataObjects = ['payment' => $payment];
-            $additionalData = $this->getAdditionalData($dataObjects);
-            $optionalData = $this->getOptionalData($dataObjects);
-            $this->helper->getEventLogger()->info('', array_merge($baseData, $additionalData, $optionalData));
+            $eventData = $this->getEventData($dataObjects);
+            $finalData = $this->hideSensitiveData(array_merge($baseData, $eventData), $this->getSensitiveData());
+            $this->helper->getEventLogger()->info('', $finalData);
         }
 
         return $this;

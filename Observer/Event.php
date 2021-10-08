@@ -31,8 +31,6 @@ use CrowdSec\Bouncer\Helper\Event as Helper;
 
 class Event
 {
-    const UNAUTHORIZED = "unauthorized";
-
     /**
      * @var Helper
      */
@@ -49,6 +47,11 @@ class Event
         $this->helper = $helper;
     }
 
+    public function getSensitiveData(): array
+    {
+        return ["customer_email"];
+    }
+
     public function getBaseData(): array
     {
         return [
@@ -56,5 +59,24 @@ class Event
             'ip' => $this->helper->getRemoteIp(),
             'x-forwarder-for-ip' => $this->helper->getForwarderForIp()
         ];
+    }
+
+    /**
+     * @param array $data
+     * @param array $sensitiveData
+     * @return array
+     */
+    public function hideSensitiveData(array $data, array $sensitiveData): array
+    {
+        $finalData = $data;
+        if ($this->helper->shouldHideSensitive()) {
+            foreach ($finalData as $key => $value) {
+                if (in_array($key, $sensitiveData)) {
+                    $finalData[$key] = hash('sha256', (string) $value);
+                }
+            }
+        }
+
+        return $finalData;
     }
 }

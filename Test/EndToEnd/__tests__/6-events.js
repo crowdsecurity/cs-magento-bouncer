@@ -11,6 +11,9 @@ const {
     fillByName,
     selectByName,
     wait,
+    onAdminGoToSettingsPage,
+    onAdminSaveSettings,
+    selectElement,
 } = require("../utils/helpers");
 
 const { CURRENT_IP, PROXY_IP, EVENT_LOG_PATH } = require("../utils/constants");
@@ -25,7 +28,7 @@ const CITY = "City";
 const POSTCODE = "12345";
 const PHONE = "0607080910";
 
-describe(`Create customer`, () => {
+describe(`Log events`, () => {
     beforeAll(async () => {
         await goToAdmin();
         await onLoginPageLoginAsAdmin();
@@ -34,7 +37,8 @@ describe(`Create customer`, () => {
         await deleteFileContent(EVENT_LOG_PATH);
     });
 
-    it("Should have empty log", async () => {
+    beforeEach(async () => {
+        await deleteFileContent(EVENT_LOG_PATH);
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toBe("");
     });
@@ -63,9 +67,6 @@ describe(`Create customer`, () => {
     });
 
     it("Should Log out and login ", async () => {
-        await deleteFileContent(EVENT_LOG_PATH);
-        let logContent = await getFileContent(EVENT_LOG_PATH);
-        await expect(logContent).toBe("");
         await page.click(".action.switch");
         await page.click('li.link:has-text("Sign Out")');
         await page.waitForLoadState("networkidle");
@@ -84,10 +85,7 @@ describe(`Create customer`, () => {
     });
 
     it("Should add to cart", async () => {
-        await deleteFileContent(EVENT_LOG_PATH);
-        let logContent = await getFileContent(EVENT_LOG_PATH);
-        await expect(logContent).toBe("");
-        await goToPublicPage("/category-1/simple-product-10.html");
+        await goToPublicPage("/simple-product-10.html");
         await page.click("#product-addtocart-button");
         await page.waitForLoadState("networkidle");
         await expect(page).toMatchText(
@@ -101,9 +99,6 @@ describe(`Create customer`, () => {
     });
 
     it("Should place order", async () => {
-        await deleteFileContent(EVENT_LOG_PATH);
-        let logContent = await getFileContent(EVENT_LOG_PATH);
-        await expect(logContent).toBe("");
         await goToPublicPage("/checkout");
         await page.waitForLoadState("networkidle");
         await fillByName("city", CITY);
@@ -123,11 +118,46 @@ describe(`Create customer`, () => {
         );
         const element = await page.$(".order-number");
 
-        const incrementId = await element.innerText();
+        let incrementId = await element.innerText();
+        incrementId = incrementId
+            .replace("<strong>", "")
+            .replace("</strong>", "");
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_ORDER_PLACE","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","order_increment_id":"${incrementId
-                .replace("<strong>", "")
-                .replace("</strong>", "")}"`,
+            `{"type":"M2_EVENT_ORDER_PLACE","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","order_increment_id":"${incrementId}"`,
         );
+        await expect(logContent).toMatch(`"customer_email":"${EMAIL}"`);
+    });
+
+    it("Should hide sensitive data", async () => {
+        await goToAdmin();
+        await onAdminGoToSettingsPage();
+        await selectElement("crowdsec_bouncer_events_log_hide_sensitive", "1");
+        await onAdminSaveSettings();
+        await goToPublicPage("/simple-product-10.html");
+        await page.click("#product-addtocart-button");
+        await page.waitForLoadState("networkidle");
+        await goToPublicPage("/checkout");
+        await page.waitForLoadState("networkidle");
+        await page.click(".action.continue.primary");
+        await page.waitForLoadState("networkidle");
+        await page.click(".action.primary.checkout");
+        await page.waitForLoadState("networkidle");
+        await wait(2000);
+        await expect(page).toMatchTitle("Success Page");
+        logContent = await getFileContent(EVENT_LOG_PATH);
+        await expect(logContent).toMatch(
+            `{"type":"M2_EVENT_PAYMENT_PLACE","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","payment_method":"checkmo"`,
+        );
+        const element = await page.$(".order-number");
+
+        let incrementId = await element.innerText();
+        incrementId = incrementId
+            .replace("<strong>", "")
+            .replace("</strong>", "");
+        await expect(logContent).toMatch(
+            `{"type":"M2_EVENT_ORDER_PLACE","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","order_increment_id":"${incrementId}"`,
+        );
+        await expect(logContent).toMatch(`"customer_email"`);
+        await expect(logContent).not.toMatch(`"customer_email":"${EMAIL}"`);
     });
 });

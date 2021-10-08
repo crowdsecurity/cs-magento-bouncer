@@ -37,16 +37,15 @@ interface EventInterface
     public function getBaseData(): array;
 
     /**
-     * Additional data for a specific event
+     * Data for a specific event
      * @param array $objects
      * @return array
      */
-    public function getAdditionalData(array $objects): array;
+    public function getEventData(array $objects): array;
 
     /**
-     * Optional data depending on configuration
-     * @param array $objects
+     * Sensitive data
      * @return array
      */
-    public function getOptionalData(array $objects): array;
+    public function getSensitiveData(): array;
 }

@@ -70,26 +70,4 @@ class Event extends Data
     {
         return $this->_eventLogger;
     }
-
-    /**
-     * Get optional data log enabled config
-     * @param $key
-     * @return bool
-     */
-    public function isOptionalLogEnabled($key): bool
-    {
-        if (!isset($this->_optionalData[$key])) {
-            switch ($key) {
-                case 'customer_email':
-                    $result = (bool)$this->scopeConfig->getValue(self::XML_PATH_EVENTS_OPTIONAL_CUSTOMER_EMAIL);
-                    break;
-                default:
-                    $result = false;
-            }
-
-            $this->_optionalData[$key] = $result;
-        }
-
-        return $this->_optionalData[$key];
-    }
 }

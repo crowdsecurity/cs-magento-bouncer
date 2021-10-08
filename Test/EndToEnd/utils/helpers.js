@@ -159,7 +159,7 @@ const setDefaultConfig = async (save = true) => {
     await selectElement("crowdsec_bouncer_advanced_debug_display_errors", "1");
     // Events
     await selectElement("crowdsec_bouncer_events_log_enabled", "1");
-    await selectElement("crowdsec_bouncer_events_optional_customer_email", "1");
+    await selectElement("crowdsec_bouncer_events_log_hide_sensitive", "0");
 
     if (save) {
         await onAdminSaveSettings();
