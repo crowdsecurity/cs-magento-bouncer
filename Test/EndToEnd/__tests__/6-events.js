@@ -28,13 +28,12 @@ const CITY = "City";
 const POSTCODE = "12345";
 const PHONE = "0607080910";
 
-describe(`Log events`, () => {
+describe(`Log events in front`, () => {
     beforeAll(async () => {
         await goToAdmin();
         await onLoginPageLoginAsAdmin();
         await removeAllDecisions();
         await setDefaultConfig();
-        await deleteFileContent(EVENT_LOG_PATH);
     });
 
     beforeEach(async () => {
@@ -77,7 +76,7 @@ describe(`Log events`, () => {
         await page.click(".action.login.primary");
         await page.waitForLoadState("networkidle");
         await expect(page).toMatchText(".logged-in", /Welcome/);
-        logContent = await getFileContent(EVENT_LOG_PATH);
+        const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
             `{"type":"M2_EVENT_CUSTOMER_LOGIN","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}"`,
         );
@@ -92,7 +91,7 @@ describe(`Log events`, () => {
             ".message-success",
             /You added Simple Product 10/,
         );
-        logContent = await getFileContent(EVENT_LOG_PATH);
+        const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
             `{"type":"M2_EVENT_QUOTE_ADD_PRODUCT","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}"`,
         );
@@ -112,7 +111,7 @@ describe(`Log events`, () => {
         await page.waitForLoadState("networkidle");
         await wait(2000);
         await expect(page).toMatchTitle("Success Page");
-        logContent = await getFileContent(EVENT_LOG_PATH);
+        const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
             `{"type":"M2_EVENT_PAYMENT_PLACE","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","payment_method":"checkmo"`,
         );
@@ -144,7 +143,7 @@ describe(`Log events`, () => {
         await page.waitForLoadState("networkidle");
         await wait(2000);
         await expect(page).toMatchTitle("Success Page");
-        logContent = await getFileContent(EVENT_LOG_PATH);
+        const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
             `{"type":"M2_EVENT_PAYMENT_PLACE","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","payment_method":"checkmo"`,
         );
@@ -159,5 +158,35 @@ describe(`Log events`, () => {
         );
         await expect(logContent).toMatch(`"customer_email"`);
         await expect(logContent).not.toMatch(`"customer_email":"${EMAIL}"`);
+    });
+});
+
+describe(`Log events in admin`, () => {
+    beforeEach(async () => {
+        await deleteFileContent(EVENT_LOG_PATH);
+        const logContent = await getFileContent(EVENT_LOG_PATH);
+        await expect(logContent).toBe("");
+    });
+
+    it("Should log failed admin user login", async () => {
+        await goToAdmin("admin/auth/logout/");
+        await expect(page).toMatchText(
+            ".message-success",
+            /You have logged out/,
+        );
+        await page.fill("#username", "BAD_USER");
+        await page.fill("#login", "BAD_PASSWORD");
+        await page.click(".action-login");
+        await page.waitForLoadState("networkidle");
+        await expect(page).toMatchText(
+            ".message-error",
+            /The account sign-in was incorrect/,
+        );
+        const element = await page.$(".message.message-error > div");
+        const errorMessage = await element.innerText();
+        const logContent = await getFileContent(EVENT_LOG_PATH);
+        await expect(logContent).toMatch(
+            `{"type":"M2_EVENT_USER_LOGIN_FAILED","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","user_name":"BAD_USER","exception_message":"${errorMessage}"`,
+        );
     });
 });

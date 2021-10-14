@@ -29,6 +29,7 @@ Please look at `etc/frontend/events.xml` and `etc/events.xml` files for more det
 
 We are using the following events:
 
+- `backend_auth_user_login_failed`
 - `checkout_cart_product_add_after`
 - `customer_login`
 - `customer_register_success`

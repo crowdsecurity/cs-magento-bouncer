@@ -32,8 +32,8 @@ const selectByName = async (selectName, valueToSelect) => {
     await page.selectOption(`[name=${selectName}]`, `${valueToSelect}`);
 };
 
-const goToAdmin = async () => {
-    await page.goto(ADMIN_URL, { waitUntil: "networkidle" });
+const goToAdmin = async (endpoint = "") => {
+    await page.goto(`${ADMIN_URL}${endpoint}`, { waitUntil: "networkidle" });
 };
 
 const goToPublicPage = async (endpoint = "") => {
