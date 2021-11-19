@@ -132,6 +132,15 @@ You will need your Magento 2 credentials to install the source code.
                            --use-rewrites=1 \
                            --elasticsearch-host=elasticsearch
 
+
+### Configure Magento 2 for local development
+
+    ddev magento config:set admin/security/password_is_forced 0
+    ddev magento config:set admin/security/password_lifetime 0
+    ddev magento module:disable Magento_TwoFactorAuth
+    ddev magento indexer:reindex
+    ddev magento c:c
+
 #### CrowdSec Bouncer extension installation
 
      mkdir m2-sources/my-own-modules
@@ -165,8 +174,8 @@ You can also add the ddev-router IP as trusted proxy IP:
 
 During development, you can run some static php tools to ensure quality code:  
 
-- PHP Code Sniffer: `ddev phpcs my-own-modules/crowdsec-bouncer`
-- PHP Mess Detector: `ddev phpmd my-own-modules/crowdsec-bouncer`
+- PHP Code Sniffer: `ddev phpcs my-own-modules/crowdsec-bouncer --ignore="*/node_modules/*"`
+- PHP Mess Detector: `ddev phpmd --exclude "node_modules"  my-own-modules/crowdsec-bouncer`
 - PHP Stan: `ddev phpstan my-own-modules/crowdsec-bouncer`
 
 You can also check unit tests: `ddev phpunit my-own-modules/crowdsec-bouncer/Test/Unit`
