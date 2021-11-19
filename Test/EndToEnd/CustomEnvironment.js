@@ -9,6 +9,8 @@ class CustomEnvironment extends PlaywrightEnvironment {
                 event.name === "test_fn_failure"
             ) {
                 this.failedTest = true;
+                const buffer = await this.global.page.screenshot();
+                console.debug("Screenshot:", buffer.toString("base64"));
             } else if (this.failedTest && event.name === "test_start") {
                 // eslint-disable-next-line no-param-reassign
                 event.test.mode = "skip";
