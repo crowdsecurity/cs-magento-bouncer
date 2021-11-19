@@ -1,8 +1,11 @@
 ![CrowdSec Logo](doc/images/logo_crowdsec.png) 
 
-# CrowdSec Bouncer extension for Magento 2
+# CrowdSec Bouncer extension for Magento 2 [Preview]
 
 > CrowdSec detects, bouncers deter.
+
+
+:warning: This is a work in progress. NOT PRODUCTION READY. :warning:
 
 ## Usage
 
