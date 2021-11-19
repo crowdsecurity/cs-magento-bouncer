@@ -104,7 +104,7 @@ jobs:
         run: |
           ddev composer require squizlabs/php_codesniffer:^3.4 magento/magento-coding-standard
           ddev exec vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/
-          ddev composer require --dev phpstan/phpstan bitexpert/phpstan-magento
+          ddev composer require --dev phpstan/phpstan:0.12.23 bitexpert/phpstan-magento:v0.10.0
           mkdir dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan
           cp .ddev/custom_files/phpstan.neon dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon
 
