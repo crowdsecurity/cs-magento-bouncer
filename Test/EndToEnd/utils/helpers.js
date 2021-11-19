@@ -40,6 +40,7 @@ const onAdminGoToSettingsPage = async () => {
         '#menu-magento-backend-stores .item-system-config:has-text("Configuration") ',
     );
     await page.waitForLoadState("networkidle");
+    await wait(1000);
 
     await page.click(
         '#system_config_tabs .config-nav-block:has-text("Security")',
