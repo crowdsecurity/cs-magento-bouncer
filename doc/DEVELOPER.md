@@ -14,7 +14,7 @@
     - [DDEV Magento 2 environment](#ddev-magento-2-environment)
     - [Magento 2 installation](#magento-2-installation)
     - [Set up Magento 2](#set-up-magento-2)
-  - [Configure Magento 2 for local development](#configure-magento-2-for-local-development)
+    - [Configure Magento 2 for local development](#configure-magento-2-for-local-development)
     - [CrowdSec Bouncer extension installation](#crowdsec-bouncer-extension-installation)
     - [CrowdSec configuration on start](#crowdsec-configuration-on-start)
   - [Extension quality](#extension-quality)
