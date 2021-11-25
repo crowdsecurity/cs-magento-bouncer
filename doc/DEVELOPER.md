@@ -102,7 +102,7 @@ cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-c
 
 - Launch DDEV
 ```
-cd .ddev && ddev start`
+cd .ddev && ddev start
 ```
  This should take some times on the first launch as this will download all necessary docker images.
 
@@ -134,7 +134,7 @@ You will need your Magento 2 credentials to install the source code.
                            --elasticsearch-host=elasticsearch
 
 
-### Configure Magento 2 for local development
+#### Configure Magento 2 for local development
 
     ddev magento config:set admin/security/password_is_forced 0
     ddev magento config:set admin/security/password_lifetime 0
