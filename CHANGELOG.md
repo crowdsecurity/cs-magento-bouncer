@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.0.0] - 2021-12-10
 
 ### Changed
+- Modify default auto_prepend mode filename to avoid Magento 2 PHP code sniff error
 - Update documentation
 
 ## [0.7.9] - 2021-11-19
