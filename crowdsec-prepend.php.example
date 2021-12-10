@@ -44,7 +44,7 @@ use Magento\Framework\ObjectManager\ConfigLoaderInterface;
 if (PHP_SAPI === 'cli') {
     return;
 }
-// THIS FILE MUST BE COPIED IN "app/etc" FOLDER
+// THIS FILE MUST BE COPIED IN "app/etc" FOLDER and renamed "crowdsec-prepend.php"
 // phpcs:ignore Magento2.Security.IncludeFile.FoundIncludeFile
 require_once dirname(__DIR__)."/autoload.php";
 

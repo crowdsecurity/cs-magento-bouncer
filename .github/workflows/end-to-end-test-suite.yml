@@ -114,7 +114,7 @@ jobs:
       - name: Prepare for playwright test
         run: |
           cp .ddev/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
-          cp ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/crowdsec-prepend.php ${{ github.workspace }}/app/etc/crowdsec-prepend.php
+          cp ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/crowdsec-prepend.php.example ${{ github.workspace }}/app/etc/crowdsec-prepend.php
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           chmod +x test-init.sh
           ./test-init.sh

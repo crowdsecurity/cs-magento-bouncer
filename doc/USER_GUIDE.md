@@ -277,7 +277,7 @@ In this mode, every browser access to a php script will be bounced.
 
 To enable the `auto prepend file` mode, you have to:
 
-- copy the `crowdsec-prepend.php` file in your Magento 2 `app/etc` folder
+- copy the `crowdsec-prepend.php.example` file in your Magento 2 `app/etc` folder and rename it `crowdsec-prepend.php`
 - configure your server by adding an `auto_prepend_file` directive for your php setup.
 
 **N.B:**
@@ -289,10 +289,10 @@ To enable the `auto prepend file` mode, you have to:
 ```
 "scripts": {
     "post-install-cmd": [
-        "php -r \"copy('vendor/crowdsec/magento2-module-bouncer/crowdsec-prepend.php', 'app/etc/crowdsec-prepend.php');\""
+        "php -r \"copy('vendor/crowdsec/magento2-module-bouncer/crowdsec-prepend.php.example','app/etc/crowdsec-prepend.php');\""
     ],
     "post-update-cmd": [
-        "php -r \"copy('vendor/crowdsec/magento2-module-bouncer/crowdsec-prepend.php', 'app/etc/crowdsec-prepend.php');\""
+        "php -r \"copy('vendor/crowdsec/magento2-module-bouncer/crowdsec-prepend.php.example','app/etc/crowdsec-prepend.php');\""
     ]
 }
 ```
