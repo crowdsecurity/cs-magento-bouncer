@@ -45,6 +45,7 @@ if (PHP_SAPI === 'cli') {
     return;
 }
 // THIS FILE MUST BE COPIED IN "app/etc" FOLDER
+// phpcs:ignore Magento2.Security.IncludeFile.FoundIncludeFile
 require_once dirname(__DIR__)."/autoload.php";
 
 if (!defined('CROWDSEC_PREPEND_RUNNING_CONTEXT')) {
@@ -86,7 +87,7 @@ try {
         $response = $objectManager->get(Response::class);
         $response->sendResponse();
         restore_error_handler();
-        // phpcs:ignore Magento2.Security.LanguageConstruct
+        // phpcs:ignore Magento2.Security.LanguageConstruct.ExitUsage
         exit(0);
     }
     restore_error_handler();
