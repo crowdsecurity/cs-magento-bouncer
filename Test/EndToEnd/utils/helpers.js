@@ -46,6 +46,7 @@ const onAdminGoToSettingsPage = async () => {
         '#system_config_tabs .config-nav-block:has-text("Security")',
     );
     await page.waitForLoadState("networkidle");
+    await wait(1000);
     await page.click('.config-nav-block li:has-text("CrowdSec Bouncer")');
     await page.waitForLoadState("networkidle");
     await expect(page).toMatchText(
