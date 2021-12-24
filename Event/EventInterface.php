@@ -25,7 +25,7 @@
  *
  */
 
-namespace CrowdSec\Bouncer\Observer;
+namespace CrowdSec\Bouncer\Event;
 
 interface EventInterface
 {
@@ -41,11 +41,5 @@ interface EventInterface
      * @param array $objects
      * @return array
      */
-    public function getEventData(array $objects): array;
-
-    /**
-     * Sensitive data
-     * @return array
-     */
-    public function getSensitiveData(): array;
+    public function getEventData(array $objects = []): array;
 }

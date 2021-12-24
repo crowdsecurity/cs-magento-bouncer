@@ -50,9 +50,18 @@
             </argument>
         </arguments>
     </type>
-    <!-- Plugin -->
+    <!-- Plugins -->
     <type name="Magento\Framework\App\FrontControllerInterface">
+        <!-- Bouncing -->
         <plugin name="crowdsec-front-controller" type="CrowdSec\Bouncer\Plugin\FrontController" sortOrder="1" />
+    </type>
+    <type name="Magento\Customer\Model\AccountManagement">
+        <!-- Event logging:customer authenticate -->
+        <plugin name="crowdsec-customer-account-management" type="CrowdSec\Bouncer\Plugin\Customer\AccountManagement" sortOrder="10" />
+    </type>
+    <type name="Magento\Checkout\Controller\Cart\Add">
+        <!-- Event logging:checkout cart add -->
+        <plugin name="crowdsec-checkout-cart-add" type="CrowdSec\Bouncer\Plugin\Checkout\CartAddController" sortOrder="10" />
     </type>
     <!-- Session -->
     <virtualType name="CrowdSec\Bouncer\Model\Session\Storage" type="Magento\Framework\Session\Storage">

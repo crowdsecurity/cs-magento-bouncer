@@ -34,5 +34,5 @@ class Login extends Customer
     /**
      * @var string
      */
-    protected $type = 'M2_EVENT_CUSTOMER_LOGIN';
+    protected $type = 'CUSTOMER_LOGIN_SUCCESS';
 }

@@ -378,19 +378,12 @@
                 <!-- Events logging -->
                 <group id="log" translate="label,comment,tooltip" showInDefault="1">
                     <label><![CDATA[Logging]]></label>
+                    <comment><![CDATA[Using it in combination to a specific CrowdSec scenario allows detecting suspicious behavior as credential or credit card stuffing.]]></comment>
                     <attribute type="expanded">1</attribute>
                     <field id="enabled" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
                         <label>Enable events log</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment><![CDATA[Logs will be written in "var/log/crowdsec-events.log".]]></comment>
-                    </field>
-                    <field id="hide_sensitive" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
-                        <label>Hide sensitive data</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment><![CDATA[Sensitive data (as email) will be obfuscated.]]></comment>
-                        <depends>
-                            <field id="crowdsec_bouncer/events/log/enabled">1</field>
-                        </depends>
                     </field>
                 </group>
             </group>

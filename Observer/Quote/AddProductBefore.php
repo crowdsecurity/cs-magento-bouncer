@@ -25,14 +25,14 @@
  *
  */
 
-namespace CrowdSec\Bouncer\Observer\User;
+namespace CrowdSec\Bouncer\Observer\Quote;
 
-use CrowdSec\Bouncer\Observer\User;
+use CrowdSec\Bouncer\Observer\Quote;
 
-class LoginFailed extends User
+class AddProductBefore extends Quote
 {
     /**
      * @var string
      */
-    protected $type = 'ADMIN_LOGIN_FAILED';
+    protected $type = 'ADD_TO_CART_PROCESS';
 }

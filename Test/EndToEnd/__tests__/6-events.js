@@ -57,11 +57,11 @@ describe(`Log events in front`, () => {
         );
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_CUSTOMER_REGISTER","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}"`,
+            `{"type":"M2_EVENT_CUSTOMER_REGISTER","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
         );
         await expect(logContent).toMatch(`"customer_email":"${EMAIL}"`);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_CUSTOMER_LOGIN","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}"`,
+            `{"type":"M2_EVENT_CUSTOMER_LOGIN","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
         );
     });
 
@@ -78,7 +78,7 @@ describe(`Log events in front`, () => {
         await expect(page).toMatchText(".logged-in", /Welcome/);
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_CUSTOMER_LOGIN","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}"`,
+            `{"type":"M2_EVENT_CUSTOMER_LOGIN","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
         );
         await expect(logContent).toMatch(`"customer_email":"${EMAIL}"`);
     });
@@ -93,7 +93,7 @@ describe(`Log events in front`, () => {
         );
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_QUOTE_ADD_PRODUCT","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}"`,
+            `{"type":"M2_EVENT_QUOTE_ADD_PRODUCT","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
         );
     });
 
@@ -113,7 +113,7 @@ describe(`Log events in front`, () => {
         await expect(page).toMatchTitle("Success Page");
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_PAYMENT_PLACE","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","payment_method":"checkmo"`,
+            `{"type":"M2_EVENT_PAYMENT_PLACE","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}","payment_method":"checkmo"`,
         );
         const element = await page.$(".order-number");
 
@@ -122,7 +122,7 @@ describe(`Log events in front`, () => {
             .replace("<strong>", "")
             .replace("</strong>", "");
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_ORDER_PLACE","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","order_increment_id":"${incrementId}"`,
+            `{"type":"M2_EVENT_ORDER_PLACE","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}","order_increment_id":"${incrementId}"`,
         );
         await expect(logContent).toMatch(`"customer_email":"${EMAIL}"`);
     });
@@ -145,7 +145,7 @@ describe(`Log events in front`, () => {
         await expect(page).toMatchTitle("Success Page");
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_PAYMENT_PLACE","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","payment_method":"checkmo"`,
+            `{"type":"M2_EVENT_PAYMENT_PLACE","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}","payment_method":"checkmo"`,
         );
         const element = await page.$(".order-number");
 
@@ -154,7 +154,7 @@ describe(`Log events in front`, () => {
             .replace("<strong>", "")
             .replace("</strong>", "");
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_ORDER_PLACE","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","order_increment_id":"${incrementId}"`,
+            `{"type":"M2_EVENT_ORDER_PLACE","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}","order_increment_id":"${incrementId}"`,
         );
         await expect(logContent).toMatch(`"customer_email"`);
         await expect(logContent).not.toMatch(`"customer_email":"${EMAIL}"`);
@@ -186,7 +186,7 @@ describe(`Log events in admin`, () => {
         const errorMessage = await element.innerText();
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_USER_LOGIN_FAILED","ip":"${PROXY_IP}","x-forwarder-for-ip":"${CURRENT_IP}","user_name":"BAD_USER","exception_message":"${errorMessage}"`,
+            `{"type":"M2_EVENT_USER_LOGIN_FAILED","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}","user_name":"BAD_USER","exception_message":"${errorMessage}"`,
         );
     });
 });

@@ -28,12 +28,19 @@
  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="customer_login">
+        <!-- Event logging:customer logged in -->
         <observer name="crowdsec_bouncer_customer_login" instance="CrowdSec\Bouncer\Observer\Customer\Login" />
     </event>
     <event name="customer_register_success">
+        <!-- Event logging:customer register -->
         <observer name="crowdsec_bouncer_customer_register_success" instance="CrowdSec\Bouncer\Observer\Customer\Register" />
     </event>
+    <event name="checkout_cart_product_add_before">
+        <!-- Event logging:add product -->
+        <observer name="crowdsec_bouncer_checkout_cart_add_product_before" instance="CrowdSec\Bouncer\Observer\Quote\AddProductBefore" />
+    </event>
     <event name="checkout_cart_product_add_after">
+        <!-- Event logging:add product -->
         <observer name="crowdsec_bouncer_checkout_cart_add_product_after" instance="CrowdSec\Bouncer\Observer\Quote\AddProduct" />
     </event>
 </config>

@@ -32,4 +32,12 @@
         <!-- We have to put our plugin before this Full Page Cache plugin-->
         <plugin name="front-controller-builtin-cache" sortOrder="10" />
     </type>
+    <type name="Magento\Catalog\Controller\Product\View">
+        <!-- Event logging:product view -->
+        <plugin name="crowdsec-catalog-product-view" type="CrowdSec\Bouncer\Plugin\Catalog\ProductViewController" sortOrder="10" />
+    </type>
+    <type name="Magento\Catalog\Controller\Category\View">
+        <!-- Event logging:category view -->
+        <plugin name="crowdsec-catalog-category-view" type="CrowdSec\Bouncer\Plugin\Catalog\CategoryViewController" sortOrder="10" />
+    </type>
 </config>

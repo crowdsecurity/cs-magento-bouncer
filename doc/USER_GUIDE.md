@@ -268,22 +268,17 @@ The prod log is lighter than the debug log. But you can disable it here.
 
 #### Events
 
-In the `Events` part, you can enable and configure business events logging.
+
+In the `Events` part, you can enable business events logging. Using it in combination to a specific CrowdSec 
+scenario allows detecting suspicious behavior as credential or credit card stuffing.
+
+![Captcha customization](images/screenshots/config-event.jpg)
 
 ***
 
 `Logging → Enable events log` (`global` scope)
 
 If enabled, logs will be written in a `var/log/crowdsec-events.log` file.
-
-***
-
-`Logging → Hide sensitive data` (`global` scope)
-
-If "Yes", sensitive data (email, ...) will be obfuscated as a sha256 hash string.
-
-***
-
 
 
 

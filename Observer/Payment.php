@@ -29,15 +29,12 @@ namespace CrowdSec\Bouncer\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use CrowdSec\Bouncer\Event\Event;
+use CrowdSec\Bouncer\Event\EventInterface;
 
 class Payment extends Event implements EventInterface, ObserverInterface
 {
-    /**
-     * @var string
-     */
-    protected $type = 'M2_EVENT_PAYMENT';
-
-    public function getEventData($objects): array
+    public function getEventData($objects = []): array
     {
         $payment = $objects['payment'] ?? null;
 
@@ -51,8 +48,10 @@ class Payment extends Event implements EventInterface, ObserverInterface
             $baseData = $this->getBaseData();
             $dataObjects = ['payment' => $payment];
             $eventData = $this->getEventData($dataObjects);
-            $finalData = $this->hideSensitiveData(array_merge($baseData, $eventData), $this->getSensitiveData());
-            $this->helper->getEventLogger()->info('', $finalData);
+            $finalData = array_merge($baseData, $eventData);
+            if ($this->validateEvent($finalData)) {
+                $this->helper->getEventLogger()->info('', $finalData);
+            }
         }
 
         return $this;

@@ -29,34 +29,31 @@ namespace CrowdSec\Bouncer\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use CrowdSec\Bouncer\Event\Event;
+use CrowdSec\Bouncer\Event\EventInterface;
 
 class User extends Event implements EventInterface, ObserverInterface
 {
-    /**
-     * @var string
-     */
-    protected $type = 'M2_EVENT_USER';
 
-    public function getEventData($objects): array
+    public function getEventData($objects = []): array
     {
-        $userName = $objects['user_name'] ?? null;
-        $userData =  $userName ? ['user_name' => $userName] : [];
-        $exception = $objects['exception'] ?? null;
-        $exceptionData =  $exception ? ['exception_message' => $exception->getMessage()] : [];
-
-        return array_merge($userData, $exceptionData);
+        return [];
     }
 
+    /**
+     * @param Observer $observer
+     * @return $this|void
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function execute(Observer $observer)
     {
         if ($this->helper->isEventsLogEnabled()) {
-            $userName = $observer->getUserName();
-            $exception = $observer->getException();
             $baseData = $this->getBaseData();
-            $dataObjects = ['user_name' => $userName, 'exception' => $exception];
-            $eventData = $this->getEventData($dataObjects);
-            $finalData = $this->hideSensitiveData(array_merge($baseData, $eventData), $this->getSensitiveData());
-            $this->helper->getEventLogger()->info('', $finalData);
+            $eventData = $this->getEventData();
+            $finalData = array_merge($baseData, $eventData);
+            if ($this->validateEvent($finalData)) {
+                $this->helper->getEventLogger()->info('', $finalData);
+            }
         }
 
         return $this;

@@ -34,5 +34,5 @@ class Register extends Customer
     /**
      * @var string
      */
-    protected $type = 'M2_EVENT_CUSTOMER_REGISTER';
+    protected $type = 'CUSTOMER_REGISTER_SUCCESS';
 }

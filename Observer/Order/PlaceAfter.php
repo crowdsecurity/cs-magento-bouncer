@@ -29,10 +29,10 @@ namespace CrowdSec\Bouncer\Observer\Order;
 
 use CrowdSec\Bouncer\Observer\Order;
 
-class Place extends Order
+class PlaceAfter extends Order
 {
     /**
      * @var string
      */
-    protected $type = 'M2_EVENT_ORDER_PLACE';
+    protected $type = 'ORDER_SUCCESS';
 }

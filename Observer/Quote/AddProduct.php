@@ -34,5 +34,5 @@ class AddProduct extends Quote
     /**
      * @var string
      */
-    protected $type = 'M2_EVENT_QUOTE_ADD_PRODUCT';
+    protected $type = 'ADD_TO_CART_SUCCESS';
 }

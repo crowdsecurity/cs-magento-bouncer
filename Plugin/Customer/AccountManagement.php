@@ -25,40 +25,44 @@
  *
  */
 
-namespace CrowdSec\Bouncer\Observer;
+namespace CrowdSec\Bouncer\Plugin\Customer;
 
-use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use CrowdSec\Bouncer\Event\Event;
 use CrowdSec\Bouncer\Event\EventInterface;
 
-class Order extends Event implements EventInterface, ObserverInterface
+/**
+ * Plugin to handle log before authenticate
+ */
+class AccountManagement extends Event implements EventInterface
 {
+
+    /**
+     * @var string
+     */
+    protected $type = 'CUSTOMER_LOGIN_PROCESS';
+
     public function getEventData($objects = []): array
     {
-        $order = $objects['order'] ?? null;
-
-        return $order ?
-            [
-                'order_id' => (string) $order->getIncrementId(),
-                'customer_id' => (string) $order->getCustomerId(),
-                'quote_id' => (string) $order->getQuoteId(),
-            ] : [];
+        return [];
     }
 
-    public function execute(Observer $observer)
+    /**
+     * Add CrowdSec event log before authenticate method
+     *
+     * @param \Magento\Customer\Model\AccountManagement $subject
+     * @noinspection PhpUnusedParameterInspection
+     * @noinspection PhpMissingParamTypeInspection
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function beforeAuthenticate($subject)
     {
         if ($this->helper->isEventsLogEnabled()) {
-            $order = $observer->getOrder();
             $baseData = $this->getBaseData();
-            $dataObjects = ['order' => $order];
-            $eventData = $this->getEventData($dataObjects);
+            $eventData = $this->getEventData();
             $finalData = array_merge($baseData, $eventData);
             if ($this->validateEvent($finalData)) {
                 $this->helper->getEventLogger()->info('', $finalData);
             }
         }
-
-        return $this;
     }
 }

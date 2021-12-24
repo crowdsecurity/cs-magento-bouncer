@@ -29,19 +29,16 @@ namespace CrowdSec\Bouncer\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use CrowdSec\Bouncer\Event\Event;
+use CrowdSec\Bouncer\Event\EventInterface;
 
 class Quote extends Event implements EventInterface, ObserverInterface
 {
-    /**
-     * @var string
-     */
-    protected $type = 'M2_EVENT_QUOTE';
-
-    public function getEventData($objects): array
+    public function getEventData($objects = []): array
     {
         $product = $objects['product'] ?? null;
         $quoteItem = $objects['quote_item'] ?? null;
-        $productData = $product ? ['product_id' => $product->getId()] : [];
+        $productData = $product ? ['product_id' => (string) $product->getId()] : [];
         $quoteItemData = $quoteItem ? ['quote_id' => (string) $quoteItem->getQuoteId()] : [];
 
         return array_merge($productData, $quoteItemData);
@@ -55,8 +52,10 @@ class Quote extends Event implements EventInterface, ObserverInterface
             $baseData = $this->getBaseData();
             $dataObjects = ['product' => $product, 'quote_item' => $quoteItem];
             $eventData = $this->getEventData($dataObjects);
-            $finalData = $this->hideSensitiveData(array_merge($baseData, $eventData), $this->getSensitiveData());
-            $this->helper->getEventLogger()->info('', $finalData);
+            $finalData = array_merge($baseData, $eventData);
+            if ($this->validateEvent($finalData)) {
+                $this->helper->getEventLogger()->info('', $finalData);
+            }
         }
 
         return $this;

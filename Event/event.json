@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ecommerce-events",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "user_agent": {
+      "type": "string"
+    },
+    "ip": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "CUSTOMER_REGISTER_SUCCESS",
+        "CUSTOMER_LOGIN_PROCESS",
+        "CUSTOMER_LOGIN_SUCCESS",
+        "PRODUCT_VIEW",
+        "PRODUCT_LIST_VIEW",
+        "ADD_TO_CART_PROCESS",
+        "ADD_TO_CART_SUCCESS",
+        "PAYMENT_PROCESS",
+        "PAYMENT_SUCCESS",
+        "ORDER_PROCESS",
+        "ORDER_SUCCESS",
+        "ADMIN_LOGIN_FAILED"
+      ]
+    },
+    "x-forwarded-for-ip": {
+      "type": "string"
+    },
+    "customer_id": {
+      "type": "string"
+    },
+    "product_id": {
+      "type": "string"
+    },
+    "product_list_id": {
+      "type": "string"
+    },
+    "quote_id": {
+      "type": "string"
+    },
+    "order_id": {
+      "type": "string"
+    },
+    "payment_method": {
+      "type": "string"
+    }
+
+  },
+  "required":["user_agent","ip", "type"]
+}

@@ -29,18 +29,16 @@ namespace CrowdSec\Bouncer\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use CrowdSec\Bouncer\Event\Event;
+use CrowdSec\Bouncer\Event\EventInterface;
 
 class Customer extends Event implements EventInterface, ObserverInterface
 {
-    /**
-     * @var string
-     */
-    protected $type = 'M2_EVENT_CUSTOMER';
 
-    public function getEventData($objects): array
+    public function getEventData($objects = []): array
     {
         $customer = $objects['customer'] ?? null;
-        return $customer ? ['customer_id' => $customer->getId(), 'customer_email' => $customer->getEmail()] : [];
+        return $customer ? ['customer_id' => (string)$customer->getId()] : [];
     }
 
     public function execute(Observer $observer)
@@ -50,8 +48,11 @@ class Customer extends Event implements EventInterface, ObserverInterface
             $baseData = $this->getBaseData();
             $dataObjects = ['customer' => $customer];
             $eventData = $this->getEventData($dataObjects);
-            $finalData = $this->hideSensitiveData(array_merge($baseData, $eventData), $this->getSensitiveData());
-            $this->helper->getEventLogger()->info('', $finalData);
+            $finalData = array_merge($baseData, $eventData);
+            if ($this->validateEvent($finalData)) {
+                $this->helper->getEventLogger()->info('', $finalData);
+            }
+
         }
 
         return $this;

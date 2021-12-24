@@ -27,10 +27,24 @@
  */
  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_order_place_before">
+        <!-- Event logging:place order -->
+        <observer name="crowdsec_bouncer_sales_order_place_before" instance="CrowdSec\Bouncer\Observer\Order\PlaceBefore" />
+    </event>
     <event name="sales_order_place_after">
-        <observer name="crowdsec_bouncer_sales_order_place_after" instance="CrowdSec\Bouncer\Observer\Order\Place" />
+        <!-- Event logging:place order -->
+        <observer name="crowdsec_bouncer_sales_order_place_after" instance="CrowdSec\Bouncer\Observer\Order\PlaceAfter" />
+    </event>
+    <event name="sales_quote_payment_import_data_before">
+        <!-- Event logging:place payment -->
+        <observer name="crowdsec_bouncer_sales_quote_payment_import_data_before" instance="CrowdSec\Bouncer\Observer\Payment\ImportDataBefore"/>
+    </event>
+    <event name="sales_order_payment_place_start">
+        <!-- Event logging:place payment -->
+        <observer name="crowdsec_bouncer_sales_order_payment_place_start" instance="CrowdSec\Bouncer\Observer\Payment\PlaceStart"/>
     </event>
     <event name="sales_order_payment_place_end">
-        <observer name="crowdsec_bouncer_sales_order_payment_place_end" instance="CrowdSec\Bouncer\Observer\Payment\Place"/>
+        <!-- Event logging:place payment -->
+        <observer name="crowdsec_bouncer_sales_order_payment_place_end" instance="CrowdSec\Bouncer\Observer\Payment\PlaceEnd"/>
     </event>
 </config>

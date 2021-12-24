@@ -25,14 +25,14 @@
  *
  */
 
-namespace CrowdSec\Bouncer\Observer\Payment;
+namespace CrowdSec\Bouncer\Observer\Order;
 
-use CrowdSec\Bouncer\Observer\Payment;
+use CrowdSec\Bouncer\Observer\Order;
 
-class Place extends Payment
+class PlaceBefore extends Order
 {
     /**
      * @var string
      */
-    protected $type = 'M2_EVENT_PAYMENT_PLACE';
+    protected $type = 'ORDER_PROCESS';
 }

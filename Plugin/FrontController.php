@@ -113,6 +113,13 @@ class FrontController
         if (defined('CROWDSEC_PREPEND_RUNNING_CONTEXT')) {
             return $proceed($request);
         }
+        $this->helper->critical('', [
+            'type' => 'TEST_EVEBT',
+            'message' => $request->getParams(),
+            'code' => $request->getPathInfo(),
+            'file' =>"",
+            'line' => "",
+        ]);
         // Check if feature is enabled
         if (!$this->helper->isEnabled($this->state->getAreaCode())) {
             return $proceed($request);

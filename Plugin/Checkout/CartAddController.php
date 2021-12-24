@@ -25,40 +25,44 @@
  *
  */
 
-namespace CrowdSec\Bouncer\Observer;
+namespace CrowdSec\Bouncer\Plugin\Checkout;
 
-use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use CrowdSec\Bouncer\Event\Event;
 use CrowdSec\Bouncer\Event\EventInterface;
+use Magento\Checkout\Controller\Cart\Add;
 
-class Order extends Event implements EventInterface, ObserverInterface
+/**
+ * Plugin to handle log before adding product to cart
+ */
+class CartAddController extends Event implements EventInterface
 {
+
+    /**
+     * @var string
+     */
+    protected $type = 'ADD_TO_CART_PROCESS';
+
     public function getEventData($objects = []): array
     {
-        $order = $objects['order'] ?? null;
-
-        return $order ?
-            [
-                'order_id' => (string) $order->getIncrementId(),
-                'customer_id' => (string) $order->getCustomerId(),
-                'quote_id' => (string) $order->getQuoteId(),
-            ] : [];
+        $controller = $objects['controller'] ?? null;
+        return $controller ? ['product_id' => (string)$controller->getRequest()->getParam('product')] : [];
     }
 
-    public function execute(Observer $observer)
+    /**
+     * Add CrowdSec event log before adding product to cart
+     *
+     * @param Add $subject
+     * @noinspection PhpMissingParamTypeInspection
+     */
+    public function beforeExecute($subject)
     {
         if ($this->helper->isEventsLogEnabled()) {
-            $order = $observer->getOrder();
             $baseData = $this->getBaseData();
-            $dataObjects = ['order' => $order];
-            $eventData = $this->getEventData($dataObjects);
+            $eventData = $this->getEventData(['controller' => $subject]);
             $finalData = array_merge($baseData, $eventData);
             if ($this->validateEvent($finalData)) {
                 $this->helper->getEventLogger()->info('', $finalData);
             }
         }
-
-        return $this;
     }
 }

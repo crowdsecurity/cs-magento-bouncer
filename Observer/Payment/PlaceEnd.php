@@ -25,14 +25,14 @@
  *
  */
 
-namespace CrowdSec\Bouncer\Observer\User;
+namespace CrowdSec\Bouncer\Observer\Payment;
 
-use CrowdSec\Bouncer\Observer\User;
+use CrowdSec\Bouncer\Observer\Payment;
 
-class LoginFailed extends User
+class PlaceEnd extends Payment
 {
     /**
      * @var string
      */
-    protected $type = 'ADMIN_LOGIN_FAILED';
+    protected $type = 'PAYMENT_SUCCESS';
 }
