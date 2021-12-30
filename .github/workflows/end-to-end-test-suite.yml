@@ -9,9 +9,13 @@ on:
 jobs:
   end-to-end-test-suite:
     strategy:
+      fail-fast: false
       matrix:
-        m2-version: [ 2.4.3 ]
-        php-version: [7.4]
+        m2-version: [ 2.3.0, 2.4.3 ]
+        php-version: [7.2, 7.4]
+        exclude:
+          - { php-version: 7.4, m2-version: 2.3.0 }
+          - { php-version: 7.2, m2-version: 2.4.3 }
 
     name: End-to-end test suite
     runs-on: ubuntu-latest

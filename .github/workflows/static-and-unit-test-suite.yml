@@ -9,6 +9,7 @@ on:
 jobs:
   static-and-unit-test-suite:
     strategy:
+      fail-fast: false
       matrix:
         m2-version: [ 2.3.0, 2.4.3 ]
         php-version: [7.2, 7.3, 7.4]

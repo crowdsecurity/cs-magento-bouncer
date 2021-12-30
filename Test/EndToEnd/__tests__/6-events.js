@@ -11,9 +11,7 @@ const {
     fillByName,
     selectByName,
     wait,
-    onAdminGoToSettingsPage,
-    onAdminSaveSettings,
-    selectElement,
+    flushCache,
 } = require("../utils/helpers");
 
 const { CURRENT_IP, PROXY_IP, EVENT_LOG_PATH } = require("../utils/constants");
@@ -34,6 +32,7 @@ describe(`Log events in front`, () => {
         await onLoginPageLoginAsAdmin();
         await removeAllDecisions();
         await setDefaultConfig();
+        await flushCache();
     });
 
     beforeEach(async () => {
@@ -57,11 +56,12 @@ describe(`Log events in front`, () => {
         );
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_CUSTOMER_REGISTER","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+            new RegExp(
+                `{"type":"CUSTOMER_REGISTER_SUCCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+            ),
         );
-        await expect(logContent).toMatch(`"customer_email":"${EMAIL}"`);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_CUSTOMER_LOGIN","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+            `{"type":"CUSTOMER_LOGIN_SUCCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
         );
     });
 
@@ -78,9 +78,23 @@ describe(`Log events in front`, () => {
         await expect(page).toMatchText(".logged-in", /Welcome/);
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_CUSTOMER_LOGIN","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+            `{"type":"CUSTOMER_LOGIN_PROCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
         );
-        await expect(logContent).toMatch(`"customer_email":"${EMAIL}"`);
+        await expect(logContent).toMatch(
+            `{"type":"CUSTOMER_LOGIN_SUCCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+        );
+    });
+
+    it("Should log category and product view on first visit", async () => {
+        await goToPublicPage("/simple-product-10.html");
+        await goToPublicPage("/category-1.html");
+        const logContent = await getFileContent(EVENT_LOG_PATH);
+        await expect(logContent).toMatch(
+            `{"type":"PRODUCT_VIEW","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+        );
+        await expect(logContent).toMatch(
+            `{"type":"PRODUCT_LIST_VIEW","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+        );
     });
 
     it("Should add to cart", async () => {
@@ -93,7 +107,10 @@ describe(`Log events in front`, () => {
         );
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_QUOTE_ADD_PRODUCT","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+            `{"type":"ADD_TO_CART_PROCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+        );
+        await expect(logContent).toMatch(
+            `{"type":"ADD_TO_CART_SUCCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
         );
     });
 
@@ -113,7 +130,14 @@ describe(`Log events in front`, () => {
         await expect(page).toMatchTitle("Success Page");
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_PAYMENT_PLACE","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}","payment_method":"checkmo"`,
+            new RegExp(
+                `{"type":"PAYMENT_PROCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}",.*,"payment_method":"checkmo"`,
+            ),
+        );
+        await expect(logContent).toMatch(
+            new RegExp(
+                `{"type":"PAYMENT_SUCCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}",.*,"payment_method":"checkmo"`,
+            ),
         );
         const element = await page.$(".order-number");
 
@@ -122,42 +146,15 @@ describe(`Log events in front`, () => {
             .replace("<strong>", "")
             .replace("</strong>", "");
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_ORDER_PLACE","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}","order_increment_id":"${incrementId}"`,
+            new RegExp(
+                `{"type":"ORDER_PROCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}",.*,"order_id":"${incrementId}","customer_id":".*","quote_id":".*"`,
+            ),
         );
-        await expect(logContent).toMatch(`"customer_email":"${EMAIL}"`);
-    });
-
-    it("Should hide sensitive data", async () => {
-        await goToAdmin();
-        await onAdminGoToSettingsPage();
-        await selectElement("crowdsec_bouncer_events_log_hide_sensitive", "1");
-        await onAdminSaveSettings();
-        await goToPublicPage("/simple-product-10.html");
-        await page.click("#product-addtocart-button");
-        await page.waitForLoadState("networkidle");
-        await goToPublicPage("/checkout");
-        await page.waitForLoadState("networkidle");
-        await page.click(".action.continue.primary");
-        await page.waitForLoadState("networkidle");
-        await page.click(".action.primary.checkout");
-        await page.waitForLoadState("networkidle");
-        await wait(2000);
-        await expect(page).toMatchTitle("Success Page");
-        const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_PAYMENT_PLACE","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}","payment_method":"checkmo"`,
+            new RegExp(
+                `{"type":"ORDER_SUCCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}",.*,"order_id":"${incrementId}","customer_id":".*","quote_id":".*"`,
+            ),
         );
-        const element = await page.$(".order-number");
-
-        let incrementId = await element.innerText();
-        incrementId = incrementId
-            .replace("<strong>", "")
-            .replace("</strong>", "");
-        await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_ORDER_PLACE","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}","order_increment_id":"${incrementId}"`,
-        );
-        await expect(logContent).toMatch(`"customer_email"`);
-        await expect(logContent).not.toMatch(`"customer_email":"${EMAIL}"`);
     });
 });
 
@@ -178,15 +175,10 @@ describe(`Log events in admin`, () => {
         await page.fill("#login", "BAD_PASSWORD");
         await page.click(".action-login");
         await page.waitForLoadState("networkidle");
-        await expect(page).toMatchText(
-            ".message-error",
-            /The account sign-in was incorrect/,
-        );
-        const element = await page.$(".message.message-error > div");
-        const errorMessage = await element.innerText();
+        await expect(page).toHaveSelector(".message-error");
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
-            `{"type":"M2_EVENT_USER_LOGIN_FAILED","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}","user_name":"BAD_USER","exception_message":"${errorMessage}"`,
+            `{"type":"ADMIN_LOGIN_FAILED","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
         );
     });
 });
