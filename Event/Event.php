@@ -77,7 +77,7 @@ class Event
      * @throws InvalidValue
      * @throws \Swaggest\JsonSchema\Exception
      */
-    public function getJsonSchema(string $path = __DIR__ . DS . 'event.json'): SchemaContract
+    public function getJsonSchema(string $path = __DIR__ . DIRECTORY_SEPARATOR . 'event.json'): SchemaContract
     {
         if (!isset($this->jsonSchema[$path])) {
             $schemaData = json_decode("{\"\$ref\": \"file://$path\"}");

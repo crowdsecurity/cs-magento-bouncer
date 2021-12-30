@@ -65,6 +65,9 @@ jobs:
           sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           ddev start
 
+      - name: Fix composer version for 2.4
+        if: startsWith(matrix.m2-version, '2.4')
+        run: ddev exec composer selfupdate -- 2.1.4
 
       - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
         # We don't use "ddev composer" create as it restarts all containers
@@ -104,12 +107,23 @@ jobs:
           ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/${{ env.EXTENSION_PATH }}/
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
+      - name: Disable some extensions for 2.4
+        if: startsWith(matrix.m2-version, '2.4')
+        run: |
+          ddev magento module:disable Magento_TwoFactorAuth
+          ddev magento module:disable Magento_AdminNotification
+
+      - name: Make some workaround for 2.3.0
+        if: startsWith(matrix.m2-version, '2.3.0')
+        run: |
+          sed -i 's/is_synchronous=\"false\"//g' ${{ github.workspace }}/vendor/magento/module-inventory-catalog/etc/communication.xml
+          sed -i 's/is_synchronous=\"false\"//g' ${{ github.workspace }}/vendor/magento/module-inventory-sales/etc/communication.xml
+          sed -i 's/is_synchronous=\"false\"//g' ${{ github.workspace }}/vendor/magento/module-inventory-indexer/etc/communication.xml
+
       - name: Enable extension
         run: |
           ddev magento deploy:mode:set developer
           ddev magento module:enable ${{ env.EXTENSION_NAME }}
-          ddev magento module:disable Magento_TwoFactorAuth
-          ddev magento module:disable Magento_AdminNotification
           ddev magento setup:upgrade
           ddev magento setup:static-content:deploy -f
           ddev crowdsec-config

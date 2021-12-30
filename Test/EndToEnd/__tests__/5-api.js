@@ -106,7 +106,8 @@ describe(`Access GraphQL endpoint`, () => {
         );
         await onAdminSaveSettings();
         const response = await goToPublicPage("/graphql");
-        await expect(response.status()).toBe(200);
+        // Magento 2.4 => 200 and Magento 2.3 => 500
+        await expect(response.status()).not.toBe(403);
     });
 
     it("Config ON: Should not access GraphQL endpoint with bad ip", async () => {
@@ -123,12 +124,14 @@ describe(`Access GraphQL endpoint`, () => {
         );
         await onAdminSaveSettings();
         const response = await goToPublicPage("/graphql");
-        await expect(response.status()).toBe(200);
+        // Magento 2.4 => 200 and Magento 2.3 => 500
+        await expect(response.status()).not.toBe(403);
     });
 
     it("Config OFF: Should access GraphQL endpoint with clean ip", async () => {
         await removeAllDecisions();
         const response = await goToPublicPage("/graphql");
-        await expect(response.status()).toBe(200);
+        // Magento 2.4 => 200 and Magento 2.3 => 500
+        await expect(response.status()).not.toBe(403);
     });
 });

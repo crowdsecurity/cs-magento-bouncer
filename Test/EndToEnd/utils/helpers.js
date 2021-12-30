@@ -47,13 +47,11 @@ const onAdminGoToSettingsPage = async () => {
         '#menu-magento-backend-stores .item-system-config:has-text("Configuration") ',
     );
     await page.waitForLoadState("networkidle");
-    await wait(1000);
-
+    await wait(3000);
     await page.click(
         '#system_config_tabs .config-nav-block:has-text("Security")',
     );
-    await page.waitForLoadState("networkidle");
-    await wait(1000);
+    await wait(1500);
     await page.click('.config-nav-block li:has-text("CrowdSec Bouncer")');
     await page.waitForLoadState("networkidle");
     await expect(page).toMatchText(
