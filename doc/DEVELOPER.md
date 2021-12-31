@@ -139,7 +139,7 @@ You will need your Magento 2 credentials to install the source code.
     ddev magento config:set admin/security/password_is_forced 0
     ddev magento config:set admin/security/password_lifetime 0
     ddev magento module:disable Magento_TwoFactorAuth
-    ddev magento indexer:reindex
+    ddev magento setup:performance:generate-fixtures setup/performance-toolkit/profiles/ce/small.xml
     ddev magento c:c
 
 #### CrowdSec Bouncer extension installation
@@ -194,6 +194,7 @@ To run a specific cron job from browser, we created a `launchCron.php` script th
 cron dependent feature (stream mode for example):
 
     cp .ddev/custom_scripts/cronLaunch.php m2-sources/pub/cronLaunch.php
+    chmod +x m2-sources/pub/cronLaunch.php
     
 Then you can use the `run-test.sh` script to run the tests:
 

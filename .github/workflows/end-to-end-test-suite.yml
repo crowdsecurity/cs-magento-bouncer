@@ -11,10 +11,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        m2-version: [ 2.3.0, 2.4.3 ]
+        m2-version: [ 2.3.5, 2.4.3 ]
         php-version: [7.2, 7.4]
         exclude:
-          - { php-version: 7.4, m2-version: 2.3.0 }
+          - { php-version: 7.4, m2-version: 2.3.5 }
           - { php-version: 7.2, m2-version: 2.4.3 }
 
     name: End-to-end test suite
@@ -113,12 +113,11 @@ jobs:
           ddev magento module:disable Magento_TwoFactorAuth
           ddev magento module:disable Magento_AdminNotification
 
-      - name: Make some workaround for 2.3.0
-        if: startsWith(matrix.m2-version, '2.3.0')
+      - name: Make some workaround for 2.3.5
+        if: startsWith(matrix.m2-version, '2.3.5')
         run: |
-          sed -i 's/is_synchronous=\"false\"//g' ${{ github.workspace }}/vendor/magento/module-inventory-catalog/etc/communication.xml
-          sed -i 's/is_synchronous=\"false\"//g' ${{ github.workspace }}/vendor/magento/module-inventory-sales/etc/communication.xml
-          sed -i 's/is_synchronous=\"false\"//g' ${{ github.workspace }}/vendor/magento/module-inventory-indexer/etc/communication.xml
+          ddev magento  module:disable Dotdigitalgroup_Chat
+          ddev magento  module:disable Dotdigitalgroup_Email
 
       - name: Enable extension
         run: |

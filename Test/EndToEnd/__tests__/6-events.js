@@ -67,15 +67,15 @@ describe(`Log events in front`, () => {
 
     it("Should Log out and login ", async () => {
         await page.click(".action.switch");
-        await page.click('li.link:has-text("Sign Out")');
+        await page.click('li.authorization-link:has-text("Sign Out")');
         await page.waitForLoadState("networkidle");
-        await page.click('li.link:has-text("Sign In")');
+        await page.click('li.authorization-link:has-text("Sign In")');
         await page.waitForLoadState("networkidle");
         await fillInput("email", EMAIL);
         await fillInput("pass", PASSWORD);
         await page.click(".action.login.primary");
         await page.waitForLoadState("networkidle");
-        await expect(page).toMatchText(".logged-in", /Welcome/);
+        await expect(page).toMatchText(".welcome > span", /Welcome/);
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
             `{"type":"CUSTOMER_LOGIN_PROCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
