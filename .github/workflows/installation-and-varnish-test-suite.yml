@@ -73,10 +73,6 @@ jobs:
           ddev replace-acl $(ddev find-ip ddev-router)
           ddev reload-vcl
 
-      - name: Fix composer version for 2.4
-        if: startsWith(matrix.m2-version, '2.4')
-        run: ddev exec composer selfupdate -- 2.1.4
-
       - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
         # We don't use "ddev composer" create as it restarts all containers
         run: |
