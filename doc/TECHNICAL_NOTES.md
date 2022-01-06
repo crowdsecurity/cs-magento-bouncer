@@ -45,10 +45,9 @@ Please look at `etc/frontend/di.xml` and `etc/di.xml` files for more details.
 
 We are using `before` plugins for the following methods:
 
-- `Magento\Catalog\Controller\Product\View::execute`
-- `Magento\Catalog\Controller\Category\View::execute`
 - `Magento\Checkout\Controller\Cart\Add::execute`
 - `Magento\Customer\Model\AccountManagement::authenticate`
+- `Magento\Customer\Controller\Account\CreatePost::execute`
 
 
 ## Full Page Cache

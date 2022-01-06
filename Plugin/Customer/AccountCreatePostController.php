@@ -25,40 +25,39 @@
  *
  */
 
-namespace CrowdSec\Bouncer\Plugin\Catalog;
+namespace CrowdSec\Bouncer\Plugin\Customer;
 
 use CrowdSec\Bouncer\Event\Event;
 use CrowdSec\Bouncer\Event\EventInterface;
-use Magento\Catalog\Controller\Product\View;
+use Magento\Customer\Controller\Account\CreatePost;
 
 /**
- * Plugin to handle log before viewing uncached product page
+ * Plugin to handle log before customer registering
  */
-class ProductViewController extends Event implements EventInterface
+class AccountCreatePostController extends Event implements EventInterface
 {
 
     /**
      * @var string
      */
-    protected $type = 'PRODUCT_VIEW';
+    protected $type = 'CUSTOMER_REGISTER_PROCESS';
 
     public function getEventData($objects = []): array
     {
-        $controller = $objects['controller'] ?? null;
-        return $controller ? ['product_id' => (string)$controller->getRequest()->getParam('id')] : [];
+        return [];
     }
 
     /**
-     * Add CrowdSec event log before viewing uncached product page
+     * Add CrowdSec event log before customer registering from post action
      *
-     * @param View $subject
+     * @param CreatePost $subject
      * @noinspection PhpMissingParamTypeInspection
      */
     public function beforeExecute($subject)
     {
         if ($this->helper->isEventsLogEnabled()) {
             $baseData = $this->getBaseData();
-            $eventData = $this->getEventData(['controller' => $subject]);
+            $eventData = $this->getEventData();
             $finalData = array_merge($baseData, $eventData);
             if ($this->validateEvent($finalData)) {
                 $this->helper->getEventLogger()->info('', $finalData);

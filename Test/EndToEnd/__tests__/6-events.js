@@ -57,6 +57,11 @@ describe(`Log events in front`, () => {
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
             new RegExp(
+                `{"type":"CUSTOMER_REGISTER_PROCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+            ),
+        );
+        await expect(logContent).toMatch(
+            new RegExp(
                 `{"type":"CUSTOMER_REGISTER_SUCCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
             ),
         );
@@ -82,18 +87,6 @@ describe(`Log events in front`, () => {
         );
         await expect(logContent).toMatch(
             `{"type":"CUSTOMER_LOGIN_SUCCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
-        );
-    });
-
-    it("Should log category and product view on first visit", async () => {
-        await goToPublicPage("/simple-product-10.html");
-        await goToPublicPage("/category-1.html");
-        const logContent = await getFileContent(EVENT_LOG_PATH);
-        await expect(logContent).toMatch(
-            `{"type":"PRODUCT_VIEW","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
-        );
-        await expect(logContent).toMatch(
-            `{"type":"PRODUCT_LIST_VIEW","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
         );
     });
 
