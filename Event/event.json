@@ -4,7 +4,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "user_agent": {
+    "bouncer_agent": {
       "type": "string"
     },
     "ip": {
@@ -51,5 +51,5 @@
     }
 
   },
-  "required":["user_agent","ip", "type"]
+  "required":["ip", "type"]
 }

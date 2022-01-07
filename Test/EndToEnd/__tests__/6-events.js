@@ -70,10 +70,33 @@ describe(`Log events in front`, () => {
         );
     });
 
-    it("Should Log out and login ", async () => {
+    it("Should Log out and failed registering with same email", async () => {
         await page.click(".action.switch");
         await page.click('li.authorization-link:has-text("Sign Out")');
         await page.waitForLoadState("networkidle");
+        await goToPublicPage("/customer/account/create");
+        await page.waitForLoadState("networkidle");
+        await fillInput("firstname", FIRSTNAME);
+        await fillInput("lastname", LASTNAME);
+        await fillInput("email_address", EMAIL);
+        await fillInput("password", PASSWORD);
+        await fillInput("password-confirmation", PASSWORD);
+        await page.click(".action.submit.primary");
+        await page.waitForLoadState("networkidle");
+        await expect(page).toMatchText(
+            ".message-error",
+            /There is already an account with this email address./,
+        );
+        const logContent = await getFileContent(EVENT_LOG_PATH);
+        await expect(logContent).toMatch(
+            `{"type":"CUSTOMER_REGISTER_PROCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+        );
+        await expect(logContent).not.toMatch(
+            `{"type":"CUSTOMER_REGISTER_SUCCESS","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
+        );
+    });
+
+    it("Should login ", async () => {
         await page.click('li.authorization-link:has-text("Sign In")');
         await page.waitForLoadState("networkidle");
         await fillInput("email", EMAIL);

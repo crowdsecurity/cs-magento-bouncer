@@ -67,7 +67,7 @@ class Event
             'type' => $this->type,
             'ip' => $this->helper->getRemoteIp(),
             'x-forwarded-for-ip' => $this->helper->getForwarderForIp(),
-            'user_agent' => Constants::BASE_USER_AGENT,
+            'bouncer_agent' => Constants::BASE_USER_AGENT,
         ];
     }
 
