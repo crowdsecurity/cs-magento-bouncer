@@ -236,7 +236,7 @@ class Data extends Config
     public function getForwarderForIp(): string
     {
         if ($this->_forwardedFroIp === null) {
-            $this->_forwardedFroIp = false;
+            $this->_forwardedFroIp = "";
             $XForwardedForHeader = $this->getHttpRequestHeader('X-Forwarded-For');
             if (null !== $XForwardedForHeader) {
                 $ipList = array_map('trim', array_values(array_filter(explode(',', $XForwardedForHeader))));
