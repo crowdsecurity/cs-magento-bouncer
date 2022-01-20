@@ -65,8 +65,8 @@ class Config extends AbstractHelper
     const XML_PATH_THEME_BAN_SUBTITLE = self::SECTION . '/theme/ban/wall_subtitle';
     const XML_PATH_THEME_BAN_FOOTER = self::SECTION . '/theme/ban/wall_footer';
     const XML_PATH_THEME_CUSTOM_CSS = self::SECTION . '/theme/css/custom';
-    const XML_PATH_THEME_COLOR_PRIMARY = self::SECTION . '/theme/color_text_primary';
-    const XML_PATH_THEME_COLOR_SECOND = self::SECTION . '/theme/color_text_secondary';
+    const XML_PATH_THEME_COLOR_PRIMARY = self::SECTION . '/theme/color/text_primary';
+    const XML_PATH_THEME_COLOR_SECOND = self::SECTION . '/theme/color/text_secondary';
     const XML_PATH_THEME_COLOR_TEXT_BUTTON = self::SECTION . '/theme/color/text_button';
     const XML_PATH_THEME_COLOR_TEXT_ERROR = self::SECTION . '/theme/color/text_error_message';
     const XML_PATH_THEME_COLOR_BG_PAGE = self::SECTION . '/theme/color/background_page';
