@@ -38,7 +38,6 @@ We are using the following events:
 - `sales_order_payment_place_end`
 - `sales_order_payment_place_start`
 - `sales_order_place_after`
-- `sales_quote_payment_import_data_before`
 
 Additionally, as there is sometimes no available event, we use the Magento 2 plugin (interceptor) pattern.
 Please look at `etc/frontend/di.xml` and `etc/di.xml` files for more details.
