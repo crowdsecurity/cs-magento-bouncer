@@ -35,4 +35,9 @@ class Login extends Customer
      * @var string
      */
     protected $type = 'CUSTOMER_LOGIN_SUCCESS';
+
+    /**
+     * @var string
+     */
+    protected $process = 'customer_login';
 }

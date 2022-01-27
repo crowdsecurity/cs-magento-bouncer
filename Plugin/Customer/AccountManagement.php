@@ -41,6 +41,8 @@ class AccountManagement extends Event implements EventInterface
      */
     protected $type = 'CUSTOMER_LOGIN_PROCESS';
 
+    protected $process = 'customer_login';
+
     public function getEventData($objects = []): array
     {
         return [];
@@ -56,7 +58,7 @@ class AccountManagement extends Event implements EventInterface
      */
     public function beforeAuthenticate($subject)
     {
-        if ($this->helper->isEventsLogEnabled()) {
+        if ($this->helper->isEventsLogEnabled($this->process)) {
             $baseData = $this->getBaseData();
             $eventData = $this->getEventData();
             $finalData = array_merge($baseData, $eventData);

@@ -35,4 +35,9 @@ class PlaceBefore extends Order
      * @var string
      */
     protected $type = 'ORDER_PROCESS';
+
+    /**
+     * @var string
+     */
+    protected $process = 'order';
 }

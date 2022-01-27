@@ -42,12 +42,12 @@ class User extends Event implements EventInterface, ObserverInterface
 
     /**
      * @param Observer $observer
-     * @return $this|void
+     * @return $this
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): User
     {
-        if ($this->helper->isEventsLogEnabled()) {
+        if ($this->helper->isEventsLogEnabled($this->process)) {
             $baseData = $this->getBaseData();
             $eventData = $this->getEventData();
             $finalData = array_merge($baseData, $eventData);

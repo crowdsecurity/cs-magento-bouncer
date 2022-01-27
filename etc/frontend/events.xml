@@ -41,6 +41,6 @@
     </event>
     <event name="checkout_cart_product_add_after">
         <!-- Event logging:add product -->
-        <observer name="crowdsec_bouncer_checkout_cart_add_product_after" instance="CrowdSec\Bouncer\Observer\Quote\AddProduct" />
+        <observer name="crowdsec_bouncer_checkout_cart_add_product_after" instance="CrowdSec\Bouncer\Observer\Quote\AddProductAfter" />
     </event>
 </config>

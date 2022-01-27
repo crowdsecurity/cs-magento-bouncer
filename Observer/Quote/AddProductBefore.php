@@ -35,4 +35,9 @@ class AddProductBefore extends Quote
      * @var string
      */
     protected $type = 'ADD_TO_CART_PROCESS';
+
+    /**
+     * @var string
+     */
+    protected $process = 'add_to_cart';
 }

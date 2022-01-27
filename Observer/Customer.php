@@ -43,7 +43,7 @@ class Customer extends Event implements EventInterface, ObserverInterface
 
     public function execute(Observer $observer)
     {
-        if ($this->helper->isEventsLogEnabled()) {
+        if ($this->helper->isEventsLogEnabled($this->process)) {
             $customer = $observer->getCustomer();
             $baseData = $this->getBaseData();
             $dataObjects = ['customer' => $customer];

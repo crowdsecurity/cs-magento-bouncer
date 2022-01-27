@@ -35,4 +35,9 @@ class PlaceAfter extends Order
      * @var string
      */
     protected $type = 'ORDER_SUCCESS';
+
+    /**
+     * @var string
+     */
+    protected $process = 'order';
 }

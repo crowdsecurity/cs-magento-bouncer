@@ -63,10 +63,6 @@
         <!-- Event logging:customer register -->
         <plugin name="crowdsec-customer-account-create-post" type="CrowdSec\Bouncer\Plugin\Customer\AccountCreatePostController" sortOrder="10" />
     </type>
-    <type name="Magento\Customer\Controller\Cart\Add">
-        <!-- Event logging:checkout cart add -->
-        <plugin name="crowdsec-checkout-cart-add" type="CrowdSec\Bouncer\Plugin\Checkout\CartAddController" sortOrder="10" />
-    </type>
     <!-- Session -->
     <virtualType name="CrowdSec\Bouncer\Model\Session\Storage" type="Magento\Framework\Session\Storage">
         <arguments>

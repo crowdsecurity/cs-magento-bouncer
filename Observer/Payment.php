@@ -43,7 +43,7 @@ class Payment extends Event implements EventInterface, ObserverInterface
 
     public function execute(Observer $observer)
     {
-        if ($this->helper->isEventsLogEnabled()) {
+        if ($this->helper->isEventsLogEnabled($this->process)) {
             $payment = $observer->getPayment();
             $baseData = $this->getBaseData();
             $dataObjects = ['payment' => $payment];

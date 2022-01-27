@@ -51,6 +51,11 @@ class Event
      */
     protected $type = 'M2_EVENT';
 
+    /**
+     * @var string
+     */
+    protected $process = '';
+
     public function __construct(
         Helper $helper
     ) {

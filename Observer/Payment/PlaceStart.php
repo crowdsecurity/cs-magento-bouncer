@@ -35,4 +35,9 @@ class PlaceStart extends Payment
      * @var string
      */
     protected $type = 'PAYMENT_PROCESS';
+
+    /**
+     * @var string
+     */
+    protected $process = 'order';
 }

@@ -88,8 +88,7 @@ class Config extends AbstractHelper
     const XML_PATH_ADVANCED_DISPLAY_ERRORS = self::SECTION . '/advanced/debug/display_errors';
     const XML_PATH_ADVANCED_DISABLE_PROD_LOG = self::SECTION . '/advanced/debug/disable_prod_log';
     // Events configs
-    const XML_PATH_EVENTS_LOG_ENABLED = self::SECTION . '/events/log/enabled';
-    const XML_PATH_EVENTS_LOG_HIDE_SENSITIVE = self::SECTION . '/events/log/hide_sensitive';
+    const XML_PATH_EVENTS_LOG_ROOT = self::SECTION . '/events/log/';
 
     /**
      * The path of trusted forward ips as array setting
@@ -111,8 +110,7 @@ class Config extends AbstractHelper
         'is_debug_log' => null,
         'can_display_errors' => null,
         'is_prod_log_disabled' => null,
-        'is_events_log_enabled' => null,
-        'event_hide_sensitive' => null,
+        'is_events_log_enabled' => [],
         'is_stream_mode' => null,
         'refresh_cron_expr' => null,
         'prune_cron_expr' => null,
@@ -240,30 +238,18 @@ class Config extends AbstractHelper
 
     /**
      * Get events log enabled config
+     * @param string $process
      * @return bool
      */
-    public function isEventsLogEnabled(): bool
+    public function isEventsLogEnabled(string $process): bool
     {
-        if (!isset($this->_globals['is_events_log_enabled'])) {
-            $this->_globals['is_events_log_enabled'] =
-                (bool)$this->scopeConfig->getValue(self::XML_PATH_EVENTS_LOG_ENABLED);
+        if (!isset($this->_globals['is_events_log_enabled'][$process])) {
+            $enabled = (bool)$this->scopeConfig->getValue(self::XML_PATH_EVENTS_LOG_ROOT . 'enabled');
+            $this->_globals['is_events_log_enabled'][$process] =
+                $enabled && $this->scopeConfig->getValue(self::XML_PATH_EVENTS_LOG_ROOT . $process);
         }
 
-        return $this->_globals['is_events_log_enabled'];
-    }
-
-    /**
-     * Get events hide sensitive data config
-     * @return bool
-     */
-    public function shouldHideSensitive(): bool
-    {
-        if (!isset($this->_globals['event_hide_sensitive'])) {
-            $this->_globals['event_hide_sensitive'] =
-                (bool)$this->scopeConfig->getValue(self::XML_PATH_EVENTS_LOG_HIDE_SENSITIVE);
-        }
-
-        return $this->_globals['event_hide_sensitive'];
+        return $this->_globals['is_events_log_enabled'][$process];
     }
 
     /**

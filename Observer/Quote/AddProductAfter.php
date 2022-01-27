@@ -29,10 +29,14 @@ namespace CrowdSec\Bouncer\Observer\Quote;
 
 use CrowdSec\Bouncer\Observer\Quote;
 
-class AddProduct extends Quote
+class AddProductAfter extends Quote
 {
     /**
      * @var string
      */
     protected $type = 'ADD_TO_CART_SUCCESS';
+    /**
+     * @var string
+     */
+    protected $process = 'add_to_cart';
 }

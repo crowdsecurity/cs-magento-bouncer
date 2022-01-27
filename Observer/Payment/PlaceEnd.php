@@ -35,4 +35,9 @@ class PlaceEnd extends Payment
      * @var string
      */
     protected $type = 'PAYMENT_SUCCESS';
+
+    /**
+     * @var string
+     */
+    protected $process = 'order';
 }

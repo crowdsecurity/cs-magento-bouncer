@@ -48,7 +48,7 @@ class Order extends Event implements EventInterface, ObserverInterface
 
     public function execute(Observer $observer)
     {
-        if ($this->helper->isEventsLogEnabled()) {
+        if ($this->helper->isEventsLogEnabled($this->process)) {
             $order = $observer->getOrder();
             $baseData = $this->getBaseData();
             $dataObjects = ['order' => $order];

@@ -74,6 +74,15 @@
                     <prune_cron_expr><![CDATA[0 0 30 2 *]]></prune_cron_expr>
                 </cache>
             </advanced>
+            <events>
+                <log>
+                    <customer_register>1</customer_register>
+                    <customer_login>1</customer_login>
+                    <admin_login>1</admin_login>
+                    <add_to_cart>1</add_to_cart>
+                    <order>1</order>
+                </log>
+            </events>
         </crowdsec_bouncer>
     </default>
 </config>

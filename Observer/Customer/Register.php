@@ -35,4 +35,9 @@ class Register extends Customer
      * @var string
      */
     protected $type = 'CUSTOMER_REGISTER_SUCCESS';
+
+    /**
+     * @var string
+     */
+    protected $process = 'customer_register';
 }

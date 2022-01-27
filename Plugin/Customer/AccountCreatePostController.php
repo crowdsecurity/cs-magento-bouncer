@@ -42,6 +42,11 @@ class AccountCreatePostController extends Event implements EventInterface
      */
     protected $type = 'CUSTOMER_REGISTER_PROCESS';
 
+    /**
+     * @var string
+     */
+    protected $process = 'customer_register';
+
     public function getEventData($objects = []): array
     {
         return [];
@@ -51,11 +56,12 @@ class AccountCreatePostController extends Event implements EventInterface
      * Add CrowdSec event log before customer registering from post action
      *
      * @param CreatePost $subject
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParamTypeInspection
      */
     public function beforeExecute($subject)
     {
-        if ($this->helper->isEventsLogEnabled()) {
+        if ($this->helper->isEventsLogEnabled($this->process)) {
             $baseData = $this->getBaseData();
             $eventData = $this->getEventData();
             $finalData = array_merge($baseData, $eventData);
