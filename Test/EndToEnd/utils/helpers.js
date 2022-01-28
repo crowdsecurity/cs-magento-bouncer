@@ -169,6 +169,11 @@ const setDefaultConfig = async (save = true, direct = true) => {
     await selectElement("crowdsec_bouncer_advanced_debug_display_errors", "1");
     // Events
     await selectElement("crowdsec_bouncer_events_log_enabled", "1");
+    await selectElement("crowdsec_bouncer_events_log_customer_register", "1");
+    await selectElement("crowdsec_bouncer_events_log_customer_login", "1");
+    await selectElement("crowdsec_bouncer_events_log_admin_login", "1");
+    await selectElement("crowdsec_bouncer_events_log_add_to_cart", "1");
+    await selectElement("crowdsec_bouncer_events_log_order", "1");
 
     if (save) {
         await onAdminSaveSettings();

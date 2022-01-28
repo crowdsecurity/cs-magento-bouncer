@@ -162,6 +162,7 @@ jobs:
 
       - name: Run events logging test
         run: |
+          ddev magento config:set admin/captcha/enable 0
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/6-events.js"
 
