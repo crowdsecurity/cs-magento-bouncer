@@ -378,7 +378,7 @@
                 <!-- Events logging -->
                 <group id="log" translate="label,comment,tooltip" showInDefault="1">
                     <label><![CDATA[Logging]]></label>
-                    <comment><![CDATA[Using it in combination to a specific CrowdSec scenario allows detecting suspicious behavior as credential or credit card stuffing. When enabled, you can choose which processes to track.]]></comment>
+                    <comment><![CDATA[Using it in combination to a specific CrowdSec scenario allows detecting suspicious behavior as credential or credit card stuffing.<br> When enabled, you can choose which processes to track.]]></comment>
                     <attribute type="expanded">1</attribute>
                     <field id="enabled" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
                         <label>Enable events log</label>

@@ -280,7 +280,35 @@ scenario allows detecting suspicious behavior as credential or credit card stuff
 
 If enabled, logs will be written in a `var/log/crowdsec-events.log` file.
 
+***
 
+`Logging → Track customer registration` (`global` scope)
+
+Will be used to detect suspicious account creation.
+
+***
+
+`Logging → Track customer login` (`global` scope)
+
+Will be used to detect credential stuffing.
+
+***
+
+`Logging → Track admin user login` (`global` scope)
+
+Will be used to detect admin brute attacks.
+
+***
+
+`Logging → Track add to cart process` (`global` scope)
+
+Will be used to detect suspicious behaviour with add to cart action.
+
+***
+
+`Logging → Track order process` (`global` scope)
+
+Will be used to detect suspicious behaviour, as credit card stuffing, on order action.
 
 ### Auto Prepend File mode
 
