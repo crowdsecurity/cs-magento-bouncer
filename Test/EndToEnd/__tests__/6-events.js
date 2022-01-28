@@ -327,11 +327,11 @@ describe(`Log events in admin`, () => {
         );
     });
 
-    it("Should not log failed admin user login if disabled configuration", async () => {
+    it("Should not log if main configuration is disabled", async () => {
         await goToAdmin();
         await onLoginPageLoginAsAdmin();
         await goToSettingsPage();
-        await selectElement("crowdsec_bouncer_events_log_admin_login", "0");
+        await selectElement("crowdsec_bouncer_events_log_enabled", "0");
         await onAdminSaveSettings();
 
         await goToAdmin("admin/auth/logout/");
@@ -349,33 +349,15 @@ describe(`Log events in admin`, () => {
             `{"type":"ADMIN_LOGIN_FAILED","ip":"${PROXY_IP}","x-forwarded-for-ip":"${CURRENT_IP}"`,
         );
     });
-});
 
-describe(`No Log if main event configuration is disabled`, () => {
-    beforeAll(async () => {
+    it("Should not log failed admin user login if disabled configuration", async () => {
         await goToAdmin();
         await onLoginPageLoginAsAdmin();
         await goToSettingsPage();
-        await selectElement("crowdsec_bouncer_events_log_order", "1");
-        await selectElement("crowdsec_bouncer_events_log_add_to_cart", "1");
-        await selectElement(
-            "crowdsec_bouncer_events_log_customer_register",
-            "1",
-        );
-        await selectElement("crowdsec_bouncer_events_log_customer_login", "1");
-        await selectElement("crowdsec_bouncer_events_log_admin_login", "1");
+        await selectElement("crowdsec_bouncer_events_log_enabled", "1");
+        await selectElement("crowdsec_bouncer_events_log_admin_login", "0");
         await onAdminSaveSettings();
-        await selectElement("crowdsec_bouncer_events_log_enabled", "0");
-        await onAdminSaveSettings();
-    });
 
-    beforeEach(async () => {
-        await deleteFileContent(EVENT_LOG_PATH);
-        const logContent = await getFileContent(EVENT_LOG_PATH);
-        await expect(logContent).toBe("");
-    });
-
-    it("Should not log failed admin user login", async () => {
         await goToAdmin("admin/auth/logout/");
         await expect(page).toMatchText(
             ".message-success",
