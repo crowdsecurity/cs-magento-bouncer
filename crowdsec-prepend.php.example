@@ -33,6 +33,8 @@
  */
 
 use CrowdSec\Bouncer\Helper\Data;
+use CrowdSec\Bouncer\Model\Bouncer;
+use CrowdSecBouncer\BouncerException;
 use CrowdSec\Bouncer\Registry\CurrentBouncer;
 use Magento\Framework\App\AreaList;
 use Magento\Framework\App\Bootstrap;
@@ -63,8 +65,8 @@ $helper = $objectManager->get(Data::class);
 try {
     // If there is any technical problem while bouncing, don't block the user. Bypass bouncing and log the
     // error.
-    set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-        throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
+    set_error_handler(function ($errno, $errstr) {
+        throw new BouncerException("$errstr (Error level: $errno)");
     });
     $areaCode = $areaList->getCodeByFrontName($request->getFrontName());
     $state->setAreaCode($areaCode);
@@ -78,7 +80,7 @@ try {
     if ($bouncerRegistry->get()) {
         return;
     }
-    /** @var \CrowdSec\Bouncer\Model\Bouncer $bouncer */
+    /** @var Bouncer $bouncer */
     $bouncer = $bouncerRegistry->create();
     $bouncer->init();
     $bouncer->run();
