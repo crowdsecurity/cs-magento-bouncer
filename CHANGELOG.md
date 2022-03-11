@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 
+## [1.1.0] - 2022-03-11
+
+### Added
+- Add events log feature
+### Fixed
+- Fix primary and secondary text configuration path
+
 ## [1.0.0] - 2021-12-10
 
 ### Changed
