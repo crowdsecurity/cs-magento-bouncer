@@ -20,40 +20,27 @@ jest.setTimeout(TIMEOUT);
 const fillInput = async (optionId, value) => {
     await page.fill(`[id=${optionId}]`, `${value}`);
 };
+const fillByName = async (name, value) => {
+    await page.fill(`[name=${name}]`, `${value}`);
+};
 
 const selectElement = async (selectId, valueToSelect) => {
     await page.selectOption(`[id=${selectId}]`, `${valueToSelect}`);
 };
 
-const goToAdmin = async () => {
-    await page.goto(ADMIN_URL, { waitUntil: "networkidle" });
+const selectByName = async (selectName, valueToSelect) => {
+    await page.selectOption(`[name=${selectName}]`, `${valueToSelect}`);
+};
+
+const goToAdmin = async (endpoint = "") => {
+    await page.goto(`${ADMIN_URL}${endpoint}`, { waitUntil: "networkidle" });
 };
 
 const goToPublicPage = async (endpoint = "") => {
     return page.goto(`${M2_URL}${endpoint}`);
 };
 
-const onAdminGoToSettingsPage = async () => {
-    await page.click("#menu-magento-backend-stores > a");
-    await page.waitForLoadState("networkidle");
-    await page.click(
-        '#menu-magento-backend-stores .item-system-config:has-text("Configuration") ',
-    );
-    await page.waitForLoadState("networkidle");
-    await wait(1000);
-
-    await page.click(
-        '#system_config_tabs .config-nav-block:has-text("Security")',
-    );
-    await page.waitForLoadState("networkidle");
-    await wait(1000);
-    await page.click('.config-nav-block li:has-text("CrowdSec Bouncer")');
-    await page.waitForLoadState("networkidle");
-    await expect(page).toMatchText(
-        "#crowdsec_bouncer_general-head",
-        "General settings",
-    );
-    // Open al tabs
+const ensureConfigVisibilty = async () => {
     let visible = await page.isVisible("#crowdsec_bouncer_general");
     if (!visible) {
         await page.click("#crowdsec_bouncer_general-head");
@@ -66,12 +53,47 @@ const onAdminGoToSettingsPage = async () => {
     if (!visible) {
         await page.click("#crowdsec_bouncer_advanced-head");
     }
+    visible = await page.isVisible("#crowdsec_bouncer_events");
+    if (!visible) {
+        await page.click("#crowdsec_bouncer_events-head");
+    }
     visible = await page.isVisible("#crowdsec_bouncer_general");
     await expect(visible).toBeTruthy();
     visible = await page.isVisible("#crowdsec_bouncer_theme");
     await expect(visible).toBeTruthy();
     visible = await page.isVisible("#crowdsec_bouncer_advanced");
     await expect(visible).toBeTruthy();
+    visible = await page.isVisible("#crowdsec_bouncer_events");
+    await expect(visible).toBeTruthy();
+};
+
+const onAdminGoToSettingsPage = async (direct = true) => {
+    if (direct) {
+        await page.goto(
+            `${ADMIN_URL}admin/system_config/edit/section/crowdsec_bouncer/`,
+            {
+                waitUntil: "networkidle",
+            },
+        );
+    } else {
+        await page.click("#menu-magento-backend-stores > a");
+        await page.waitForLoadState("networkidle");
+        await page.click(
+            '#menu-magento-backend-stores .item-system-config:has-text("Configuration") ',
+        );
+        await page.waitForLoadState("networkidle");
+        await wait(3000);
+        await page.click(
+            '#system_config_tabs .config-nav-block:has-text("Security")',
+        );
+        await wait(1500);
+        await page.click('.config-nav-block li:has-text("CrowdSec Bouncer")');
+        await page.waitForLoadState("networkidle");
+        await expect(page).toMatchText(
+            "#crowdsec_bouncer_general-head",
+            "General settings",
+        );
+    }
 };
 
 const onAdminSaveSettings = async (successExpected = true) => {
@@ -85,13 +107,14 @@ const onAdminSaveSettings = async (successExpected = true) => {
     }
 };
 
-const goToSettingsPage = async () => {
+const goToSettingsPage = async (direct = true) => {
     await goToAdmin();
-    await onAdminGoToSettingsPage();
+    await onAdminGoToSettingsPage(direct);
+    await ensureConfigVisibilty();
 };
 
-const setDefaultConfig = async (save = true) => {
-    await goToSettingsPage();
+const setDefaultConfig = async (save = true, direct = true) => {
+    await goToSettingsPage(direct);
     // Connexion details
     await fillInput(
         "crowdsec_bouncer_general_connection_api_url",
@@ -144,6 +167,13 @@ const setDefaultConfig = async (save = true) => {
     // Debug
     await selectElement("crowdsec_bouncer_advanced_debug_log", "1");
     await selectElement("crowdsec_bouncer_advanced_debug_display_errors", "1");
+    // Events
+    await selectElement("crowdsec_bouncer_events_log_enabled", "1");
+    await selectElement("crowdsec_bouncer_events_log_customer_register", "1");
+    await selectElement("crowdsec_bouncer_events_log_customer_login", "1");
+    await selectElement("crowdsec_bouncer_events_log_admin_login", "1");
+    await selectElement("crowdsec_bouncer_events_log_add_to_cart", "1");
+    await selectElement("crowdsec_bouncer_events_log_order", "1");
 
     if (save) {
         await onAdminSaveSettings();
@@ -308,7 +338,9 @@ module.exports = {
     captchaIpForSeconds,
     removeAllDecisions,
     fillInput,
+    fillByName,
     selectElement,
+    selectByName,
     getFileContent,
     deleteFileContent,
     setDefaultConfig,

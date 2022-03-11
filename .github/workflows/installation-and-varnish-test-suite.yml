@@ -1,21 +1,34 @@
 name: Installation and Varnish test suite
 on:
   push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
 
 jobs:
   installation-and-varnish-test-suite:
     strategy:
+      fail-fast: false
       matrix:
-        m2-version: [ 2.4.3 ]
-        php-version: [7.4]
+        m2-version: [ "2.3.0", "2.4.3" ]
+        php-version: [ "7.2", "7.3", "7.4" ]
+        exclude:
+          - { php-version: "7.3", m2-version: "2.3.0" }
+          - { php-version: "7.4", m2-version: "2.3.0" }
+          - { php-version: "7.2", m2-version: "2.4.3" }
+
 
     name: Installation and Varnish test suite
     # @see https://devdocs.magento.com/marketplace/sellers/installation-and-varnish-tests.html
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"
       EXTENSION_NAME: "CrowdSec_Bouncer"
@@ -30,12 +43,14 @@ jobs:
           repository: julienloizelet/ddev-m2
 
       - name: Install DDEV
+        env:
+          DDEV_VERSION: v1.18.2
         run: |
           # @see https://ddev.readthedocs.io/en/stable/#installationupgrade-script-linux-and-macos-armarm64-and-amd64-architectures
           sudo apt-get -qq update
           sudo apt-get -qq -y install libnss3-tools
           curl -LO https://raw.githubusercontent.com/drud/ddev/master/scripts/install_ddev.sh
-          bash install_ddev.sh
+          bash install_ddev.sh ${{env.DDEV_VERSION}}
           ddev config global --instrumentation-opt-in=false --omit-containers=dba,ddev-ssh-agent
           rm install_ddev.sh
 
@@ -115,9 +130,13 @@ jobs:
           ddev magento deploy:mode:set production
           ddev magento indexer:reindex
 
-      - name: Prepare for Varnish tests
+      - name: Disable some extensions for 2.4
+        if: startsWith(matrix.m2-version, '2.4')
         run: |
           ddev magento module:disable Magento_TwoFactorAuth
+
+      - name: Prepare for Varnish tests
+        run: |
           ddev magento setup:di:compile
           ddev magento config:set system/full_page_cache/caching_application 2
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml

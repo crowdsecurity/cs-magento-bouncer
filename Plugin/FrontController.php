@@ -28,7 +28,7 @@
 namespace CrowdSec\Bouncer\Plugin;
 
 use Closure;
-use ErrorException;
+use CrowdSecBouncer\BouncerException;
 use Exception;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\FrontControllerInterface;
@@ -101,7 +101,6 @@ class FrontController
      * @param Closure $proceed
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
-     * @throws ErrorException
      * @throws LocalizedException
      */
     public function aroundDispatch(
@@ -121,8 +120,8 @@ class FrontController
         try {
             // If there is any technical problem while bouncing, don't block the user. Bypass bouncing and log the
             // error.
-            set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-                throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
+            set_error_handler(function ($errno, $errstr) {
+                throw new BouncerException("$errstr (Error level: $errno)");
             });
 
             $result = $this->bounce($subject, $proceed, $request);

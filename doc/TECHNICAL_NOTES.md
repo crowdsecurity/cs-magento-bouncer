@@ -21,6 +21,33 @@
 This extension is mainly based on the CrowdSec Bouncer PHP library. It is an open source library whose code you can find
 [here](https://github.com/crowdsecurity/php-cs-bouncer).
 
+
+## Events logging
+
+Events logging feature is essentially based on Magento 2 event and observer pattern.
+Please look at `etc/frontend/events.xml` and `etc/events.xml` files for more details.
+
+We are using the following events:
+
+- `backend_auth_user_login_failed`
+- `checkout_cart_product_add_after`
+- `checkout_cart_product_add_before`
+- `customer_login`
+- `customer_register_success`
+- `sales_order_place_before`
+- `sales_order_payment_place_end`
+- `sales_order_payment_place_start`
+- `sales_order_place_after`
+
+Additionally, as there is sometimes no available event, we use the Magento 2 plugin (interceptor) pattern.
+Please look at `etc/frontend/di.xml` and `etc/di.xml` files for more details.
+
+We are using `before` plugins for the following methods:
+
+- `Magento\Customer\Model\AccountManagement::authenticate`
+- `Magento\Customer\Controller\Account\CreatePost::execute`
+
+
 ## Full Page Cache
 
 In Magento 2, the full page cache is implemented via a plugin on the front controller (`vendor/magento/module-page-cache/Model/App/FrontController/BuiltinPlugin.php::aroundDispatch`). 

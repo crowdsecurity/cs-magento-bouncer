@@ -1,19 +1,31 @@
 name: End-to-end test suite
 on:
   push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
 
 jobs:
   end-to-end-test-suite:
     strategy:
+      fail-fast: false
       matrix:
-        m2-version: [ 2.4.3 ]
-        php-version: [7.4]
+        m2-version: [ "2.3.5", "2.4.3" ]
+        php-version: ["7.2", "7.3", "7.4"]
+        exclude:
+          - { php-version: "7.3", m2-version: "2.3.5" }
+          - { php-version: "7.4", m2-version: "2.3.5" }
+          - { php-version: "7.2", m2-version: "2.4.3" }
 
     name: End-to-end test suite
+    if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
     runs-on: ubuntu-latest
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"
@@ -29,12 +41,14 @@ jobs:
           repository: julienloizelet/ddev-m2
 
       - name: Install DDEV
+        env:
+          DDEV_VERSION: v1.18.2
         run: |
           # @see https://ddev.readthedocs.io/en/stable/#installationupgrade-script-linux-and-macos-armarm64-and-amd64-architectures
           sudo apt-get -qq update
           sudo apt-get -qq -y install libnss3-tools
           curl -LO https://raw.githubusercontent.com/drud/ddev/master/scripts/install_ddev.sh
-          bash install_ddev.sh
+          bash install_ddev.sh ${{env.DDEV_VERSION}}
           ddev config global --instrumentation-opt-in=false --omit-containers=dba,ddev-ssh-agent
           rm install_ddev.sh
 
@@ -57,9 +71,9 @@ jobs:
           cp .ddev/config_overrides/config.${{ env.M2_VERSION_CODE }}.yaml .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
           cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-compose.playwright.yaml
+          cp .ddev/custom_files/varnish-profile.xml varnish-profile.xml
           sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           ddev start
-
 
       - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
         # We don't use "ddev composer" create as it restarts all containers
@@ -99,20 +113,31 @@ jobs:
           ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/${{ env.EXTENSION_PATH }}/
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
+      - name: Disable some extensions for 2.4
+        if: startsWith(matrix.m2-version, '2.4')
+        run: |
+          ddev magento module:disable Magento_TwoFactorAuth
+          ddev magento module:disable Magento_AdminNotification
+
+      - name: Make some workaround for 2.3.5
+        if: startsWith(matrix.m2-version, '2.3.5')
+        run: |
+          ddev magento  module:disable Dotdigitalgroup_Chat
+          ddev magento  module:disable Dotdigitalgroup_Email
+
       - name: Enable extension
         run: |
           ddev magento deploy:mode:set developer
           ddev magento module:enable ${{ env.EXTENSION_NAME }}
-          ddev magento module:disable Magento_TwoFactorAuth
-          ddev magento module:disable Magento_AdminNotification
           ddev magento setup:upgrade
           ddev magento setup:static-content:deploy -f
           ddev crowdsec-config
           ddev magento cache:flush
 
-
       - name: Prepare for playwright test
         run: |
+          ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
+          ddev magento cache:flush
           cp .ddev/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
           cp ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/crowdsec-prepend.php.example ${{ github.workspace }}/app/etc/crowdsec-prepend.php
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
@@ -130,7 +155,6 @@ jobs:
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/2-live-mode.js"
 
-
       - name: Run stream mode test
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
@@ -146,14 +170,15 @@ jobs:
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/5-api.js"
 
+      - name: Run events logging test
+        run: |
+          ddev magento config:set admin/captcha/enable 0
+          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
+          ./run-tests.sh ci "./__tests__/6-events.js"
+
       - name: Run auto prepend mode test suite
         run: |
           cd ${{ github.workspace }}/.ddev
           ddev crowdsec-prepend-nginx
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci
-
-
-
-
-

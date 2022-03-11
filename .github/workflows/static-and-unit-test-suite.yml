@@ -1,24 +1,31 @@
 name: Static and unit test suite
 on:
   push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
 
 jobs:
   static-and-unit-test-suite:
     strategy:
+      fail-fast: false
       matrix:
-        m2-version: [ 2.3.0, 2.4.3 ]
-        php-version: [7.2, 7.3, 7.4]
+        m2-version: [ "2.3.0", "2.4.3" ]
+        php-version: ["7.2", "7.3", "7.4"]
         exclude:
-          - { php-version: 7.4, m2-version: 2.3.0}
-          - { php-version: 7.3, m2-version: 2.3.0}
-          - { php-version: 7.2, m2-version: 2.4.3}
+          - { php-version: "7.4", m2-version: "2.3.0"}
+          - { php-version: "7.3", m2-version: "2.3.0"}
+          - { php-version: "7.2", m2-version: "2.4.3"}
 
     name: Static and unit test suite
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"
 
@@ -30,12 +37,14 @@ jobs:
           repository: julienloizelet/ddev-m2
 
       - name: Install DDEV
+        env:
+          DDEV_VERSION: v1.18.2
         run: |
           # @see https://ddev.readthedocs.io/en/stable/#installationupgrade-script-linux-and-macos-armarm64-and-amd64-architectures
           sudo apt-get -qq update
           sudo apt-get -qq -y install libnss3-tools
           curl -LO https://raw.githubusercontent.com/drud/ddev/master/scripts/install_ddev.sh
-          bash install_ddev.sh
+          bash install_ddev.sh ${{env.DDEV_VERSION}}
           ddev config global --instrumentation-opt-in=false --omit-containers=dba,ddev-ssh-agent
           rm install_ddev.sh
 
@@ -59,7 +68,6 @@ jobs:
           cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
           sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           ddev start
-
 
       - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
         # We don't use "ddev composer" create as it restarts all containers

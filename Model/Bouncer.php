@@ -30,8 +30,6 @@ namespace CrowdSec\Bouncer\Model;
 use CrowdSec\Bouncer\Exception\CrowdSecException;
 use Exception;
 use Magento\Framework\App\Response\Http;
-use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
-use Magento\Framework\App\Request\Http as Request;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSecBouncer\AbstractBounce;
 use CrowdSecBouncer\IBounce;
@@ -43,16 +41,6 @@ use CrowdSecBouncer\BouncerFactory;
  */
 class Bouncer extends AbstractBounce implements IBounce
 {
-
-    /**
-     * @var RemoteAddress
-     */
-    protected $remoteAddress;
-
-    /**
-     * @var Request
-     */
-    protected $request;
 
     /**
      * @var Http
@@ -87,16 +75,12 @@ class Bouncer extends AbstractBounce implements IBounce
     protected $bouncerConfigs;
 
     public function __construct(
-        RemoteAddress $remoteAddress,
-        Request $request,
         Http $response,
         Session $session,
         Helper $helper,
         CacheFactory $cacheFactory,
         BouncerFactory $bouncerInstanceFactory
     ) {
-        $this->remoteAddress = $remoteAddress;
-        $this->request = $request;
         $this->response = $response;
         $this->session = $session;
         $this->helper = $helper;
@@ -196,8 +180,7 @@ class Bouncer extends AbstractBounce implements IBounce
      */
     public function getHttpRequestHeader(string $name): ?string
     {
-        $httpRequestHeader = $this->request->getHeader($name);
-        return $httpRequestHeader ?: null;
+        return $this->helper->getHttpRequestHeader($name);
     }
 
     /**
@@ -205,7 +188,7 @@ class Bouncer extends AbstractBounce implements IBounce
      */
     public function getRemoteIp(): string
     {
-        return $this->remoteAddress->getRemoteAddress();
+        return $this->helper->getRemoteIp();
     }
 
     /**
@@ -213,7 +196,7 @@ class Bouncer extends AbstractBounce implements IBounce
      */
     public function getHttpMethod(): string
     {
-        return $this->request->getMethod();
+        return $this->helper->getHttpMethod();
     }
 
     /**
@@ -279,8 +262,7 @@ class Bouncer extends AbstractBounce implements IBounce
      */
     public function getPostedVariable(string $name): ?string
     {
-        $post = $this->request->getPost($name);
-        return $post?:null;
+        return $this->helper->getPostedVariable($name);
     }
 
     /**

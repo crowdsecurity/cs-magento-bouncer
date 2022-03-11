@@ -18,7 +18,7 @@ describe(`Extension configuration`, () => {
     });
 
     it("Should set default config", async () => {
-        await setDefaultConfig();
+        await setDefaultConfig(true, false);
     });
 
     it("Should test connection with error", async () => {
