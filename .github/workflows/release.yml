@@ -4,10 +4,15 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        default: ""
+        type: string
+        required: true
       draft:
+        type: boolean
+        description: Draft release
         default: false
       prerelease:
+        type: boolean
+        description: Prerelease
         default: false
 
 jobs:
@@ -61,7 +66,7 @@ jobs:
           fi
 
           CURRENT_DATE=$(date +'%Y-%m-%d')
-          CHANGELOG_VERSION=$(grep -E "## \[(.*)\] - $CURRENT_DATE"  CHANGELOG.md | sed 's/ //g')
+          CHANGELOG_VERSION=$(grep -o -E "## \[(.*)\] - $CURRENT_DATE"  CHANGELOG.md | head -1 | sed 's/ //g')
           if [[ $CHANGELOG_VERSION == "##[${{ env.VERSION_NUMBER }}]-$CURRENT_DATE" ]]
           then
               echo "CHANGELOG VERSION OK"
