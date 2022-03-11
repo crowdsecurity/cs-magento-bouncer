@@ -16,6 +16,7 @@
     - [General Settings](#general-settings)
     - [Theme customizations](#theme-customizations)
     - [Advanced settings](#advanced-settings)
+    - [Events](#events)
   - [Auto Prepend File mode](#auto-prepend-file-mode)
     - [PHP](#php)
     - [Nginx](#nginx)
