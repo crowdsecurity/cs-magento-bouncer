@@ -1,4 +1,4 @@
-![CrowdSec Logo](https://github.com/crowdsecurity/cs-magento-bouncer/raw/main/doc/images/logo_crowdsec.png) 
+![CrowdSec Logo](https://raw.githubusercontent.com/crowdsecurity/cs-magento-bouncer/main/doc/images/logo_crowdsec.png) 
 
 # CrowdSec Bouncer extension for Magento 2
 
