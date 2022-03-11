@@ -20,7 +20,7 @@ See [Technical notes](https://github.com/crowdsecurity/cs-magento-bouncer/blob/m
 
 ## Developer guide
 
-See [Developer guide](https://github.com/crowdsecurity/cs-magento-bouncer/blob/main/doc/USER_GUIDE.md)
+See [Developer guide](https://github.com/crowdsecurity/cs-magento-bouncer/blob/main/doc/DEVELOPER.md)
 
 
 ## License
