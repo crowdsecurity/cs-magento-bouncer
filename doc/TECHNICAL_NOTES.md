@@ -9,6 +9,7 @@
 **Table of Contents**
 
 - [CrowdSec Bouncer PHP Library](#crowdsec-bouncer-php-library)
+- [Events logging](#events-logging)
 - [Full Page Cache](#full-page-cache)
 - [Varnish](#varnish)
 - [Magento 2.2](#magento-22)
