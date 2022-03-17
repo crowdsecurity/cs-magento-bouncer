@@ -82,7 +82,8 @@ try {
     }
     /** @var Bouncer $bouncer */
     $bouncer = $bouncerRegistry->create();
-    $bouncer->init();
+    $configs = $helper->getBouncerConfigs();
+    $bouncer->init($configs);
     $bouncer->run();
     // If ban or captcha remediation wall display is detected
     if ($bouncer->getRemediationDisplay()) {

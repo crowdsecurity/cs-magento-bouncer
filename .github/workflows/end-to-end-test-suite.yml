@@ -176,9 +176,28 @@ jobs:
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/6-events.js"
 
-      - name: Run auto prepend mode test suite
+      - name: Prepare auto-prepend-file mode test suite
         run: |
           cd ${{ github.workspace }}/.ddev
-          ddev crowdsec-prepend-nginx
+          ddev nginx-config custom_files/crowdsec-prepend-nginx-site.conf
+          ddev exec -s crowdsec cscli decisions delete --all
+
+      - name: Verify auto_prepend_file directive
+        run: |
+          cd ${{ github.workspace }}
+          cp .ddev/custom_files/phpinfo.php pub/phpinfo.php
+          PREPENDVERIF=$(curl https://${{ env.M2_VERSION_CODE }}.ddev.site/phpinfo.php | grep -o -E "auto_prepend_file=(.*)php(.*)" | sed 's/<\/tr>//g; s/<\/td>//g;' | tr '\n' '#')
+          if [[ $PREPENDVERIF == "auto_prepend_file=/var/www/html/app/etc/crowdsec-prepend.php#auto_prepend_file=/var/www/html/app/etc/crowdsec-prepend.php#" ]]
+          then
+              echo "AUTO PREPEND FILE OK"
+          else
+              echo "AUTO PREPEND FILE KO"
+              echo $PREPENDVERIF
+              exit 1
+          fi
+
+
+      - name: Run auto prepend mode test suite
+        run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci

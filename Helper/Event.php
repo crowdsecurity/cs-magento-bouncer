@@ -41,8 +41,6 @@ class Event extends Data
      */
     protected $_eventLogger;
 
-    protected $_optionalData = [];
-
     /**
      * Data constructor.
      * @param EventLogger $eventLogger

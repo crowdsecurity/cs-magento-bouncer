@@ -32,7 +32,8 @@ class PruneCache
         if ($this->helper->getCacheTechnology() === Constants::CACHE_SYSTEM_PHPFS) {
             try {
                 $bouncer = $this->registryBouncer->create();
-                $bouncer->init()->pruneCache();
+                $configs = $this->helper->getBouncerConfigs();
+                $bouncer->init($configs)->pruneCache();
             } catch (CrowdSecException $e) {
                 $this->helper->error('', [
                     'type' => 'M2_EXCEPTION_WHILE_PRUNING_CACHE',

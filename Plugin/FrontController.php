@@ -102,6 +102,7 @@ class FrontController
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
      * @throws LocalizedException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function aroundDispatch(
         FrontControllerInterface $subject,
@@ -154,6 +155,7 @@ class FrontController
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
      * @throws LocalizedException
+     * @throws \Psr\Cache\InvalidArgumentException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpUnusedParameterInspection
      */
@@ -167,7 +169,8 @@ class FrontController
             return $proceed($request);
         }
         $registryBouncer = $this->registryBouncer->create();
-        $registryBouncer->init();
+        $configs = $this->helper->getBouncerConfigs();
+        $registryBouncer->init($configs);
         $registryBouncer->run();
 
         // If ban or captcha remediation wall display is detected

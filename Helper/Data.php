@@ -343,7 +343,7 @@ class Data extends Config
                 'api_url' => $this->getApiUrl(),
                 'api_key' => $this->getApiKey(),
                 'api_user_agent' => Constants::BASE_USER_AGENT,
-                'live_mode' => !$this->isStreamModeEnabled(),
+                'stream_mode' => $this->isStreamModeEnabled(),
                 'clean_ip_duration' => $this->getCleanIpCacheDuration(),
                 'bad_ip_duration' => $this->getBadIpCacheDuration(),
                 'fallback_remediation' => $this->getRemediationFallback(),

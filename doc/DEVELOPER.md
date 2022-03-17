@@ -50,11 +50,16 @@ release._
 
 #### DDEV installation
 
-Please follow the [official instructions](https://ddev.readthedocs.io/en/stable/#installation). On a Linux 
-distribution, this should be as simple as
-
-    sudo apt-get install linuxbrew-wrapper
-    brew tap drud/ddev && brew install ddev
+This project is fully compatible with DDEV 1.18.2 and it is recommended to use this specific version.
+For the DDEV installation, please follow the [official instructions](https://ddev.readthedocs.io/en/stable/#installation).
+On a Linux distribution, you can run:
+```
+sudo apt-get -qq update
+sudo apt-get -qq -y install libnss3-tools
+curl -LO https://raw.githubusercontent.com/drud/ddev/master/scripts/install_ddev.sh
+bash install_ddev.sh v1.18.2
+rm install_ddev.sh
+```
 
 
 #### DDEV Magento 2 environment

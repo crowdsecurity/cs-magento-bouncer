@@ -431,7 +431,9 @@ class Config
                 if (!($bouncer = $this->registryBouncer->get())) {
                     $bouncer = $this->registryBouncer->create();
                 }
+                $configs = $this->helper->getBouncerConfigs();
                 $bouncer->init(
+                    $configs,
                     [
                         'forced_cache_system' => $cacheSystem,
                         'memcached_dsn' => $memcachedDsn,
@@ -473,8 +475,10 @@ class Config
         Phrase $preMessage = null
     ): void {
         try {
+            $configs = $this->helper->getBouncerConfigs();
             $clearCacheResult =
                 $bouncer->init(
+                    $configs,
                     [
                         'forced_cache_system' => $cacheSystem,
                         'memcached_dsn' => $memcachedDsn,
@@ -507,8 +511,10 @@ class Config
     protected function _warmUpCache(Bouncer $bouncer, $cacheSystem, $memcachedDsn, $redisDsn, $cacheLabel): void
     {
         try {
+            $configs = $this->helper->getBouncerConfigs();
             $warmUpCacheResult =
                 $bouncer->init(
+                    $configs,
                     [
                         'forced_cache_system' => $cacheSystem,
                         'memcached_dsn' => $memcachedDsn,

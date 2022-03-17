@@ -28,6 +28,7 @@
 namespace CrowdSec\Bouncer\Model;
 
 use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSecBouncer\BouncerException;
 use Exception;
 use Magento\Framework\App\Response\Http;
 use CrowdSec\Bouncer\Helper\Data as Helper;
@@ -112,14 +113,9 @@ class Bouncer extends AbstractBounce implements IBounce
      * @return BouncerInstance
      * @throws CrowdSecException
      */
-    public function getBouncerInstance(array $forcedConfigs = []): BouncerInstance
+    public function getBouncerInstance(array $configs = [], bool $forceReload = false): BouncerInstance
     {
-        if ($this->bouncerInstance === null || !empty($forcedConfigs)) {
-            $configs = $this->helper->getBouncerConfigs();
-            // We replace configs by forced configs
-            if (is_array($forcedConfigs)) {
-                $configs = array_merge($configs, $forcedConfigs);
-            }
+        if ($this->bouncerInstance === null || $forceReload) {
             $this->bouncerConfigs = $configs;
             $this->logger = $configs['logger'];
             $this->setDisplayErrors($configs['display_errors']);
@@ -146,7 +142,7 @@ class Bouncer extends AbstractBounce implements IBounce
                     'api_key' => $configs['api_key'],
                     'api_url' => $configs['api_url'],
                     'api_user_agent' => $configs['api_user_agent'],
-                    'live_mode' => $configs['live_mode'],
+                    'stream_mode' => $configs['stream_mode'],
                     'max_remediation_level' => $configs['max_remediation_level'],
                     'fallback_remediation' => $configs['fallback_remediation'],
                     'cache_expiration_for_clean_ip' => $configs['clean_ip_duration'],
@@ -168,9 +164,10 @@ class Bouncer extends AbstractBounce implements IBounce
      * @return BouncerInstance
      * @throws CrowdSecException
      */
-    public function init(array $forcedConfigs = []): BouncerInstance
+    public function init(array $configs, array $forcedConfigs = []): BouncerInstance
     {
-        $this->bouncer = $this->getBouncerInstance($forcedConfigs);
+        $finalConfigs = array_merge($configs, $forcedConfigs);
+        $this->bouncer = $this->getBouncerInstance($finalConfigs);
 
         return $this->bouncer;
     }
@@ -270,15 +267,7 @@ class Bouncer extends AbstractBounce implements IBounce
      */
     public function shouldBounceCurrentIp(): bool
     {
-        $shouldBounce = $this->isConfigValid();
-        if (!$shouldBounce) {
-            $this->logger->warning('', [
-                'type' => 'M2_INVALID_BOUNCER_CONFIG',
-                'message' => 'No bouncing because bouncer config is not valid.',
-            ]);
-        }
-
-        return $shouldBounce;
+        return true;
     }
 
     /**
@@ -315,16 +304,38 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * Check if the bouncer configuration is correct or not.
+     * If there is any technical problem while bouncing, don't block the user. Bypass bouncing and log the error.
+     *
+     * @throws CacheException
+     * @throws ErrorException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
-    public function isConfigValid(): bool
+    public function safelyBounce(array $configs): bool
     {
         $result = false;
-        $configs = $this->bouncerConfigs;
-        if (is_array($configs) && !empty($configs['api_url']) && !empty($configs['api_key'])) {
+        try {
+            set_error_handler(function ($errno, $errstr) {
+                throw new BouncerException("$errstr (Error level: $errno)");
+            });
+            $this->init($configs);
+            $this->run();
             $result = true;
+            restore_error_handler();
+        } catch (Exception $e) {
+            $this->logger->error('', [
+                'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            if ($this->displayErrors) {
+                throw $e;
+            }
         }
 
         return $result;
     }
+
+
 }
