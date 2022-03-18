@@ -28,7 +28,6 @@
 namespace CrowdSec\Bouncer\Model;
 
 use CrowdSec\Bouncer\Exception\CrowdSecException;
-use CrowdSecBouncer\BouncerException;
 use Exception;
 use Magento\Framework\App\Response\Http;
 use CrowdSec\Bouncer\Helper\Data as Helper;
@@ -315,13 +314,13 @@ class Bouncer extends AbstractBounce implements IBounce
         $result = false;
         try {
             set_error_handler(function ($errno, $errstr) {
-                throw new BouncerException("$errstr (Error level: $errno)");
+                throw new CrowdSecException("$errstr (Error level: $errno)");
             });
             $this->init($configs);
             $this->run();
             $result = true;
             restore_error_handler();
-        } catch (Exception $e) {
+        } catch (CrowdSecException $e) {
             $this->logger->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
                 'message' => $e->getMessage(),
@@ -336,6 +335,4 @@ class Bouncer extends AbstractBounce implements IBounce
 
         return $result;
     }
-
-
 }

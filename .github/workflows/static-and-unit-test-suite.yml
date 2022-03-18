@@ -23,8 +23,8 @@ jobs:
           - { php-version: "7.4", m2-version: "2.3.0"}
           - { php-version: "7.3", m2-version: "2.3.0"}
           - { php-version: "7.2", m2-version: "2.4.3"}
-          - { php-version: "7.2", m2-version: "2.4.0" }
-          - { php-version: "7.3", m2-version: "2.4.0" }
+          - { php-version: "7.2", m2-version: "2.4.0"}
+          - { php-version: "7.3", m2-version: "2.4.0"}
 
     name: Static and unit test suite
     runs-on: ubuntu-latest

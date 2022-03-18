@@ -94,7 +94,7 @@ try {
         exit(0);
     }
     restore_error_handler();
-} catch (Exception $e) {
+} catch (BouncerException $e) {
     $helper->critical('', [
         'type' => 'M2_EXCEPTION_WHILE_PREPEND_BOUNCING',
         'message' => $e->getMessage(),

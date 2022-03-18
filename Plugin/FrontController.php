@@ -29,7 +29,6 @@ namespace CrowdSec\Bouncer\Plugin;
 
 use Closure;
 use CrowdSecBouncer\BouncerException;
-use Exception;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\FrontControllerInterface;
 use Magento\Framework\App\RequestInterface;
@@ -39,6 +38,7 @@ use Magento\Framework\App\State;
 use CrowdSec\Bouncer\Helper\Data as HelperData;
 use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use Magento\Framework\Exception\LocalizedException;
+use Psr\Cache\InvalidArgumentException;
 
 /**
  * Plugin to handle controller request before Full Page Cache
@@ -102,7 +102,7 @@ class FrontController
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
      * @throws LocalizedException
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function aroundDispatch(
         FrontControllerInterface $subject,
@@ -130,7 +130,7 @@ class FrontController
             restore_error_handler();
 
             return $result;
-        } catch (Exception $e) {
+        } catch (BouncerException $e) {
             $this->helper->critical('', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
                 'message' => $e->getMessage(),
@@ -155,7 +155,7 @@ class FrontController
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
      * @throws LocalizedException
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpUnusedParameterInspection
      */
