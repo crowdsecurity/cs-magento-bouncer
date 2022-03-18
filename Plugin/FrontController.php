@@ -28,7 +28,7 @@
 namespace CrowdSec\Bouncer\Plugin;
 
 use Closure;
-use CrowdSecBouncer\BouncerException;
+use CrowdSec\Bouncer\Exception\CrowdSecException;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\FrontControllerInterface;
 use Magento\Framework\App\RequestInterface;
@@ -122,7 +122,7 @@ class FrontController
             // If there is any technical problem while bouncing, don't block the user. Bypass bouncing and log the
             // error.
             set_error_handler(function ($errno, $errstr) {
-                throw new BouncerException("$errstr (Error level: $errno)");
+                throw new CrowdSecException("$errstr (Error level: $errno)");
             });
 
             $result = $this->bounce($subject, $proceed, $request);
@@ -130,7 +130,7 @@ class FrontController
             restore_error_handler();
 
             return $result;
-        } catch (BouncerException $e) {
+        } catch (CrowdSecException $e) {
             $this->helper->critical('', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
                 'message' => $e->getMessage(),

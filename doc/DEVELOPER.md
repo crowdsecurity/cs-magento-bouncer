@@ -100,14 +100,14 @@ git clone git@github.com:julienloizelet/ddev-m2.git ./
 - Copy some configurations file:
 
 ```      
-cp .ddev/config_overrides/config.m243.yaml .ddev/config.m243.yaml
-cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
-cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-compose.playwright.yaml
+cp config_overrides/config.m243.yaml config.m243.yaml
+cp additional_docker_compose/docker-compose.crowdsec.yaml docker-compose.crowdsec.yaml
+cp additional_docker_compose/docker-compose.playwright.yaml docker-compose.playwright.yaml
 ```
 
 - Launch DDEV
 ```
-cd .ddev && ddev start
+ddev start
 ```
  This should take some times on the first launch as this will download all necessary docker images.
 

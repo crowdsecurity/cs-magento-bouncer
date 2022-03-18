@@ -27,8 +27,8 @@
 
 namespace CrowdSec\Bouncer\Exception;
 
-use Magento\Framework\Exception\LocalizedException;
+use CrowdSecBouncer\BouncerException;
 
-class CrowdSecException extends LocalizedException
+class CrowdSecException extends BouncerException
 {
 }
