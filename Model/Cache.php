@@ -70,30 +70,29 @@ class Cache
                 case Constants::CACHE_SYSTEM_MEMCACHED:
                     if (empty($memcachedDsn)) {
                         throw new CrowdSecException(
-                            __('The selected cache technology is Memcached.' .
-                               ' Please set a Memcached DSN or select another cache technology.')
+                            'The selected cache technology is Memcached.' .
+                               ' Please set a Memcached DSN or select another cache technology.'
                         );
                     }
                     $cacheAdapterInstance = new MemcachedAdapter(MemcachedAdapter::createConnection($memcachedDsn));
                     break;
                 case Constants::CACHE_SYSTEM_REDIS:
                     if (empty($redisDsn)) {
-                        throw new CrowdSecException(__('The selected cache technology is Redis.' .
-                                                       ' Please set a Redis DSN or select another cache technology.'));
+                        throw new CrowdSecException('The selected cache technology is Redis.' .
+                                                       ' Please set a Redis DSN or select another cache technology.');
                     }
 
                     try {
                         $cacheAdapterInstance = new RedisAdapter(RedisAdapter::createConnection($redisDsn));
                     } catch (InvalidArgumentException $e) {
-                        throw new CrowdSecException(
-                            __('Error when connecting to Redis.' .
-                               ' Please fix the Redis DSN or select another cache technology.')
+                        throw new CrowdSecException('Error when connecting to Redis.' .
+                               ' Please fix the Redis DSN or select another cache technology.'
                         );
                     }
 
                     break;
                 default:
-                    throw new CrowdSecException(__('Unknown selected cache technology.'));
+                    throw new CrowdSecException('Unknown selected cache technology.');
             }
             $this->cacheAdapter[$cacheSystem][$memcachedDsn][$redisDsn][$fsCachePath][$forcedCacheSystem] =
                 $cacheAdapterInstance;

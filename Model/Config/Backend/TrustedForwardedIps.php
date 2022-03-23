@@ -102,14 +102,14 @@ class TrustedForwardedIps extends Value
                     if (false !== strpos($stringRange, '/')) {
                         $range = Factory::parseRangeString($stringRange);
                         if (null === $range) {
-                            throw new CrowdSecException(__('Invalid IP List format.'));
+                            throw new CrowdSecException('Invalid IP List format.');
                         }
                         $bounds = [$range->getComparableStartString(), $range->getComparableEndString()];
                         $comparableIpBoundsList = [$bounds];
                     } else {
-                        $address = Factory::parseAddressString($stringRange);
+                        $address = Factory::parseAddressString($stringRange, 3);
                         if (null === $address) {
-                            throw new CrowdSecException(__('Invalid IP List format.'));
+                            throw new CrowdSecException('Invalid IP List format.');
                         }
                         $comparableString = $address->getComparableString();
                         $comparableIpBoundsList[] = [$comparableString, $comparableString];
@@ -124,7 +124,7 @@ class TrustedForwardedIps extends Value
                 );
             } catch (Exception $e) {
                 $this->_logger->error($e->getMessage());
-                throw new CrowdSecException(__('CrowdSec Trusted forward ips settings can\'t be saved'));
+                throw new CrowdSecException('CrowdSec Trusted forward ips settings can\'t be saved');
             }
         }
 

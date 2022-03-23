@@ -87,6 +87,7 @@ class Config extends AbstractHelper
     const XML_PATH_ADVANCED_DEBUG_LOG = self::SECTION . '/advanced/debug/log';
     const XML_PATH_ADVANCED_DISPLAY_ERRORS = self::SECTION . '/advanced/debug/display_errors';
     const XML_PATH_ADVANCED_DISABLE_PROD_LOG = self::SECTION . '/advanced/debug/disable_prod_log';
+    const XML_PATH_ADVANCED_FORCED_TEST_IP = self::SECTION . '/advanced/debug/forced_test_ip';
     // Events configs
     const XML_PATH_EVENTS_LOG_ROOT = self::SECTION . '/events/log/';
 
@@ -151,7 +152,7 @@ class Config extends AbstractHelper
             $this->_globals['api_url'] = trim((string)$this->scopeConfig->getValue(self::XML_PATH_API_URL));
         }
 
-        return $this->_globals['api_url'];
+        return (string) $this->_globals['api_url'];
     }
 
     /**
@@ -164,7 +165,7 @@ class Config extends AbstractHelper
             $this->_globals['api_key'] = trim((string)$this->scopeConfig->getValue(self::XML_PATH_API_KEY));
         }
 
-        return $this->_globals['api_key'];
+        return (string) $this->_globals['api_key'];
     }
 
     /**
@@ -180,7 +181,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_storeviews['is_front_enabled'];
+        return (bool) $this->_storeviews['is_front_enabled'];
     }
 
     /**
@@ -193,7 +194,7 @@ class Config extends AbstractHelper
             $this->_globals['is_admin_enabled'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_ADMIN_ENABLED);
         }
 
-        return $this->_globals['is_admin_enabled'];
+        return (bool) $this->_globals['is_admin_enabled'];
     }
 
     /**
@@ -206,7 +207,7 @@ class Config extends AbstractHelper
             $this->_globals['is_api_enabled'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_API_ENABLED);
         }
 
-        return $this->_globals['is_api_enabled'];
+        return (bool) $this->_globals['is_api_enabled'];
     }
 
     /**
@@ -219,7 +220,7 @@ class Config extends AbstractHelper
             $this->_globals['is_debug_log'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_DEBUG_LOG);
         }
 
-        return $this->_globals['is_debug_log'];
+        return (bool) $this->_globals['is_debug_log'];
     }
 
     /**
@@ -233,7 +234,7 @@ class Config extends AbstractHelper
                 (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_DISABLE_PROD_LOG);
         }
 
-        return $this->_globals['is_prod_log_disabled'];
+        return (bool) $this->_globals['is_prod_log_disabled'];
     }
 
     /**
@@ -249,7 +250,7 @@ class Config extends AbstractHelper
                 $enabled && $this->scopeConfig->getValue(self::XML_PATH_EVENTS_LOG_ROOT . $process);
         }
 
-        return $this->_globals['is_events_log_enabled'][$process];
+        return (bool) $this->_globals['is_events_log_enabled'][$process];
     }
 
     /**
@@ -263,7 +264,7 @@ class Config extends AbstractHelper
                 (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_DISPLAY_ERRORS);
         }
 
-        return $this->_globals['can_display_errors'];
+        return (bool) $this->_globals['can_display_errors'];
     }
 
     /**
@@ -279,7 +280,22 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_storeviews['bouncing_level'];
+        return (string) $this->_storeviews['bouncing_level'];
+    }
+
+    /**
+     * Get forced test ip config
+     * @return string
+     */
+    public function getForcedTestIp(): string
+    {
+        if (!isset($this->_globals['forced_test_ip'])) {
+            $this->_globals['forced_test_ip'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_ADVANCED_FORCED_TEST_IP
+            );
+        }
+
+        return (string) $this->_globals['forced_test_ip'];
     }
 
     /**
@@ -292,7 +308,7 @@ class Config extends AbstractHelper
             $this->_globals['is_stream_mode'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_MODE_STREAM);
         }
 
-        return $this->_globals['is_stream_mode'];
+        return (bool) $this->_globals['is_stream_mode'];
     }
 
     /**
@@ -307,7 +323,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['refresh_cron_expr'];
+        return (string) $this->_globals['refresh_cron_expr'];
     }
 
     /**
@@ -322,7 +338,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['prune_cron_expr'];
+        return (string) $this->_globals['prune_cron_expr'];
     }
 
     /**
@@ -337,7 +353,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['cache_technology'];
+        return (string) $this->_globals['cache_technology'];
     }
 
     /**
@@ -352,7 +368,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['redis_dsn'];
+        return (string) $this->_globals['redis_dsn'];
     }
 
     /**
@@ -367,7 +383,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['memcached_dsn'];
+        return (string) $this->_globals['memcached_dsn'];
     }
 
     /**
@@ -382,7 +398,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['clean_ip_duration'];
+        return (int) $this->_globals['clean_ip_duration'];
     }
 
     /**
@@ -397,7 +413,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['bad_ip_duration'];
+        return (int) $this->_globals['bad_ip_duration'];
     }
 
     /**
@@ -413,14 +429,14 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_storeviews['remediation_fallback'];
+        return (string) $this->_storeviews['remediation_fallback'];
     }
 
     /**
      * Get trusted forwarded ips config
-     * @return mixed
+     * @return array
      */
-    public function getTrustedForwardedIps()
+    public function getTrustedForwardedIps(): array
     {
         if (!isset($this->_globals['trusted_forwarded_ip'])) {
             $trustedForwardedIps = $this->scopeConfig->getValue(self::TRUSTED_FORWARD_IPS_PATH);
@@ -429,6 +445,6 @@ class Config extends AbstractHelper
                 !empty($trustedForwardedIps) ? $this->serializer->unserialize($trustedForwardedIps) : [];
         }
 
-        return $this->_globals['trusted_forwarded_ip'];
+        return (array) $this->_globals['trusted_forwarded_ip'];
     }
 }

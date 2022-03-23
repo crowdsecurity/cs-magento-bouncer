@@ -57,9 +57,9 @@ class Data extends Config
     protected $_finalLogger;
 
     /**
-     * @var bool
+     * @var array
      */
-    protected $_isEnabled;
+    protected $_isEnabled = [];
 
     /** @var array */
     protected $_captchaWallConfigs = [];
@@ -336,25 +336,40 @@ class Data extends Config
                     $maxRemediationLevel = Constants::REMEDIATION_BAN;
                     break;
                 default:
-                    throw new CrowdSecException(__("Unknown $bouncingLevel"));
+                    throw new CrowdSecException("Unknown $bouncingLevel");
             }
 
+            $logger = $this->getFinalLogger();
+
             $this->_bouncerConfigs = [
+                // API connection
                 'api_url' => $this->getApiUrl(),
                 'api_key' => $this->getApiKey(),
                 'api_user_agent' => Constants::BASE_USER_AGENT,
-                'stream_mode' => $this->isStreamModeEnabled(),
-                'clean_ip_duration' => $this->getCleanIpCacheDuration(),
-                'bad_ip_duration' => $this->getBadIpCacheDuration(),
+                'api_timeout' => Constants::API_TIMEOUT,
+                // Debug
+                'debug_mode' => $this->isDebugLog(),
+                'log_directory_path' =>Constants::CROWDSEC_LOG_PATH,
+                'forced_test_ip' => $this->getForcedTestIp(),
+                'display_errors' => $this->canDisplayErrors(),
+                // Bouncer behavior
+                'bouncing_level' => $bouncingLevel,
+                'trust_ip_forward_array' => $this->getTrustedForwardedIps(),
                 'fallback_remediation' => $this->getRemediationFallback(),
                 'max_remediation_level' => $maxRemediationLevel,
-                'logger' => $this->getFinalLogger(),
+                // Cache
+                'stream_mode' => $this->isStreamModeEnabled(),
                 'cache_system' => $this->getCacheTechnology(),
-                'memcached_dsn' => $this->getMemcachedDSN(),
-                'redis_dsn' => $this->getRedisDSN(),
                 'fs_cache_path' => Constants::CROWDSEC_CACHE_PATH,
+                'redis_dsn' => $this->getRedisDSN(),
+                'memcached_dsn' => $this->getMemcachedDSN(),
+                'cache_expiration_for_clean_ip' => $this->getCleanIpCacheDuration(),
+                'cache_expiration_for_bad_ip' => $this->getBadIpCacheDuration(),
+                // Geolocation
+                'geolocation' => [],
+                // Extra configs
                 'forced_cache_system' => null,
-                'display_errors' => $this->canDisplayErrors()
+                'logger' => $logger,
             ];
         }
 
@@ -371,7 +386,7 @@ class Data extends Config
     {
         $e = preg_split('#\s+#', $expr, -1, PREG_SPLIT_NO_EMPTY);
         if (count($e) < 5 || count($e) > 6) {
-            throw new CrowdSecException(__('Invalid cron expression: %1', $expr));
+            throw new CrowdSecException("Invalid cron expression: $expr");
         }
     }
 

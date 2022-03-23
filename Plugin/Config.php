@@ -275,8 +275,7 @@ class Config
                 $cronMessage = __('Cache refresh cron has been disabled.');
                 $this->messageManager->addNoticeMessage($cronMessage);
             } catch (Exception $e) {
-                throw new CrowdSecException(__('Disabled refresh cron expression can\'t be saved: ', $e->getMessage(
-                )));
+                throw new CrowdSecException('Disabled refresh cron expression can\'t be saved: '. $e->getMessage());
             }
         } elseif ($cronExprChanged) {
             // Check expression
@@ -284,10 +283,7 @@ class Config
                 $this->helper->validateCronExpr($newCronExpr);
             } catch (Exception $e) {
                 $this->messageManager->getMessages(true);
-                throw new CrowdSecException(__(
-                    'Refresh cron expression (%1) is not valid.',
-                    $newCronExpr
-                ));
+                throw new CrowdSecException("Refresh cron expression ($newCronExpr) is not valid.");
             }
         }
     }
@@ -313,8 +309,7 @@ class Config
                 $cronMessage = __('File system cache pruning cron has been disabled.');
                 $this->messageManager->addNoticeMessage($cronMessage);
             } catch (Exception $e) {
-                throw new CrowdSecException(__('Disabled pruning cron expression can\'t be saved: ', $e->getMessage(
-                )));
+                throw new CrowdSecException('Disabled pruning cron expression can\'t be saved: '. $e->getMessage());
             }
         } elseif ($cronExprChanged) {
             // Check expression
@@ -322,10 +317,7 @@ class Config
                 $this->helper->validateCronExpr($newCronExpr);
             } catch (Exception $e) {
                 $this->messageManager->getMessages(true);
-                throw new CrowdSecException(__(
-                    'Pruning cron expression (%1) is not valid.',
-                    $newCronExpr
-                ));
+                throw new CrowdSecException("Pruning cron expression ($newCronExpr) is not valid.");
             }
         }
     }
@@ -348,7 +340,7 @@ class Config
             try {
                 $this->helper->ping($this->restClient, $newUrl, Constants::BASE_USER_AGENT, $newKey);
             } catch (Exception $e) {
-                throw new CrowdSecException(__('Connection test failed with url "%1" and key "%2"', $newUrl, $newKey));
+                throw new CrowdSecException("Connection test failed with url \'$newUrl\' and key \'$newKey\'");
             }
         }
     }
@@ -451,8 +443,8 @@ class Config
                     'line' => $e->getLine(),
                 ]);
                 $cacheMessage =
-                    __('Technical error while testing the %1 cache: ' . $e->getMessage(), $cacheLabel);
-                throw new CrowdSecException(__($cacheMessage));
+                    "Technical error while testing the $cacheLabel cache: " . $e->getMessage();
+                throw new CrowdSecException($cacheMessage);
             }
         }
     }
@@ -532,8 +524,8 @@ class Config
             ]);
 
             $cacheMessage =
-                __('Technical error while warming up the %1 cache: ' . $e->getMessage(), $cacheLabel);
-            throw new CrowdSecException(__($cacheMessage));
+                "Technical error while warming up the $cacheLabel cache: " . $e->getMessage();
+            throw new CrowdSecException($cacheMessage);
         }
     }
 

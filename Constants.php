@@ -40,4 +40,7 @@ class Constants extends LibConstants
 
     /** @var string  */
     public const CROWDSEC_CACHE_PATH = BP . '/var/cache/crowdsec';
+
+    /** @var string  */
+    public const CROWDSEC_LOG_PATH = '/var/log';
 }

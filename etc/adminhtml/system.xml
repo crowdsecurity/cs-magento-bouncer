@@ -369,6 +369,10 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment><![CDATA[By default, production logs are written in "var/log/crowdsec-bouncer-prod.log". You can disable this log here. ]]></comment>
                     </field>
+                    <field id="forced_test_ip" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
+                        <label><![CDATA[Forced test IP ]]></label>
+                        <comment><![CDATA[Do not use in production. For test purpose only. If not empty, it will be used for all remediations and geolocation processes.]]></comment>
+                    </field>
                 </group>
             </group>
             <!-- Events -->

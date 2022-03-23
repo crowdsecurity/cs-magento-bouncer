@@ -129,7 +129,7 @@ class Bouncer extends AbstractBounce implements IBounce
                     $configs['forced_cache_system']
                 );
             } catch (Exception $e) {
-                throw new CrowdSecException(__($e->getMessage()));
+                throw new CrowdSecException($e->getMessage());
             }
 
             try {
@@ -138,17 +138,34 @@ class Bouncer extends AbstractBounce implements IBounce
                         ['cacheAdapter' => $cacheAdapter, 'logger' => $this->logger ]
                     );
                 $bouncerInstance->configure([
+                    // LAPI connection
                     'api_key' => $configs['api_key'],
                     'api_url' => $configs['api_url'],
                     'api_user_agent' => $configs['api_user_agent'],
-                    'stream_mode' => $configs['stream_mode'],
-                    'max_remediation_level' => $configs['max_remediation_level'],
+                    'api_timeout' => $configs['api_timeout'],
+                    // Debug
+                    'debug_mode' => $configs['debug_mode'],
+                    'log_directory_path' => $configs['log_directory_path'],
+                    'forced_test_ip' => $configs['forced_test_ip'],
+                    'display_errors' => $configs['display_errors'],
+                    // Bouncer
+                    'bouncing_level' => $configs['bouncing_level'],
+                    'trust_ip_forward_array' => $configs['trust_ip_forward_array'],
                     'fallback_remediation' => $configs['fallback_remediation'],
-                    'cache_expiration_for_clean_ip' => $configs['clean_ip_duration'],
-                    'cache_expiration_for_bad_ip' => $configs['bad_ip_duration'],
+                    'max_remediation_level' => $configs['max_remediation_level'],
+                    // Cache settings
+                    'stream_mode' => $configs['stream_mode'],
+                    'cache_system' => $configs['cache_system'],
+                    'fs_cache_path' => $configs['fs_cache_path'],
+                    'redis_dsn' => $configs['redis_dsn'],
+                    'memcached_dsn' => $configs['memcached_dsn'],
+                    'cache_expiration_for_clean_ip' => $configs['cache_expiration_for_clean_ip'],
+                    'cache_expiration_for_bad_ip' => $configs['cache_expiration_for_bad_ip'],
+                    // Geolocation
+                    'geolocation' => $configs['geolocation']
                 ]);
             } catch (Exception $e) {
-                throw new CrowdSecException(__($e->getMessage()));
+                throw new CrowdSecException($e->getMessage());
             }
 
             $this->bouncerInstance = $bouncerInstance;
@@ -159,9 +176,9 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Initialize the bouncer instance
+     * @param array $configs
      * @param array $forcedConfigs
      * @return BouncerInstance
-     * @throws CrowdSecException
      */
     public function init(array $configs, array $forcedConfigs = []): BouncerInstance
     {
@@ -292,7 +309,7 @@ class Bouncer extends AbstractBounce implements IBounce
                 $this->response->setHeader('cache-control', $noCacheControl);
                 break;
             default:
-                throw new CrowdSecException(__("Unhandled code $statusCode"));
+                throw new CrowdSecException("Unhandled code $statusCode");
         }
         if (null !== $body) {
             $this->setRemediationDisplay(true);
@@ -303,7 +320,8 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * If there is any technical problem while bouncing, don't block the user. Bypass bouncing and log the error.
+     * If there is any technical problem while bouncing, don't block the user.
+     * Bypass bouncing and log the error.
      *
      * @throws CacheException
      * @throws ErrorException
@@ -313,13 +331,9 @@ class Bouncer extends AbstractBounce implements IBounce
     {
         $result = false;
         try {
-            set_error_handler(function ($errno, $errstr) {
-                throw new CrowdSecException("$errstr (Error level: $errno)");
-            });
             $this->init($configs);
             $this->run();
             $result = true;
-            restore_error_handler();
         } catch (CrowdSecException $e) {
             $this->logger->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',

@@ -46,7 +46,7 @@ jobs:
 
       - name: Install DDEV
         env:
-          DDEV_VERSION: v1.18.2
+          DDEV_VERSION: v1.19.1
         run: |
           # @see https://ddev.readthedocs.io/en/stable/#installationupgrade-script-linux-and-macos-armarm64-and-amd64-architectures
           sudo apt-get -qq update
@@ -61,10 +61,6 @@ jobs:
         # Example : 2.4.3 => m243
         run: |
            echo "M2_VERSION_CODE=$(echo m${{ matrix.m2-version }} | sed 's/\.//g' )" >> $GITHUB_ENV
-
-      - name: Set ELASTIC_INSTALL_STRING env for 2.3
-        if: startsWith(matrix.m2-version, '2.3')
-        run: echo "ELASTIC_INSTALL_STRING=''" >> $GITHUB_ENV
 
       - name: Set ELASTIC_INSTALL_STRING env for 2.4
         if: startsWith(matrix.m2-version, '2.4')
@@ -127,8 +123,8 @@ jobs:
         run: |
           ddev magento module:enable ${{ env.EXTENSION_NAME }}
           ddev magento setup:upgrade
-          ddev magento setup:di:compile
           ddev magento setup:static-content:deploy -f
+          ddev magento setup:di:compile
           ddev magento deploy:mode:set production
           ddev magento indexer:reindex
 
