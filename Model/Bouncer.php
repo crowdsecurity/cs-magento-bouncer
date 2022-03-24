@@ -71,9 +71,6 @@ class Bouncer extends AbstractBounce implements IBounce
     /** bool */
     protected $remediationDisplay = false;
 
-    /** @var array|null */
-    protected $bouncerConfigs;
-
     public function __construct(
         Http $response,
         Session $session,
@@ -115,7 +112,6 @@ class Bouncer extends AbstractBounce implements IBounce
     public function getBouncerInstance(array $configs = [], bool $forceReload = false): BouncerInstance
     {
         if ($this->bouncerInstance === null || $forceReload) {
-            $this->bouncerConfigs = $configs;
             $this->logger = $configs['logger'];
             $this->setDisplayErrors($configs['display_errors']);
 
@@ -137,6 +133,7 @@ class Bouncer extends AbstractBounce implements IBounce
                     $this->bouncerInstanceFactory->create(
                         ['cacheAdapter' => $cacheAdapter, 'logger' => $this->logger ]
                     );
+
                 $bouncerInstance->configure([
                     // LAPI connection
                     'api_key' => $configs['api_key'],
@@ -159,8 +156,8 @@ class Bouncer extends AbstractBounce implements IBounce
                     'fs_cache_path' => $configs['fs_cache_path'],
                     'redis_dsn' => $configs['redis_dsn'],
                     'memcached_dsn' => $configs['memcached_dsn'],
-                    'cache_expiration_for_clean_ip' => $configs['cache_expiration_for_clean_ip'],
-                    'cache_expiration_for_bad_ip' => $configs['cache_expiration_for_bad_ip'],
+                    'clean_ip_cache_duration' => $configs['clean_ip_cache_duration'],
+                    'bad_ip_cache_duration' => $configs['bad_ip_cache_duration'],
                     // Geolocation
                     'geolocation' => $configs['geolocation']
                 ]);
@@ -182,8 +179,8 @@ class Bouncer extends AbstractBounce implements IBounce
      */
     public function init(array $configs, array $forcedConfigs = []): BouncerInstance
     {
-        $finalConfigs = array_merge($configs, $forcedConfigs);
-        $this->bouncer = $this->getBouncerInstance($finalConfigs);
+        $this->settings = array_merge($configs, $forcedConfigs);
+        $this->bouncer = $this->getBouncerInstance($this->settings);
 
         return $this->bouncer;
     }

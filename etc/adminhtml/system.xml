@@ -327,6 +327,53 @@
                         <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
                     </field>
                 </group>
+                <!-- Geolocation -->
+                <group id="geolocation" translate="label,comment,tooltip" showInDefault="1" >
+                    <label><![CDATA[Geolocation]]></label>
+                    <attribute type="expanded">1</attribute>
+                    <comment><![CDATA[Configure geolocation behavior.]]></comment>
+                    <field id="enabled" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
+                        <label>Enable geolocation feature</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Enable if you want to handle country scoped decisions]]></comment>
+                    </field>
+                    <field id="save_in_session" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
+                        <label>Save geolocation country result in session</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Enabling this option will avoid multiple call to the geolocalized system (e.g. maxmind database)]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/geolocation/enabled">1</field>
+                        </depends>
+                    </field>
+                    <field id="type" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
+                        <label>Geolocation type</label>
+                        <comment><![CDATA[At this time, only MaxMind type is allowed.]]></comment>
+                        <source_model>CrowdSec\Bouncer\Model\Config\Source\GeolocationType</source_model>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/geolocation/enabled">1</field>
+                        </depends>
+                    </field>
+                    <field id="maxmind_database_type" translate="label,comment,tooltip" type="select" sortOrder="400" showInDefault="1">
+                        <label>MaxMind database type</label>
+                        <source_model>CrowdSec\Bouncer\Model\Config\Source\MaxMindDatabaseType</source_model>
+                        <comment><![CDATA[Choose between "Country" and "City" depending on your MaxMind database]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/geolocation/enabled">1</field>
+                            <field id="crowdsec_bouncer/advanced/geolocation/type">maxmind</field>
+                        </depends>
+                    </field>
+                    <field id="maxmind_database_path" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
+                        <label><![CDATA[MaxMind database path]]></label>
+                        <comment><![CDATA[Relative path to the "var" folder of your Magento 2 instance]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/geolocation/enabled">1</field>
+                            <field id="crowdsec_bouncer/advanced/geolocation/type">maxmind</field>
+                        </depends>
+                        <validate>required-entry</validate>
+                        <tooltip><![CDATA[For example: crowdsec/maxmind/GeoLite2-Country.mmdb]]></tooltip>
+                    </field>
+
+                </group>
                 <!-- Remediation -->
                 <group id="remediation" translate="label,comment,tooltip" showInDefault="1" >
                     <label><![CDATA[Remediations]]></label>

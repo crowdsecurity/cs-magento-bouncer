@@ -86,8 +86,7 @@ class Cache
                         $cacheAdapterInstance = new RedisAdapter(RedisAdapter::createConnection($redisDsn));
                     } catch (InvalidArgumentException $e) {
                         throw new CrowdSecException('Error when connecting to Redis.' .
-                               ' Please fix the Redis DSN or select another cache technology.'
-                        );
+                               ' Please fix the Redis DSN or select another cache technology.');
                     }
 
                     break;

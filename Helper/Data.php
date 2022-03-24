@@ -36,6 +36,7 @@ use Magento\Store\Model\ScopeInterface;
 use CrowdSec\Bouncer\Logger\Logger;
 use CrowdSec\Bouncer\Logger\Handlers\DebugFactory as DebugHandler;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\App\Filesystem\DirectoryList;
 
 class Data extends Config
 {
@@ -81,14 +82,16 @@ class Data extends Config
      * @param DebugHandler $debugHandler
      * @param Context $context
      * @param Json $serializer
+     * @param DirectoryList $directoryList
      */
     public function __construct(
         Logger       $logger,
         DebugHandler $debugHandler,
         Context      $context,
-        Json         $serializer
+        Json         $serializer,
+        DirectoryList $directoryList
     ) {
-        parent::__construct($context, $serializer);
+        parent::__construct($context, $serializer, $directoryList);
         $this->_selfLogger = $logger;
         $this->_debugHandler = $debugHandler;
     }
@@ -363,10 +366,10 @@ class Data extends Config
                 'fs_cache_path' => Constants::CROWDSEC_CACHE_PATH,
                 'redis_dsn' => $this->getRedisDSN(),
                 'memcached_dsn' => $this->getMemcachedDSN(),
-                'cache_expiration_for_clean_ip' => $this->getCleanIpCacheDuration(),
-                'cache_expiration_for_bad_ip' => $this->getBadIpCacheDuration(),
+                'clean_ip_cache_duration' => $this->getCleanIpCacheDuration(),
+                'bad_ip_cache_duration' => $this->getBadIpCacheDuration(),
                 // Geolocation
-                'geolocation' => [],
+                'geolocation' => $this->getGeolocation(),
                 // Extra configs
                 'forced_cache_system' => null,
                 'logger' => $logger,

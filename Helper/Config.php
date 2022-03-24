@@ -27,6 +27,8 @@
 
 namespace CrowdSec\Bouncer\Helper;
 
+use CrowdSec\Bouncer\Constants;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -88,6 +90,13 @@ class Config extends AbstractHelper
     const XML_PATH_ADVANCED_DISPLAY_ERRORS = self::SECTION . '/advanced/debug/display_errors';
     const XML_PATH_ADVANCED_DISABLE_PROD_LOG = self::SECTION . '/advanced/debug/disable_prod_log';
     const XML_PATH_ADVANCED_FORCED_TEST_IP = self::SECTION . '/advanced/debug/forced_test_ip';
+
+    const XML_PATH_ADVANCED_GEOLOCATION_ENABLED = self::SECTION . '/advanced/geolocation/enabled';
+    const XML_PATH_ADVANCED_GEOLOCATION_TYPE = self::SECTION . '/advanced/geolocation/type';
+    const XML_PATH_ADVANCED_GEOLOCATION_SAVE_SESSION = self::SECTION . '/advanced/geolocation/save_in_session';
+    const XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_TYPE = self::SECTION . '/advanced/geolocation/maxmind_database_type';
+    const XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_PATH = self::SECTION . '/advanced/geolocation/maxmind_database_path';
+
     // Events configs
     const XML_PATH_EVENTS_LOG_ROOT = self::SECTION . '/events/log/';
 
@@ -103,12 +112,18 @@ class Config extends AbstractHelper
      */
     private $serializer;
 
+    /**
+     * @var DirectoryList
+     */
+    private $directoryList;
+
     protected $_globals = [
         'api_url' => null,
         'api_key' => null,
         'is_admin_enabled' => null,
         'is_api_enabled' => null,
         'is_debug_log' => null,
+        'forced_test_ip' => null,
         'can_display_errors' => null,
         'is_prod_log_disabled' => null,
         'is_events_log_enabled' => [],
@@ -120,7 +135,8 @@ class Config extends AbstractHelper
         'memcached_dsn' => null,
         'clean_ip_duration' => null,
         'bad_ip_duration' => null,
-        'trusted_forwarded_ip' => null
+        'trusted_forwarded_ip' => null,
+        'geolocation' => null,
     ];
 
     protected $_storeviews = [
@@ -136,10 +152,12 @@ class Config extends AbstractHelper
      */
     public function __construct(
         Context $context,
-        Json $serializer
+        Json $serializer,
+        DirectoryList $directoryList
     ) {
         parent::__construct($context);
         $this->serializer = $serializer;
+        $this->directoryList = $directoryList;
     }
 
     /**
@@ -281,6 +299,34 @@ class Config extends AbstractHelper
         }
 
         return (string) $this->_storeviews['bouncing_level'];
+    }
+
+    /**
+     * Get geolocation config
+     * @return array
+     */
+    public function getGeolocation(): array
+    {
+        if (!isset($this->_globals['geolocation'])) {
+            $result = ['enabled' => false];
+            if ($this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_ENABLED)) {
+                $result['enabled'] = true;
+                $result['save_in_session'] =
+                    (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_SAVE_SESSION);
+                $type = (string)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_TYPE);
+                $result['type'] = $type;
+                if ($type === Constants::GEOLOCATION_TYPE_MAXMIND) {
+                    $result[$type]['database_type'] =
+                        (string)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_TYPE);
+                    $result[$type]['database_path'] = $this->directoryList->getPath(DirectoryList::VAR_DIR) . DS .
+                        ltrim($this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_PATH), '/');
+                }
+            }
+
+            $this->_globals['geolocation'] = $result;
+        }
+
+        return (array)$this->_globals['geolocation'];
     }
 
     /**

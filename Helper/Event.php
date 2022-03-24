@@ -32,6 +32,7 @@ use CrowdSec\Bouncer\Logger\Logger;
 use CrowdSec\Bouncer\Logger\EventLogger;
 use CrowdSec\Bouncer\Logger\Handlers\DebugFactory as DebugHandler;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\App\Filesystem\DirectoryList;
 
 class Event extends Data
 {
@@ -48,15 +49,17 @@ class Event extends Data
      * @param DebugHandler $debugHandler
      * @param Context $context
      * @param Json $serializer
+     * @param DirectoryList $directoryList
      */
     public function __construct(
         EventLogger $eventLogger,
         Logger       $logger,
         DebugHandler $debugHandler,
         Context      $context,
-        Json         $serializer
+        Json         $serializer,
+        DirectoryList $directoryList
     ) {
-        parent::__construct($logger, $debugHandler, $context, $serializer);
+        parent::__construct($logger, $debugHandler, $context, $serializer, $directoryList);
         $this->_eventLogger = $eventLogger;
     }
 
