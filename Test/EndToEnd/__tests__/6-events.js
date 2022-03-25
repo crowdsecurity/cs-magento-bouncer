@@ -35,7 +35,6 @@ describe(`Log events in front`, () => {
         await onLoginPageLoginAsAdmin();
         await removeAllDecisions();
         await setDefaultConfig();
-        await flushCache();
     });
 
     beforeEach(async () => {

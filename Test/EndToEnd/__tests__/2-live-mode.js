@@ -20,8 +20,13 @@ const {
     wait,
     fillInput,
     setDefaultConfig,
+    deleteFileContent,
+    getFileContent,
+    goToPublicPage,
 } = require("../utils/helpers");
 const { addDecision } = require("../utils/watcherClient");
+
+const { DEBUG_LOG_PATH } = require("../utils/constants");
 
 describe(`Live mode run`, () => {
     beforeAll(async () => {
@@ -34,7 +39,6 @@ describe(`Live mode run`, () => {
     it("Should display the homepage with no remediation", async () => {
         await publicHomepageShouldBeAccessible();
     });
-
     it("Should display a captcha wall with mentions", async () => {
         await captchaIpForSeconds(15 * 60, CURRENT_IP);
         await publicHomepageShouldBeCaptchaWallWithMentions();
@@ -152,11 +156,11 @@ describe(`Test cache in Live mode`, () => {
         await goToSettingsPage();
         await fillInput(
             "crowdsec_bouncer_advanced_cache_clean_ip_cache_duration",
-            60,
+            30,
         );
         await fillInput(
             "crowdsec_bouncer_advanced_cache_bad_ip_cache_duration",
-            60,
+            30,
         );
         await onAdminSaveSettings();
     });
@@ -176,5 +180,37 @@ describe(`Test cache in Live mode`, () => {
             /CrowdSec cache \(.*\) has been cleared./,
         );
         await publicHomepageShouldBeAccessible();
+    });
+
+    it("Should log miss then it", async () => {
+        await goToSettingsPage();
+        await page.click("#crowdsec_bouncer_advanced_cache_clear_cache");
+        await expect(page).toMatchText(
+            "#cache_clearing_result",
+            /CrowdSec cache \(.*\) has been cleared./,
+        );
+        await deleteFileContent(DEBUG_LOG_PATH);
+        let logContent = await getFileContent(DEBUG_LOG_PATH);
+        await expect(logContent).toBe("");
+
+        await goToPublicPage();
+
+        logContent = await getFileContent(DEBUG_LOG_PATH);
+        await expect(logContent).toMatch(
+            new RegExp(
+                `{"type":"CLEAN_VALUE","scope":"Ip","value":"${CURRENT_IP}","cache":"miss"}`,
+            ),
+        );
+
+        await deleteFileContent(DEBUG_LOG_PATH);
+        await wait(1000);
+        await goToPublicPage();
+
+        logContent = await getFileContent(DEBUG_LOG_PATH);
+        await expect(logContent).toMatch(
+            new RegExp(
+                `{"type":"CLEAN_VALUE","scope":"Ip","value":"${CURRENT_IP}","cache":"hit"}`,
+            ),
+        );
     });
 });

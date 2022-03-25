@@ -164,9 +164,13 @@ const setDefaultConfig = async (save = true, direct = true) => {
         "crowdsec_bouncer_advanced_remediation_hide_mentions",
         "0",
     );
+    // Geolocation
+    await selectElement("crowdsec_bouncer_advanced_geolocation_enabled", "0");
+
     // Debug
     await selectElement("crowdsec_bouncer_advanced_debug_log", "1");
     await selectElement("crowdsec_bouncer_advanced_debug_display_errors", "1");
+    await fillInput("crowdsec_bouncer_advanced_debug_forced_test_ip", "");
     // Events
     await selectElement("crowdsec_bouncer_events_log_enabled", "1");
     await selectElement("crowdsec_bouncer_events_log_customer_register", "1");
