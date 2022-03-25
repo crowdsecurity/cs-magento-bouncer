@@ -340,7 +340,7 @@
                     <field id="save_in_session" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
                         <label>Save geolocation country result in session</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment><![CDATA[Enabling this option will avoid multiple call to the geolocalized system (e.g. maxmind database)]]></comment>
+                        <comment><![CDATA[Enabling this option will avoid multiple call to the geolocation system (e.g. MaxMind database)]]></comment>
                         <depends>
                             <field id="crowdsec_bouncer/advanced/geolocation/enabled">1</field>
                         </depends>
