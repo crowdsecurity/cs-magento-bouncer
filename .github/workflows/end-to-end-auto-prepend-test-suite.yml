@@ -1,4 +1,4 @@
-name: End-to-end test suite
+name: End-to-end auto-prepend-file mode test suite
 on:
   pull_request:
     branches:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  end-to-end-test-suite:
+  end-to-end-auto-prepend-file-test-suite:
     strategy:
       fail-fast: false
       matrix:
@@ -19,7 +19,7 @@ jobs:
           - { php-version: "7.4", m2-version: "2.3.5" }
           - { php-version: "7.2", m2-version: "2.4.3" }
 
-    name: End-to-end test suite
+    name: End-to-end auto-prepend-file mode test suite
     if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
     runs-on: ubuntu-latest
     env:
@@ -148,38 +148,27 @@ jobs:
           ./test-init.sh
           chmod +x run-tests.sh
 
-      - name: Run config test
+      - name: Prepare auto-prepend-file mode test suite
         run: |
-          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh ci "./__tests__/1-config.js"
+          cd ${{ github.workspace }}/.ddev
+          ddev nginx-config custom_files/crowdsec-prepend-nginx-site.conf
+          ddev exec -s crowdsec cscli decisions delete --all
 
-      - name: Run live mode test
+      - name: Verify auto_prepend_file directive
         run: |
-          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh ci "./__tests__/2-live-mode.js"
+          cd ${{ github.workspace }}
+          cp .ddev/custom_files/phpinfo.php pub/phpinfo.php
+          PREPENDVERIF=$(curl https://${{ env.M2_VERSION_CODE }}.ddev.site/phpinfo.php | grep -o -E "auto_prepend_file=(.*)php(.*)" | sed 's/<\/tr>//g; s/<\/td>//g;' | tr '\n' '#')
+          if [[ $PREPENDVERIF == "auto_prepend_file=/var/www/html/app/etc/crowdsec-prepend.php#auto_prepend_file=/var/www/html/app/etc/crowdsec-prepend.php#" ]]
+          then
+              echo "AUTO PREPEND FILE OK"
+          else
+              echo "AUTO PREPEND FILE KO"
+              echo $PREPENDVERIF
+              exit 1
+          fi
 
-      - name: Run stream mode test
+      - name: Run auto prepend mode test suite
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh ci "./__tests__/3-stream-mode.js"
-
-      - name: Run cron test
-        run: |
-          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh ci "./__tests__/4-cron.js"
-
-      - name: Run api tests
-        run: |
-          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh ci "./__tests__/5-api.js"
-
-      - name: Run events logging test
-        run: |
-          ddev magento config:set admin/captcha/enable 0
-          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh ci "./__tests__/6-events.js"
-
-      - name: Run geolocation test
-        run: |
-          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
-          ./run-tests.sh ci "./__tests__/7-geolocation.js"
+          ./run-tests.sh ci
