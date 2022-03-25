@@ -372,6 +372,14 @@
                         <validate>required-entry</validate>
                         <tooltip><![CDATA[For example: crowdsec/maxmind/GeoLite2-Country.mmdb]]></tooltip>
                     </field>
+                    <field id="geolocalize"  translate="button_label" sortOrder="600" showInDefault="1">
+                        <button_label>Test geolocation settings</button_label>
+                        <frontend_model>CrowdSec\Bouncer\Block\Adminhtml\System\Config\Geolocation\Country</frontend_model>
+                        <depends>
+                            <field id="crowdsec_bouncer/advanced/geolocation/enabled">1</field>
+                            <field id="crowdsec_bouncer/advanced/geolocation/type">maxmind</field>
+                        </depends>
+                    </field>
 
                 </group>
                 <!-- Remediation -->

@@ -257,7 +257,7 @@ Relative path to the `var` folder of your Magento 2 instance.
 
 ***
 
-
+**N.B** : There is also a test button if you want to test your geolocation settings.
 
 ![Remediations](images/screenshots/config-remediations.jpg)
 

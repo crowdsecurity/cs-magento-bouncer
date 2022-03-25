@@ -1,0 +1,86 @@
+<?php
+/**
+ * CrowdSec_Bouncer Extension
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the MIT LICENSE
+ * that is bundled with this package in the file LICENSE
+ *
+ * @category   CrowdSec
+ * @package    CrowdSec_Bouncer
+ * @copyright  Copyright (c)  2021+ CrowdSec
+ * @author     CrowdSec team
+ * @see        https://crowdsec.net CrowdSec Official Website
+ * @license    MIT LICENSE
+ *
+ */
+
+/**
+ *
+ * @category CrowdSec
+ * @package  CrowdSec_Bouncer
+ * @module   Bouncer
+ * @author   CrowdSec team
+ *
+ */
+?>
+
+<?php
+/** @var \CrowdSec\Bouncer\Block\Adminhtml\System\Config\Geolocation\Country $block */
+?>
+<script>
+    require(['prototype'], function(){
+
+//<![CDATA[
+        function testGeolocation() {
+            var testGeolocationMessage = $('geolocation_test_result');
+            var dataBaseType = $('<?= $block->escapeJs($block->getGeolocationMaxmindDatabaseTypeField()) ?>');
+            var dataBasePath = $('<?= $block->escapeJs($block->getGeolocationMaxmindDatabasePathField()) ?>');
+
+            params = {
+                geolocation_type: $('<?= $block->escapeJs($block->getGeolocationTypeField()) ?>').value,
+                geolocation_maxmind_database_type: dataBaseType.value,
+                geolocation_maxmind_database_path: dataBasePath.value,
+                forced_test_ip: $('<?= $block->escapeJs($block->getForcedTestIpField()) ?>').value
+            };
+
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
+                parameters: params,
+                onSuccess: function(response) {
+                    var result =
+                        '<?= $block->escapeJs($block->escapeHtml(__('Error during CrowdSec geolocation test.'))) ?>';
+                    try {
+                        if (response.responseText.isJSON()) {
+                            response = response.responseText.evalJSON();
+                            result = response.message;
+                        }
+                        if (response.test == 1) {
+                            testGeolocationMessage.removeClassName('hidden')
+                                .removeClassName('error').addClassName('success');
+                        } else {
+                            testGeolocationMessage.removeClassName('hidden').removeClassName('success')
+                                .addClassName('error');
+                        }
+                    } catch (e) {
+                        testGeolocationMessage.removeClassName('hidden').removeClassName('success')
+                            .addClassName('error');
+                    }
+                    testGeolocationMessage.update(result);
+                }
+            });
+        }
+
+        window.testGeolocation = testGeolocation;
+//]]>
+
+    });
+</script>
+
+<div class="actions actions-test-geolocation actions-crowdsec">
+    <button onclick="javascript:testGeolocation(); return false;" class="action-test-geolocation" type="button" id="<?=
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
+    </button>
+    <p class="hidden" id="geolocation_test_result"></p>
+</div>

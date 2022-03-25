@@ -302,8 +302,19 @@ class Config extends AbstractHelper
     }
 
     /**
+     * @param string $relativePath
+     * @return string
+     * @throws \Magento\Framework\Exception\FileSystemException
+     */
+    public function getGeolocationDatabaseFullPath(string $relativePath): string
+    {
+        return $this->directoryList->getPath(DirectoryList::VAR_DIR) . DS . ltrim($relativePath, '/');
+    }
+
+    /**
      * Get geolocation config
      * @return array
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function getGeolocation(): array
     {
@@ -318,8 +329,10 @@ class Config extends AbstractHelper
                 if ($type === Constants::GEOLOCATION_TYPE_MAXMIND) {
                     $result[$type]['database_type'] =
                         (string)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_TYPE);
-                    $result[$type]['database_path'] = $this->directoryList->getPath(DirectoryList::VAR_DIR) . DS .
-                        ltrim($this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_PATH), '/');
+                    $result[$type]['database_path'] =
+                        $this->getGeolocationDatabaseFullPath(
+                            $this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_PATH)
+                        );
                 }
             }
 

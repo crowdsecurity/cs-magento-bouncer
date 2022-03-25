@@ -90,6 +90,11 @@ describe(`Geolocation and country scoped decision`, () => {
             "crowdsec_bouncer_advanced_geolocation_maxmind_database_path",
             "crowdsec/GeoLite2-City.mmdb",
         );
+        await page.click("#crowdsec_bouncer_advanced_geolocation_geolocalize");
+        await expect(page).toMatchText(
+            "#geolocation_test_result",
+            /Geolocation test result: success./,
+        );
         await onAdminSaveSettings();
         await addDecision("FR", "ban", 15 * 60, "Country");
         await wait(1000);
@@ -127,6 +132,7 @@ describe(`Geolocation and country scoped decision`, () => {
             "crowdsec_bouncer_advanced_debug_forced_test_ip",
             JAPAN_IP,
         );
+
         await onAdminSaveSettings();
         await deleteFileContent(DEBUG_LOG_PATH);
         let logContent = await getFileContent(DEBUG_LOG_PATH);
