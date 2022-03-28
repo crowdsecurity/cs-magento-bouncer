@@ -102,8 +102,10 @@ jobs:
 
       - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
         run: |
-          ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/${{ env.EXTENSION_PATH }}/
-          ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
+          ddev composer config --unset repositories.0
+          ddev composer config repositories.0 path my-own-modules/${{ env.EXTENSION_PATH }}/
+          ddev composer config repositories.1 composer https://repo.magento.com/
+          ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction --prefer-source
 
       - name: Disable some extensions for 2.4
         if: startsWith(matrix.m2-version, '2.4')

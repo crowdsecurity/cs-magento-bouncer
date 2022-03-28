@@ -308,7 +308,7 @@ class Config extends AbstractHelper
      */
     public function getGeolocationDatabaseFullPath(string $relativePath): string
     {
-        return $this->directoryList->getPath(DirectoryList::VAR_DIR) . DS . ltrim($relativePath, '/');
+        return $this->directoryList->getPath(DirectoryList::VAR_DIR) . '/' . ltrim($relativePath, '/');
     }
 
     /**

@@ -97,7 +97,9 @@ jobs:
 
       - name: Add CrowdSec Bouncer as composer dependency
         run: |
-          ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
+          ddev composer config --unset repositories.0
+          ddev composer config repositories.0 path my-own-modules/${{ env.EXTENSION_PATH }}/
+          ddev composer config repositories.1 composer https://repo.magento.com/
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
       - name: Add Coding Standard and PHPStan for Magento 2.3
