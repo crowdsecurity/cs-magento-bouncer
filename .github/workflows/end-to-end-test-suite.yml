@@ -100,11 +100,20 @@ jobs:
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 
-      - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
+      - name: Prepare composer repository for 2.4 (composer 2)
+        if: startsWith(matrix.m2-version, '2.4')
+        run: |
+          ddev composer config repositories.crowdsec-bouncer path my-own-modules/${{ env.EXTENSION_PATH }}/
+
+      - name: Prepare composer repository for 2.3 (composer 1)
+        if: startsWith(matrix.m2-version, '2.3')
         run: |
           ddev composer config --unset repositories.0
           ddev composer config repositories.0 path my-own-modules/${{ env.EXTENSION_PATH }}/
           ddev composer config repositories.1 composer https://repo.magento.com/
+
+      - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
+        run: |
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
       - name: Disable some extensions for 2.4
