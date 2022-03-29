@@ -35,9 +35,11 @@ use CrowdSecBouncer\AbstractBounce;
 use CrowdSecBouncer\IBounce;
 use CrowdSecBouncer\Bouncer as BouncerInstance;
 use CrowdSecBouncer\BouncerFactory;
+use Psr\Cache\InvalidArgumentException;
 
 /**
  * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Bouncer extends AbstractBounce implements IBounce
 {
@@ -105,24 +107,24 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Get the bouncer instance
-     * @param array $forcedConfigs
+     * @param array $settings
+     * @param bool $forceReload
      * @return BouncerInstance
-     * @throws CrowdSecException
      */
-    public function getBouncerInstance(array $configs = [], bool $forceReload = false): BouncerInstance
+    public function getBouncerInstance(array $settings = [], bool $forceReload = false): BouncerInstance
     {
         if ($this->bouncerInstance === null || $forceReload) {
-            $this->logger = $configs['logger'];
-            $this->setDisplayErrors($configs['display_errors']);
+            $this->logger = $settings['logger'];
+            $this->setDisplayErrors($settings['display_errors']);
 
             try {
                 $cache = $this->cacheFactory->create();
                 $cacheAdapter = $cache->getAdapter(
-                    $configs['cache_system'],
-                    $configs['memcached_dsn'],
-                    $configs['redis_dsn'],
-                    $configs['fs_cache_path'],
-                    $configs['forced_cache_system']
+                    $settings['cache_system'],
+                    $settings['memcached_dsn'],
+                    $settings['redis_dsn'],
+                    $settings['fs_cache_path'],
+                    $settings['forced_cache_system']
                 );
             } catch (Exception $e) {
                 throw new CrowdSecException($e->getMessage());
@@ -136,30 +138,30 @@ class Bouncer extends AbstractBounce implements IBounce
 
                 $bouncerInstance->configure([
                     // LAPI connection
-                    'api_key' => $configs['api_key'],
-                    'api_url' => $configs['api_url'],
-                    'api_user_agent' => $configs['api_user_agent'],
-                    'api_timeout' => $configs['api_timeout'],
+                    'api_key' => $settings['api_key'],
+                    'api_url' => $settings['api_url'],
+                    'api_user_agent' => $settings['api_user_agent'],
+                    'api_timeout' => $settings['api_timeout'],
                     // Debug
-                    'debug_mode' => $configs['debug_mode'],
-                    'log_directory_path' => $configs['log_directory_path'],
-                    'forced_test_ip' => $configs['forced_test_ip'],
-                    'display_errors' => $configs['display_errors'],
+                    'debug_mode' => $settings['debug_mode'],
+                    'log_directory_path' => $settings['log_directory_path'],
+                    'forced_test_ip' => $settings['forced_test_ip'],
+                    'display_errors' => $settings['display_errors'],
                     // Bouncer
-                    'bouncing_level' => $configs['bouncing_level'],
-                    'trust_ip_forward_array' => $configs['trust_ip_forward_array'],
-                    'fallback_remediation' => $configs['fallback_remediation'],
-                    'max_remediation_level' => $configs['max_remediation_level'],
+                    'bouncing_level' => $settings['bouncing_level'],
+                    'trust_ip_forward_array' => $settings['trust_ip_forward_array'],
+                    'fallback_remediation' => $settings['fallback_remediation'],
+                    'max_remediation_level' => $settings['max_remediation_level'],
                     // Cache settings
-                    'stream_mode' => $configs['stream_mode'],
-                    'cache_system' => $configs['cache_system'],
-                    'fs_cache_path' => $configs['fs_cache_path'],
-                    'redis_dsn' => $configs['redis_dsn'],
-                    'memcached_dsn' => $configs['memcached_dsn'],
-                    'clean_ip_cache_duration' => $configs['clean_ip_cache_duration'],
-                    'bad_ip_cache_duration' => $configs['bad_ip_cache_duration'],
+                    'stream_mode' => $settings['stream_mode'],
+                    'cache_system' => $settings['cache_system'],
+                    'fs_cache_path' => $settings['fs_cache_path'],
+                    'redis_dsn' => $settings['redis_dsn'],
+                    'memcached_dsn' => $settings['memcached_dsn'],
+                    'clean_ip_cache_duration' => $settings['clean_ip_cache_duration'],
+                    'bad_ip_cache_duration' => $settings['bad_ip_cache_duration'],
                     // Geolocation
-                    'geolocation' => $configs['geolocation']
+                    'geolocation' => $settings['geolocation']
                 ]);
             } catch (Exception $e) {
                 throw new CrowdSecException($e->getMessage());
@@ -322,7 +324,7 @@ class Bouncer extends AbstractBounce implements IBounce
      *
      * @throws CacheException
      * @throws ErrorException
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function safelyBounce(array $configs): bool
     {

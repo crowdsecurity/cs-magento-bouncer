@@ -101,17 +101,12 @@ jobs:
         with:
           path: my-own-modules/crowdsec-bouncer
 
-      - name: Prepare composer repository for composer 2
-        if: startsWith(env.COMPOSER_VERSION, '2')
-        run: |
-          ddev composer config repositories.crowdsec-bouncer path my-own-modules/${{ env.EXTENSION_PATH }}/
-
-      - name: Prepare composer repository for composer 1
-        if: startsWith(env.COMPOSER_VERSION, '1')
+      - name: Prepare composer repositories
         run: |
           ddev composer config --unset repositories.0
-          ddev composer config repositories.0 path my-own-modules/${{ env.EXTENSION_PATH }}/
-          ddev composer config repositories.1 composer https://repo.magento.com/  
+          ddev composer config repositories.0 '{"type": "path", "url":"my-own-modules/${{ env.EXTENSION_PATH }}/",  "canonical": true}'
+          ddev composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}"]}'
+          cat composer.json
 
       - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
         run: |
