@@ -64,10 +64,6 @@ jobs:
           sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           ddev start
 
-      - name: Set COMPOSER_VERSION env
-        run: |
-          echo "COMPOSER_VERSION=$(ddev composer -- --version | grep -oE "([0-9]{1,}\.)([0-9]{1,}\.)([0-9]{1,})(-(alpha|beta)\.[0-9]{1,})?" | head -1)" >> $GITHUB_ENV
-
       - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
         # We don't use "ddev composer" create as it restarts all containers
         run: |
