@@ -24,7 +24,7 @@
     "require": {
         "php": "^7.2|^7.3|^7.4",
         "magento/framework": ">=102",
-        "crowdsec/bouncer": "0.19.0",
+        "crowdsec/bouncer": "0.20.0",
         "swaggest/json-schema": "0.12.39"
 
     },
