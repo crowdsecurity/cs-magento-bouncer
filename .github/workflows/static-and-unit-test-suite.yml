@@ -1,6 +1,6 @@
 name: Static and unit test suite
 on:
-  pull_request:
+  push:
     branches:
       - main
     paths-ignore:

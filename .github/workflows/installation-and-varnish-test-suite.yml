@@ -1,6 +1,6 @@
 name: Installation and Varnish test suite
 on:
-  pull_request:
+  push:
     branches:
       - main
     paths-ignore:
