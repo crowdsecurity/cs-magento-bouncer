@@ -148,7 +148,6 @@ jobs:
           rm GeoLite2-Country.tar.gz GeoLite2-Country.tar.gz.sha256.txt GeoLite2-City.tar.gz GeoLite2-City.tar.gz.sha256.txt
           cd ${{ github.workspace }}
           cp .ddev/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
-          cp ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/crowdsec-prepend.php.example ${{ github.workspace }}/app/etc/crowdsec-prepend.php
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           chmod +x test-init.sh
           ./test-init.sh
