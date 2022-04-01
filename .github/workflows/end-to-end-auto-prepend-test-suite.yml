@@ -1,8 +1,6 @@
 name: End-to-end auto-prepend-file mode test suite
 on:
   push:
-    branches:
-      - main
     paths-ignore:
       - '**.md'
   workflow_dispatch:

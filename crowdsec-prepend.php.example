@@ -63,6 +63,10 @@ $state = $objectManager->get(State::class);
 $configLoader = $objectManager->get(ConfigLoaderInterface::class);
 $helper = $objectManager->get(Data::class);
 try {
+    // Start session
+    if (\PHP_SESSION_NONE === session_status()) {
+        session_start();
+    }
     /**
     * If there is any technical problem while bouncing, don't block the user.
     * Bypass bouncing and log the error.
