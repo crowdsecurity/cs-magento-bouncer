@@ -27,7 +27,6 @@ describe(`Geolocation and country scoped decision`, () => {
         await onLoginPageLoginAsAdmin();
         await removeAllDecisions();
         await setDefaultConfig();
-        await flushCache();
     });
 
     beforeEach(async () => {

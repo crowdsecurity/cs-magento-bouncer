@@ -9,6 +9,11 @@
         {
             "name": "CrowdSec",
             "email": "info@crowdsec.net"
+        },
+        {
+            "name": "Julien Loizelet",
+            "homepage": "https://github.com/julienloizelet/",
+            "role": "Developer"
         }
     ],
     "homepage": "https://github.com/crowdsecurity/cs-magento-bouncer",
