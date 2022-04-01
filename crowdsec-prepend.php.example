@@ -65,6 +65,7 @@ $helper = $objectManager->get(Data::class);
 try {
     // Start session
     if (\PHP_SESSION_NONE === session_status()) {
+        session_name('crowdsec_auto_prepend');
         session_start();
     }
     /**
