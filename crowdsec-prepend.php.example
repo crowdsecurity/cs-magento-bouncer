@@ -34,6 +34,7 @@
 
 use CrowdSec\Bouncer\Helper\Data;
 use CrowdSec\Bouncer\Model\Bouncer;
+use CrowdSec\Bouncer\Model\Session;
 use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Registry\CurrentBouncer;
 use Magento\Framework\App\AreaList;
@@ -63,11 +64,6 @@ $state = $objectManager->get(State::class);
 $configLoader = $objectManager->get(ConfigLoaderInterface::class);
 $helper = $objectManager->get(Data::class);
 try {
-    // Start session
-    if (\PHP_SESSION_NONE === session_status()) {
-        session_name('crowdsec_auto_prepend');
-        session_start();
-    }
     /**
     * If there is any technical problem while bouncing, don't block the user.
     * Bypass bouncing and log the error.
@@ -84,6 +80,8 @@ try {
     if ($bouncerRegistry->get()) {
         return;
     }
+    // Handle session start
+    $session = $objectManager->get(Session::class);
     /** @var Bouncer $bouncer */
     $bouncer = $bouncerRegistry->create();
     $configs = $helper->getBouncerConfigs();
