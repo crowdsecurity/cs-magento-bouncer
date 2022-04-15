@@ -33,9 +33,6 @@
         "swaggest/json-schema": "0.12.39",
         "crowdsec/symfony-cache": "5.4.7.1"
     },
-    "replace": {
-        "symfony/cache": "5.4.7"
-    },
     "autoload": {
         "files": [
             "registration.php"
