@@ -33,7 +33,6 @@ jobs:
         with:
           path: .ddev
           repository: julienloizelet/ddev-m2
-          ref: "v2.0.0"
 
       - name: Install DDEV
         env:

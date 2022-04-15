@@ -27,11 +27,14 @@
         "bouncer"
     ],
     "require": {
-        "php": "^7.2|^7.3|^7.4",
+        "php": "^7.2|^7.3|^7.4|^8.1",
         "magento/framework": ">=102",
-        "crowdsec/bouncer": "0.20.0",
-        "swaggest/json-schema": "0.12.39"
-
+        "crowdsec/bouncer": "0.21.0",
+        "swaggest/json-schema": "0.12.39",
+        "crowdsec/symfony-cache": "5.4.7.1"
+    },
+    "replace": {
+        "symfony/cache": "5.4.7"
     },
     "autoload": {
         "files": [
