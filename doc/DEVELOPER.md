@@ -149,9 +149,9 @@ You will need your Magento 2 credentials to install the source code.
 
 #### CrowdSec Bouncer extension installation
 
-     mkdir m2-sources/my-own-modules
-     mkdir m2-sources/my-own-modules/crowdsec-bouncer
-     cd m2-sources/my-own-modules/crowdsec-bouncer
+     cd m2-sources
+     mkdir -p my-own-modules/crowdsec-bouncer
+     cd my-own-modules/crowdsec-bouncer
      git clone git@github.com:crowdsecurity/cs-magento-bouncer.git ./
      ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
      ddev composer require crowdsec/magento2-module-bouncer:@dev
