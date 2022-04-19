@@ -66,6 +66,13 @@ jobs:
           sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           ddev start
 
+      - name: Some DEBUG information
+        run: |
+          ddev --version
+          ddev exec php -v
+          ddev exec -s crowdsec crowdsec -version
+          ddev php -r "echo phpversion('memcached');"
+
       - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
         # We don't use "ddev composer" create as it restarts all containers
         run: |
@@ -102,7 +109,7 @@ jobs:
       - name: Prepare composer repositories
         run: |
           ddev composer config --unset repositories.0
-          ddev composer config repositories.0 '{"type": "path", "url":"my-own-modules/${{ env.EXTENSION_PATH }}/",  "canonical": true}'
+          ddev composer config repositories.0 '{"type": "path", "url":"my-own-modules/${{ env.EXTENSION_PATH }}/",  "canonical": true, "options": {"symlink": false}}'
           ddev composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}"]}'
           cat composer.json
 
@@ -129,7 +136,9 @@ jobs:
 
       - name: PHPSTAN
         run: |
-          ddev phpstan vendor/${{ env.EXTENSION_PACKAGE_NAME }}
+          ddev exec --raw ls -l dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon
+          ddev exec cat dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon
+          ddev phpstan vendor/${{ env.EXTENSION_PACKAGE_NAME }} --debug
 
       - name: PHP UNIT
         run: |
