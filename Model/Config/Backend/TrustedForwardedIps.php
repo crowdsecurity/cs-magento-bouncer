@@ -59,15 +59,17 @@ class TrustedForwardedIps extends Value
     private $serializer;
 
     /**
+     * Constructor
+     *
      * @param Context $context
      * @param Registry $registry
      * @param ScopeConfigInterface $config
      * @param TypeListInterface $cacheTypeList
      * @param WriterInterface $configWriter
+     * @param Json $serializer
      * @param AbstractResource|null $resource
      * @param AbstractDb|null $resourceCollection
      * @param array $data
-     * @param Json $serializer
      */
     public function __construct(
         Context $context,
@@ -86,8 +88,8 @@ class TrustedForwardedIps extends Value
     }
 
     /**
-     *
      * Update array config for Ips
+     *
      * @return Value
      * @throws CrowdSecException
      */

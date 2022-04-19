@@ -36,5 +36,5 @@ abstract class Action extends BackendAction implements HttpPostActionInterface
      *
      * @see _isAllowed()
      */
-    const ADMIN_RESOURCE = 'CrowdSec_Bouncer::manage_config_actions';
+    public const ADMIN_RESOURCE = 'CrowdSec_Bouncer::manage_config_actions';
 }

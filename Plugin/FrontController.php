@@ -141,6 +141,8 @@ class FrontController
     }
 
     /**
+     * Bounce process
+     *
      * @param FrontControllerInterface $subject
      * @param Closure $proceed
      * @param RequestInterface $request

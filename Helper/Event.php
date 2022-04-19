@@ -37,7 +37,6 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 class Event extends Data
 {
     /**
-     * Event logger
      * @var EventLogger
      */
     protected $_eventLogger;
@@ -65,6 +64,7 @@ class Event extends Data
 
     /**
      * Event Loger getter
+     *
      * @return EventLogger
      */
     public function getEventLogger(): EventLogger

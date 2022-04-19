@@ -37,6 +37,11 @@ class Cache implements OptionSourceInterface
      */
     private $helper;
 
+    /**
+     * Constructor
+     *
+     * @param Helper $helper
+     */
     public function __construct(
         Helper $helper
     ) {

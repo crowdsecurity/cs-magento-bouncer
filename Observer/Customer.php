@@ -34,13 +34,24 @@ use CrowdSec\Bouncer\Event\EventInterface;
 
 class Customer extends Event implements EventInterface, ObserverInterface
 {
-
+    /**
+     * Get event data
+     *
+     * @param array $objects
+     * @return array|string[]
+     */
     public function getEventData($objects = []): array
     {
         $customer = $objects['customer'] ?? null;
         return $customer ? ['customer_id' => (string)$customer->getId()] : [];
     }
 
+    /**
+     * Event observer execution
+     *
+     * @param Observer $observer
+     * @return $this|void
+     */
     public function execute(Observer $observer)
     {
         if ($this->helper->isEventsLogEnabled($this->process)) {

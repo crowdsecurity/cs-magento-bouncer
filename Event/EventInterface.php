@@ -32,12 +32,14 @@ interface EventInterface
 
     /**
      * Common data for all events
+     *
      * @return array
      */
     public function getBaseData(): array;
 
     /**
      * Data for a specific event
+     *
      * @param array $objects
      * @return array
      */

@@ -52,7 +52,6 @@ class Data extends Config
     protected $_debugHandler;
 
     /**
-     * Final logger
      * @var Logger
      */
     protected $_finalLogger;
@@ -98,6 +97,7 @@ class Data extends Config
 
     /**
      * Manage logger and its handlers
+     *
      * @return Logger
      */
     public function getFinalLogger(): Logger
@@ -117,6 +117,7 @@ class Data extends Config
     }
 
     /**
+     * Check if feature is enabled for some area
      *
      * @param string $areaCode
      * @return bool
@@ -144,16 +145,35 @@ class Data extends Config
         return $this->_isEnabled[$areaCode];
     }
 
+    /**
+     * Retrieve a boolean setting
+     *
+     * @param string $path
+     * @param string $scope
+     * @return bool
+     */
     protected function _getBooleanSetting($path, $scope = ScopeInterface::SCOPE_STORE): bool
     {
         return (bool)$this->scopeConfig->getValue($path, $scope);
     }
 
+    /**
+     * Retrieve a string setting
+     *
+     * @param string $path
+     * @param string $scope
+     * @return string
+     */
     protected function _getStringSetting($path, $scope = ScopeInterface::SCOPE_STORE): string
     {
         return trim((string)$this->scopeConfig->getValue($path, $scope));
     }
 
+    /**
+     * Retrieve captcha wall settings
+     *
+     * @return array
+     */
     public function getCaptchaWallConfigs(): array
     {
         if (empty($this->_captchaWallConfigs)) {
@@ -192,6 +212,11 @@ class Data extends Config
         return $this->_captchaWallConfigs;
     }
 
+    /**
+     * Retrieve ban wall settings
+     *
+     * @return array
+     */
     public function getBanWallConfigs(): array
     {
         if (empty($this->_banWallConfigs)) {
@@ -226,7 +251,9 @@ class Data extends Config
     }
 
     /**
-     * @return string The current IP, even if it's the IP of a proxy
+     * Get the current IP, even if it's the IP of a proxy
+     *
+     * @return string
      */
     public function getRemoteIp(): string
     {
@@ -234,7 +261,9 @@ class Data extends Config
     }
 
     /**
-     * @return string The X-Forwarded-For IP
+     * Get the X-Forwarded-For IP
+     *
+     * @return string
      */
     public function getForwarderForIp(): string
     {
@@ -251,7 +280,9 @@ class Data extends Config
     }
 
     /**
-     * @return string The current HTTP method
+     * Get the current HTTP method
+     *
+     * @return string
      */
     public function getHttpMethod(): string
     {
@@ -260,6 +291,9 @@ class Data extends Config
 
     /**
      * Get the value of a posted field.
+     *
+     * @param string $name
+     * @return string|null
      */
     public function getPostedVariable(string $name): ?string
     {
@@ -269,7 +303,10 @@ class Data extends Config
     }
 
     /**
-     * @return string Ex: "X-Forwarded-For"
+     * Get a http header by its name (Ex: "X-Forwarded-For")
+     *
+     * @param string $name
+     * @return string|null
      */
     public function getHttpRequestHeader(string $name): ?string
     {
@@ -280,8 +317,10 @@ class Data extends Config
 
     /**
      * Write a message on debug log file if debug log is enabled
-     * @param $message
+     *
+     * @param mixed $message
      * @param array $context
+     * @return void
      */
     public function debug($message, array $context = []): void
     {
@@ -292,8 +331,10 @@ class Data extends Config
 
     /**
      * Write a critical message in prod log (and in debug log if enabled)
-     * @param $message
+     *
+     * @param mixed $message
      * @param array $context
+     * @return void
      */
     public function critical($message, array $context = []): void
     {
@@ -302,14 +343,21 @@ class Data extends Config
 
     /**
      * Write an error message in prod log (and in debug log if enabled)
-     * @param $message
+     *
+     * @param mixed $message
      * @param array $context
+     * @return void
      */
     public function error($message, array $context = []): void
     {
         $this->getFinalLogger()->error($message, $context);
     }
 
+    /**
+     * Get cache system options
+     *
+     * @return array
+     */
     public function getCacheSystemOptions(): array
     {
         return [
@@ -321,8 +369,9 @@ class Data extends Config
 
     /**
      * Generate a config array in order to instantiate a bouncer
+     *
      * @return array
-     * @throws CrowdSecException
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function getBouncerConfigs(): array
     {
@@ -380,10 +429,11 @@ class Data extends Config
     }
 
     /**
-     * @param string $expr
+     * Check if a cron expression is valid
      *
-     * @throws CrowdSecException
      * @see \Magento\Cron\Model\Schedule::setCronExpr
+     * @param string $expr
+     * @return void
      */
     public function validateCronExpr(string $expr)
     {
@@ -394,11 +444,14 @@ class Data extends Config
     }
 
     /**
+     * Make a rest request
+     *
      * @param RestClient $restClient
      * @param string $baseUri
      * @param string $userAgent
      * @param string $apiKey
      * @param int $timeout
+     * @return void
      */
     public function ping(RestClient $restClient, string $baseUri, string $userAgent, string $apiKey, int $timeout = 1)
     {

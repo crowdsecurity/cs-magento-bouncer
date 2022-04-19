@@ -39,7 +39,6 @@ class Debug extends Base
     protected $loggerType = Logger::DEBUG;
 
     /**
-     * File name
      * @var string
      */
     protected $fileName = Constants::CROWDSEC_LOG_PATH. '/crowdsec-bouncer-debug.log';

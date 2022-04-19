@@ -39,7 +39,6 @@ class Event extends Base
     protected $loggerType = Logger::INFO;
 
     /**
-     * File name
      * @var string
      */
     protected $fileName = Constants::CROWDSEC_LOG_PATH. '/crowdsec-events.log';

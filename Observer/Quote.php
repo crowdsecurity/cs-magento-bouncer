@@ -34,6 +34,12 @@ use CrowdSec\Bouncer\Event\EventInterface;
 
 class Quote extends Event implements EventInterface, ObserverInterface
 {
+    /**
+     * Get evant data
+     *
+     * @param array $objects
+     * @return array
+     */
     public function getEventData($objects = []): array
     {
         $product = $objects['product'] ?? null;
@@ -44,6 +50,12 @@ class Quote extends Event implements EventInterface, ObserverInterface
         return array_merge($productData, $quoteItemData);
     }
 
+    /**
+     * Event observer execution
+     *
+     * @param Observer $observer
+     * @return $this|void
+     */
     public function execute(Observer $observer)
     {
         if ($this->helper->isEventsLogEnabled($this->process)) {

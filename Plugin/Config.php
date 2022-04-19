@@ -46,7 +46,7 @@ class Config
     /**
      * @see https://devdocs.magento.com/guides/v2.4/config-guide/cron/custom-cron-ref.html#disable-cron-job
      */
-    const CRON_DISABLE = '0 0 30 2 *';
+    public const CRON_DISABLE = '0 0 30 2 *';
 
     /**
      * @var ManagerInterface
@@ -71,6 +71,15 @@ class Config
      */
     protected $registryBouncer;
 
+    /**
+     * Constructor
+     *
+     * @param ManagerInterface $messageManager
+     * @param Helper $helper
+     * @param RegistryBouncer $registryBouncer
+     * @param WriterInterface $configWriter
+     * @param RestClient $restClient
+     */
     public function __construct(
         ManagerInterface $messageManager,
         Helper           $helper,
@@ -87,6 +96,7 @@ class Config
 
     /**
      * Handle admin CrowdSec section changes
+     *
      * @param \Magento\Config\Model\Config $subject
      * @return null
      * @throws CrowdSecException
@@ -164,6 +174,13 @@ class Config
         return null;
     }
 
+    /**
+     * Get a configuration current value
+     *
+     * @param mixed $subject
+     * @param mixed $saved
+     * @return mixed
+     */
     private function getCurrentValue($subject, $saved)
     {
         return $subject ?: $saved;
@@ -171,6 +188,7 @@ class Config
 
     /**
      * Handle Stream Mode specificity
+     *
      * @param bool $oldStreamMode
      * @param bool $newStreamMode
      * @param bool $refreshCronExprChanged
@@ -215,6 +233,7 @@ class Config
 
     /**
      * Warm up the cache if necessary
+     *
      * @param bool $oldStreamMode
      * @param bool $newStreamMode
      * @param bool $refreshCronExprChanged ,
@@ -257,7 +276,13 @@ class Config
     }
 
     /**
-     * @throws CrowdSecException
+     * Handle refresh expression cron
+     *
+     * @param bool $oldStreamMode
+     * @param bool $newStreamMode
+     * @param bool $cronExprChanged
+     * @param string $newCronExpr
+     * @return void
      */
     protected function _handleRefreshCronExpr(
         bool   $oldStreamMode,
@@ -289,7 +314,13 @@ class Config
     }
 
     /**
-     * @throws CrowdSecException
+     * Handle prune cron expression cron
+     *
+     * @param string $oldCacheSystem
+     * @param string $newCacheSystem
+     * @param bool $cronExprChanged
+     * @param string $newCronExpr
+     * @return void
      */
     protected function _handlePruneCronExpr(
         string $oldCacheSystem,
@@ -323,11 +354,13 @@ class Config
     }
 
     /**
+     * Handle connection changes
+     *
      * @param string $oldUrl
      * @param string $newUrl
      * @param string $oldKey
      * @param string $newKey
-     * @throws CrowdSecException
+     * @return void
      */
     protected function _handleConnectionChanges(
         string $oldUrl,
@@ -347,6 +380,7 @@ class Config
 
     /**
      * Clear current cache if necessary
+     *
      * @param bool $oldStreamMode
      * @param bool $newStreamMode
      * @param string $newCacheSystem
@@ -380,6 +414,7 @@ class Config
 
     /**
      * Clear old cache if necessary
+     *
      * @param bool $cacheChanged
      * @param string $oldCacheSystem
      * @param string $oldMemcachedDsn
@@ -403,6 +438,7 @@ class Config
 
     /**
      * Test a cache configuration for some bouncer
+     *
      * @param bool $cacheChanged
      * @param string $cacheSystem
      * @param string $memcachedDsn
@@ -451,6 +487,7 @@ class Config
 
     /**
      * Clear a cache for some config and bouncer
+     *
      * @param Bouncer $bouncer
      * @param string $cacheSystem
      * @param string $memcachedDsn
@@ -493,12 +530,16 @@ class Config
     }
 
     /**
+     * Warm up the cache
+     *
      * @param Bouncer $bouncer
-     * @param $cacheSystem
-     * @param $memcachedDsn
-     * @param $redisDsn
-     * @param $cacheLabel
-     * @throws CrowdSecException
+     * @param string $cacheSystem
+     * @param string $memcachedDsn
+     * @param string $redisDsn
+     * @param string $cacheLabel
+     * @return void
+     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function _warmUpCache(Bouncer $bouncer, $cacheSystem, $memcachedDsn, $redisDsn, $cacheLabel): void
     {
@@ -529,6 +570,16 @@ class Config
         }
     }
 
+    /**
+     * Check if DNS configuration has changed
+     *
+     * @param string $newCacheSystem
+     * @param string $oldRedisDsn
+     * @param string $newRedisDsn
+     * @param string $oldMemcachedDsn
+     * @param string $newMemcachedDsn
+     * @return bool
+     */
     private function hasDsnChanged($newCacheSystem, $oldRedisDsn, $newRedisDsn, $oldMemcachedDsn, $newMemcachedDsn):
     bool
     {
@@ -542,6 +593,14 @@ class Config
         }
     }
 
+    /**
+     * Manage cache clear message display
+     *
+     * @param bool $clearCacheResult
+     * @param string $cacheLabel
+     * @param string $preMessage
+     * @return void
+     */
     private function displayCacheClearMessage($clearCacheResult, $cacheLabel, $preMessage = null): void
     {
         $clearCacheMessage =
@@ -550,6 +609,13 @@ class Config
         $this->messageManager->addNoticeMessage($preMessage . $clearCacheMessage);
     }
 
+    /**
+     * Manage cache warm up message display
+     *
+     * @param array $warmUpCacheResult
+     * @param string $cacheLabel
+     * @return void
+     */
     private function displayCacheWarmUpMessage($warmUpCacheResult, $cacheLabel): void
     {
         $decisionsCount = $warmUpCacheResult['count'] ?? 0;

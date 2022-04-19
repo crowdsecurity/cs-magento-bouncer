@@ -34,6 +34,12 @@ use CrowdSec\Bouncer\Event\EventInterface;
 
 class Payment extends Event implements EventInterface, ObserverInterface
 {
+    /**
+     * Get event data
+     *
+     * @param array $objects
+     * @return array
+     */
     public function getEventData($objects = []): array
     {
         $payment = $objects['payment'] ?? null;
@@ -41,6 +47,12 @@ class Payment extends Event implements EventInterface, ObserverInterface
         return $payment ? ['payment_method' => $payment->getMethod()] : [];
     }
 
+    /**
+     * Event observer execution
+     *
+     * @param Observer $observer
+     * @return $this|void
+     */
     public function execute(Observer $observer)
     {
         if ($this->helper->isEventsLogEnabled($this->process)) {

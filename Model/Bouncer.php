@@ -70,9 +70,18 @@ class Bouncer extends AbstractBounce implements IBounce
     /** @var  BouncerFactory */
     protected $bouncerInstanceFactory;
 
-    /** bool */
+    /** @var bool */
     protected $remediationDisplay = false;
 
+    /**
+     * Constructor
+     *
+     * @param Http $response
+     * @param Session $session
+     * @param Helper $helper
+     * @param CacheFactory $cacheFactory
+     * @param BouncerFactory $bouncerInstanceFactory
+     */
     public function __construct(
         Http $response,
         Session $session,
@@ -95,11 +104,22 @@ class Bouncer extends AbstractBounce implements IBounce
         $this->logger = $this->helper->getFinalLogger();
     }
 
+    /**
+     * Remediation display setter
+     *
+     * @param bool $value
+     * @return void
+     */
     public function setRemediationDisplay(bool $value): void
     {
         $this->remediationDisplay = $value;
     }
 
+    /**
+     * Remediation display getter
+     *
+     * @return bool
+     */
     public function getRemediationDisplay(): bool
     {
         return $this->remediationDisplay;
@@ -107,6 +127,7 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Get the bouncer instance
+     *
      * @param array $settings
      * @param bool $forceReload
      * @return BouncerInstance
@@ -175,6 +196,7 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Initialize the bouncer instance
+     *
      * @param array $configs
      * @param array $forcedConfigs
      * @return BouncerInstance
@@ -188,7 +210,10 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return string Ex: "X-Forwarded-For"
+     * Retrieve http header by its name
+     *
+     * @param string $name
+     * @return string|null
      */
     public function getHttpRequestHeader(string $name): ?string
     {
@@ -196,7 +221,9 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return string The current IP, even if it's the IP of a proxy
+     * Get the current IP, even if it's the IP of a proxy
+     *
+     * @return string
      */
     public function getRemoteIp(): string
     {
@@ -204,7 +231,9 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return string The current HTTP method
+     * Get the current HTTP method
+     *
+     * @return string
      */
     public function getHttpMethod(): string
     {
@@ -212,9 +241,9 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return array ['hide_crowdsec_mentions': bool, color:[text:['primary' : string, 'secondary' : string, 'button' :
-     *     string, 'error_message : string' ...]]] (returns an array of option required to build the captcha wall
-     *     template)
+     * Retrieve captcha wall options
+     *
+     * @return array
      */
     public function getCaptchaWallOptions(): array
     {
@@ -222,8 +251,9 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return array ['hide_crowdsec_mentions': bool, color:[text:['primary' : string, 'secondary' : string,
-     *     'error_message : string' ...]]] (returns an array of option required to build the ban wall template)
+     * Retrieve ban wall options
+     *
+     * @return array
      */
     public function getBanWallOptions(): array
     {
@@ -231,7 +261,9 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return array [[string, string], ...] Returns IP ranges to trust as proxies as an array of comparables ip bounds
+     * Retrieve IP ranges to trust as proxies as an array of comparables ip bounds
+     *
+     * @return array [[string, string], ...]
      */
     public function getTrustForwardedIpBoundsList(): array
     {
@@ -239,13 +271,21 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * Return a session variable, null if not set.
+     * Get session variable value
+     *
+     * @param string $name
+     * @return mixed
      */
     public function getSessionVariable(string $name)
     {
         return $this->session->getData($name);
     }
 
+    /**
+     * Get all session variables
+     *
+     * @return mixed
+     */
     public function getAllSessionVariables()
     {
         return $this->session->getData();
@@ -253,6 +293,10 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Set a session variable.
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return void
      */
     public function setSessionVariable(string $name, $value): void
     {
@@ -262,7 +306,8 @@ class Bouncer extends AbstractBounce implements IBounce
     /**
      * Unset a session variable, throw an error if this does not exist.
      *
-     * @return void;
+     * @param string $name
+     * @return void
      */
     public function unsetSessionVariable(string $name): void
     {
@@ -271,6 +316,9 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Get the value of a posted field.
+     *
+     * @param string $name
+     * @return string|null
      */
     public function getPostedVariable(string $name): ?string
     {
@@ -287,7 +335,10 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Send HTTP response.
-     * @throws CrowdSecException
+     *
+     * @param string|null $body
+     * @param int $statusCode
+     * @return void
      */
     public function sendResponse(?string $body, int $statusCode = 200): void
     {
@@ -320,10 +371,11 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * If there is any technical problem while bouncing, don't block the user.
+     *
      * Bypass bouncing and log the error.
      *
-     * @throws CacheException
-     * @throws ErrorException
+     * @param array $configs
+     * @return bool
      * @throws InvalidArgumentException
      */
     public function safelyBounce(array $configs): bool

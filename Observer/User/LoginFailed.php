@@ -35,6 +35,8 @@ class LoginFailed extends User
      * @var string
      */
     protected $type = 'ADMIN_LOGIN_FAILED';
-
+    /**
+     * @var string
+     */
     protected $process ='admin_login';
 }

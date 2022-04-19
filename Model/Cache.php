@@ -44,14 +44,15 @@ class Cache
 
     /**
      * Initialize cache adapter for CrowdSec Bouncer
+     *
      * @param string $cacheSystem
      * @param string $memcachedDsn
      * @param string $redisDsn
      * @param string $fsCachePath
      * @param string|null $forcedCacheSystem
      * @return mixed
-     * @throws CrowdSecException
-     * @throws ErrorException|CacheException
+     * @throws CacheException
+     * @throws ErrorException
      */
     public function getAdapter(
         string $cacheSystem,

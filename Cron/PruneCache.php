@@ -14,9 +14,16 @@ class PruneCache
      */
     protected $helper;
     /**
+     * @var RegistryBouncer
      */
     protected $registryBouncer;
 
+    /**
+     * Constructor
+     *
+     * @param Helper $helper
+     * @param RegistryBouncer $registryBouncer
+     */
     public function __construct(Helper $helper, RegistryBouncer $registryBouncer)
     {
         $this->helper = $helper;
@@ -24,8 +31,10 @@ class PruneCache
     }
 
     /**
-     * Prune file system cache
+     *  Prune file system cache
      *
+     * @return void
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function execute(): void
     {

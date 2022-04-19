@@ -34,6 +34,12 @@ use CrowdSec\Bouncer\Event\EventInterface;
 
 class Order extends Event implements EventInterface, ObserverInterface
 {
+    /**
+     * Get event data
+     *
+     * @param array $objects
+     * @return array|string[]
+     */
     public function getEventData($objects = []): array
     {
         $order = $objects['order'] ?? null;
@@ -46,6 +52,12 @@ class Order extends Event implements EventInterface, ObserverInterface
             ] : [];
     }
 
+    /**
+     * Event observer execution
+     *
+     * @param Observer $observer
+     * @return $this|void
+     */
     public function execute(Observer $observer)
     {
         if ($this->helper->isEventsLogEnabled($this->process)) {

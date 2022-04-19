@@ -13,9 +13,16 @@ class RefreshCache
      */
     protected $helper;
     /**
+     * @var RegistryBouncer
      */
     protected $registryBouncer;
 
+    /**
+     * Constructor
+     *
+     * @param Helper $helper
+     * @param RegistryBouncer $registryBouncer
+     */
     public function __construct(Helper $helper, RegistryBouncer $registryBouncer)
     {
         $this->helper = $helper;
@@ -25,6 +32,9 @@ class RefreshCache
     /**
      * Refresh cache in Stream Mode
      *
+     * @return void
+     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function execute(): void
     {
