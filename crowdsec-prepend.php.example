@@ -88,7 +88,7 @@ try {
     $bouncer->init($configs);
     $bouncer->run();
     // If ban or captcha remediation wall display is detected
-    if ($bouncer->getRemediationDisplay()) {
+    if ($bouncer->hasRemediationDisplay()) {
         $response = $objectManager->get(Response::class);
         $response->sendResponse();
         // phpcs:ignore Magento2.Security.LanguageConstruct.ExitUsage

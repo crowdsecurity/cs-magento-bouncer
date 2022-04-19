@@ -29,7 +29,6 @@ namespace CrowdSec\Bouncer\Plugin;
 
 use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
-use CrowdSec\Bouncer\Model\Bouncer;
 use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use Exception;
 use Magento\Framework\Message\ManagerInterface;
@@ -268,10 +267,7 @@ class Config
         }
 
         if ($shouldWarmUp) {
-            if (!($bouncer = $this->registryBouncer->get())) {
-                $bouncer = $this->registryBouncer->create();
-            }
-            $this->_warmUpCache($bouncer, $newCacheSystem, $newMemcachedDsn, $newRedisDsn, $newCacheLabel);
+            $this->_warmUpCache($newCacheSystem, $newMemcachedDsn, $newRedisDsn, $newCacheLabel);
         }
     }
 
@@ -404,11 +400,8 @@ class Config
         }
 
         if ($shouldClearCache) {
-            if (!($bouncer = $this->registryBouncer->get())) {
-                $bouncer = $this->registryBouncer->create();
-            }
             $preMessage = __('As the stream mode has been deactivated: ');
-            $this->_clearCache($bouncer, $newCacheSystem, $newMemcachedDsn, $newRedisDsn, $newCacheLabel, $preMessage);
+            $this->_clearCache($newCacheSystem, $newMemcachedDsn, $newRedisDsn, $newCacheLabel, $preMessage);
         }
     }
 
@@ -429,10 +422,7 @@ class Config
         Phrase $oldCacheLabel
     ) {
         if ($cacheChanged) {
-            if (!($bouncer = $this->registryBouncer->get())) {
-                $bouncer = $this->registryBouncer->create();
-            }
-            $this->_clearCache($bouncer, $oldCacheSystem, $oldMemcachedDsn, $oldRedisDsn, $oldCacheLabel);
+            $this->_clearCache($oldCacheSystem, $oldMemcachedDsn, $oldRedisDsn, $oldCacheLabel);
         }
     }
 
@@ -488,7 +478,6 @@ class Config
     /**
      * Clear a cache for some config and bouncer
      *
-     * @param Bouncer $bouncer
      * @param string $cacheSystem
      * @param string $memcachedDsn
      * @param string $redisDsn
@@ -496,7 +485,6 @@ class Config
      * @param Phrase|null $preMessage
      */
     protected function _clearCache(
-        Bouncer $bouncer,
         string  $cacheSystem,
         string  $memcachedDsn,
         string  $redisDsn,
@@ -504,6 +492,9 @@ class Config
         Phrase $preMessage = null
     ): void {
         try {
+            if (!($bouncer = $this->registryBouncer->get())) {
+                $bouncer = $this->registryBouncer->create();
+            }
             $configs = $this->helper->getBouncerConfigs();
             $clearCacheResult =
                 $bouncer->init(
@@ -532,7 +523,6 @@ class Config
     /**
      * Warm up the cache
      *
-     * @param Bouncer $bouncer
      * @param string $cacheSystem
      * @param string $memcachedDsn
      * @param string $redisDsn
@@ -541,9 +531,12 @@ class Config
      * @throws \Magento\Framework\Exception\FileSystemException
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    protected function _warmUpCache(Bouncer $bouncer, $cacheSystem, $memcachedDsn, $redisDsn, $cacheLabel): void
+    protected function _warmUpCache($cacheSystem, $memcachedDsn, $redisDsn, $cacheLabel): void
     {
         try {
+            if (!($bouncer = $this->registryBouncer->get())) {
+                $bouncer = $this->registryBouncer->create();
+            }
             $configs = $this->helper->getBouncerConfigs();
             $warmUpCacheResult =
                 $bouncer->init(

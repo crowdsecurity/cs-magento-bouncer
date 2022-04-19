@@ -120,7 +120,7 @@ class Bouncer extends AbstractBounce implements IBounce
      *
      * @return bool
      */
-    public function getRemediationDisplay(): bool
+    public function hasRemediationDisplay(): bool
     {
         return $this->remediationDisplay;
     }

@@ -167,7 +167,7 @@ class FrontController
         $registryBouncer->run();
 
         // If ban or captcha remediation wall display is detected
-        if ($registryBouncer->getRemediationDisplay()) {
+        if ($registryBouncer->hasRemediationDisplay()) {
             // Stop further processing if your condition is met
             $this->actionFlag->set('', ActionInterface::FLAG_NO_DISPATCH, true);
 

@@ -151,6 +151,7 @@ class Data extends Config
      * @param string $path
      * @param string $scope
      * @return bool
+     * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
     protected function _getBooleanSetting($path, $scope = ScopeInterface::SCOPE_STORE): bool
     {
