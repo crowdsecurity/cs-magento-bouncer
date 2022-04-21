@@ -130,7 +130,7 @@ jobs:
 
             -   name: Installation tests
                 run: |
-                    rm -rf /var/www/html/generated/code/Magento
+                    ddev exec --raw rm -rf /var/www/html/generated/code/Magento
                     ddev magento module:enable ${{ env.EXTENSION_NAME }}
                     ddev magento setup:upgrade
                     ddev magento setup:static-content:deploy -f
@@ -141,7 +141,7 @@ jobs:
             -   name: Disable some extensions for 2.4
                 if: startsWith(matrix.m2-version, '2.4')
                 run: |
-                    rm -rf /var/www/html/generated/code/Magento
+                    ddev exec --raw rm -rf /var/www/html/generated/code/Magento
                     ddev magento module:disable Magento_TwoFactorAuth
 
             -   name: Prepare for Varnish tests
