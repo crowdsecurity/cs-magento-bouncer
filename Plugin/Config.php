@@ -31,11 +31,14 @@ use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use Exception;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Message\ManagerInterface;
 use CrowdSec\Bouncer\Constants;
 use Magento\Framework\Phrase;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use CrowdSecBouncer\RestClient;
+use Psr\Cache\InvalidArgumentException;
+use Magento\Config\Model\Config as MagentoConfig;
 
 /**
  * Plugin to handle crowdsec section config updates
@@ -96,12 +99,13 @@ class Config
     /**
      * Handle admin CrowdSec section changes
      *
-     * @param \Magento\Config\Model\Config $subject
+     * @param MagentoConfig $subject
      * @return null
-     * @throws CrowdSecException
+     * @throws CrowdSecException|InvalidArgumentException
+     * @throws FileSystemException
      */
     public function beforeSave(
-        \Magento\Config\Model\Config $subject
+        MagentoConfig $subject
     ) {
         if ($subject->getSection() === Helper::SECTION) {
             // Retrieve saved values (old) and posted data (new)
@@ -196,7 +200,8 @@ class Config
      * @param string $newRedisDsn
      * @param string $newMemcachedDsn
      * @param Phrase $newCacheLabel
-     * @throws CrowdSecException
+     * @throws InvalidArgumentException
+     * @throws FileSystemException
      */
     public function _handleStreamMode(
         bool   $oldStreamMode,
@@ -241,7 +246,8 @@ class Config
      * @param string $newRedisDsn
      * @param string $newMemcachedDsn
      * @param Phrase $newCacheLabel
-     * @throws CrowdSecException
+     * @throws InvalidArgumentException
+     * @throws FileSystemException
      */
     protected function _handleWarmUp(
         bool   $oldStreamMode,
@@ -383,6 +389,8 @@ class Config
      * @param string $newRedisDsn
      * @param string $newMemcachedDsn
      * @param Phrase $newCacheLabel
+     * @throws InvalidArgumentException
+     * @throws FileSystemException
      */
     protected function _handleNewClearCache(
         bool   $oldStreamMode,
@@ -413,6 +421,8 @@ class Config
      * @param string $oldMemcachedDsn
      * @param string $oldRedisDsn
      * @param Phrase $oldCacheLabel
+     * @throws FileSystemException
+     * @throws InvalidArgumentException
      */
     protected function _handleOldClearCache(
         bool   $cacheChanged,
@@ -434,7 +444,7 @@ class Config
      * @param string $memcachedDsn
      * @param string $redisDsn
      * @param Phrase $cacheLabel
-     * @throws CrowdSecException
+     * @throws CrowdSecException|InvalidArgumentException
      */
     protected function _handleTestCache(
         bool   $cacheChanged,
@@ -483,6 +493,8 @@ class Config
      * @param string $redisDsn
      * @param Phrase $cacheLabel
      * @param Phrase|null $preMessage
+     * @throws InvalidArgumentException
+     * @throws FileSystemException
      */
     protected function _clearCache(
         string  $cacheSystem,
@@ -526,13 +538,17 @@ class Config
      * @param string $cacheSystem
      * @param string $memcachedDsn
      * @param string $redisDsn
-     * @param string $cacheLabel
+     * @param Phrase $cacheLabel
      * @return void
-     * @throws \Magento\Framework\Exception\FileSystemException
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws FileSystemException
+     * @throws InvalidArgumentException
      */
-    protected function _warmUpCache($cacheSystem, $memcachedDsn, $redisDsn, $cacheLabel): void
-    {
+    protected function _warmUpCache(
+        string $cacheSystem,
+        string $memcachedDsn,
+        string $redisDsn,
+        Phrase $cacheLabel
+    ): void {
         try {
             if (!($bouncer = $this->registryBouncer->get())) {
                 $bouncer = $this->registryBouncer->create();
@@ -573,9 +589,13 @@ class Config
      * @param string $newMemcachedDsn
      * @return bool
      */
-    private function hasDsnChanged($newCacheSystem, $oldRedisDsn, $newRedisDsn, $oldMemcachedDsn, $newMemcachedDsn):
-    bool
-    {
+    private function hasDsnChanged(
+        string $newCacheSystem,
+        string $oldRedisDsn,
+        string $newRedisDsn,
+        string $oldMemcachedDsn,
+        string $newMemcachedDsn
+    ): bool {
         switch ($newCacheSystem) {
             case Constants::CACHE_SYSTEM_REDIS:
                 return $oldRedisDsn !== $newRedisDsn;
@@ -590,12 +610,15 @@ class Config
      * Manage cache clear message display
      *
      * @param bool $clearCacheResult
-     * @param string $cacheLabel
-     * @param string $preMessage
+     * @param Phrase $cacheLabel
+     * @param Phrase|null $preMessage
      * @return void
      */
-    private function displayCacheClearMessage($clearCacheResult, $cacheLabel, $preMessage = null): void
-    {
+    private function displayCacheClearMessage(
+        bool $clearCacheResult,
+        Phrase $cacheLabel,
+        Phrase $preMessage = null
+    ): void {
         $clearCacheMessage =
             $clearCacheResult ? __('%1 cache has been cleared.', $cacheLabel) :
                 __('%1 cache has not been cleared.', $cacheLabel);
@@ -606,10 +629,10 @@ class Config
      * Manage cache warm up message display
      *
      * @param array $warmUpCacheResult
-     * @param string $cacheLabel
+     * @param Phrase $cacheLabel
      * @return void
      */
-    private function displayCacheWarmUpMessage($warmUpCacheResult, $cacheLabel): void
+    private function displayCacheWarmUpMessage(array $warmUpCacheResult, Phrase $cacheLabel): void
     {
         $decisionsCount = $warmUpCacheResult['count'] ?? 0;
         $decisionsMessage =
