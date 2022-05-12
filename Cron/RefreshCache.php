@@ -13,9 +13,16 @@ class RefreshCache
      */
     protected $helper;
     /**
+     * @var RegistryBouncer
      */
     protected $registryBouncer;
 
+    /**
+     * Constructor
+     *
+     * @param Helper $helper
+     * @param RegistryBouncer $registryBouncer
+     */
     public function __construct(Helper $helper, RegistryBouncer $registryBouncer)
     {
         $this->helper = $helper;
@@ -25,13 +32,17 @@ class RefreshCache
     /**
      * Refresh cache in Stream Mode
      *
+     * @return void
+     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     public function execute(): void
     {
         if ($this->helper->isStreamModeEnabled()) {
             try {
                 $bouncer = $this->registryBouncer->create();
-                $bouncer->init()->refreshBlocklistCache();
+                $configs = $this->helper->getBouncerConfigs();
+                $bouncer->init($configs)->refreshBlocklistCache();
             } catch (CrowdSecException $e) {
                 $this->helper->error('', [
                     'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',

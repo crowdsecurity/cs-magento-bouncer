@@ -2,13 +2,18 @@
     "name": "crowdsec/magento2-module-bouncer",
     "description": "The Bouncer module for Magento 2 allows rejecting IP detected as malicious by CrowdSec",
     "type": "magento2-module",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "minimum-stability": "dev",
     "license": "MIT",
     "authors": [
         {
             "name": "CrowdSec",
             "email": "info@crowdsec.net"
+        },
+        {
+            "name": "Julien Loizelet",
+            "homepage": "https://github.com/julienloizelet/",
+            "role": "Developer"
         }
     ],
     "homepage": "https://github.com/crowdsecurity/cs-magento-bouncer",
@@ -22,11 +27,11 @@
         "bouncer"
     ],
     "require": {
-        "php": "^7.2|^7.3|^7.4",
+        "php": "^7.2|^7.3|^7.4|^8.1",
         "magento/framework": ">=102",
-        "crowdsec/bouncer": "0.14.0",
-        "swaggest/json-schema": "0.12.39"
-
+        "crowdsec/bouncer": "0.21.0",
+        "swaggest/json-schema": "0.12.39",
+        "crowdsec/magento-symfony-cache": "1.0.0 || 2.0.0"
     },
     "autoload": {
         "files": [

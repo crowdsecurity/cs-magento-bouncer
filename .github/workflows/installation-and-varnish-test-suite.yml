@@ -5,24 +5,29 @@ on:
       - main
     paths-ignore:
       - '**.md'
-  pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   installation-and-varnish-test-suite:
     strategy:
       fail-fast: false
       matrix:
-        m2-version: [ "2.3.0", "2.4.3" ]
-        php-version: [ "7.2", "7.3", "7.4" ]
+        m2-version: [ "2.3.0", "2.4.0", "2.4.3", "2.4.4" ]
+        php-version: [ "7.2", "7.3", "7.4", "8.1" ]
         exclude:
           - { php-version: "7.3", m2-version: "2.3.0" }
           - { php-version: "7.4", m2-version: "2.3.0" }
+          - { php-version: "8.1", m2-version: "2.3.0" }
           - { php-version: "7.2", m2-version: "2.4.3" }
+          - { php-version: "8.1", m2-version: "2.4.3" }
+          - { php-version: "7.2", m2-version: "2.4.0" }
+          - { php-version: "7.3", m2-version: "2.4.0" }
+          - { php-version: "8.1", m2-version: "2.4.0" }
+          - { php-version: "7.2", m2-version: "2.4.4" }
+          - { php-version: "7.3", m2-version: "2.4.4" }
 
 
     name: Installation and Varnish test suite
@@ -44,7 +49,7 @@ jobs:
 
       - name: Install DDEV
         env:
-          DDEV_VERSION: v1.18.2
+          DDEV_VERSION: v1.19.1
         run: |
           # @see https://ddev.readthedocs.io/en/stable/#installationupgrade-script-linux-and-macos-armarm64-and-amd64-architectures
           sudo apt-get -qq update
@@ -58,11 +63,7 @@ jobs:
         # used in some directory path and conventional file naming
         # Example : 2.4.3 => m243
         run: |
-           echo "M2_VERSION_CODE=$(echo m${{ matrix.m2-version }} | sed 's/\.//g' )" >> $GITHUB_ENV
-
-      - name: Set ELASTIC_INSTALL_STRING env for 2.3
-        if: startsWith(matrix.m2-version, '2.3')
-        run: echo "ELASTIC_INSTALL_STRING=''" >> $GITHUB_ENV
+          echo "M2_VERSION_CODE=$(echo m${{ matrix.m2-version }} | sed 's/\.//g' )" >> $GITHUB_ENV
 
       - name: Set ELASTIC_INSTALL_STRING env for 2.4
         if: startsWith(matrix.m2-version, '2.4')
@@ -116,28 +117,37 @@ jobs:
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 
-      - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
+      - name: Prepare composer repositories
         run: |
-          ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/${{ env.EXTENSION_PATH }}/
-          ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
+          ddev composer config --unset repositories.0
+          ddev composer config repositories.0 '{"type": "path", "url":"my-own-modules/${{ env.EXTENSION_PATH }}/",  "canonical": true}'
+          ddev composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}"]}'
+          cat composer.json
+
+      - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
+        run: ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
+
 
       - name: Installation tests
         run: |
+          sudo chmod -R 777 ${{ github.workspace }}
+          ddev magento maintenance:enable
           ddev magento module:enable ${{ env.EXTENSION_NAME }}
+          ddev magento maintenance:disable
           ddev magento setup:upgrade
-          ddev magento setup:di:compile
-          ddev magento setup:static-content:deploy -f
           ddev magento deploy:mode:set production
           ddev magento indexer:reindex
 
       - name: Disable some extensions for 2.4
         if: startsWith(matrix.m2-version, '2.4')
         run: |
+          sudo chmod -R 777 ${{ github.workspace }}
+          ddev magento maintenance:enable
           ddev magento module:disable Magento_TwoFactorAuth
+          ddev magento maintenance:disable
 
       - name: Prepare for Varnish tests
         run: |
-          ddev magento setup:di:compile
           ddev magento config:set system/full_page_cache/caching_application 2
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
 

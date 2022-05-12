@@ -28,8 +28,6 @@
 namespace CrowdSec\Bouncer\Plugin;
 
 use Closure;
-use CrowdSecBouncer\BouncerException;
-use Exception;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\FrontControllerInterface;
 use Magento\Framework\App\RequestInterface;
@@ -39,6 +37,7 @@ use Magento\Framework\App\State;
 use CrowdSec\Bouncer\Helper\Data as HelperData;
 use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use Magento\Framework\Exception\LocalizedException;
+use Psr\Cache\InvalidArgumentException;
 
 /**
  * Plugin to handle controller request before Full Page Cache
@@ -102,6 +101,7 @@ class FrontController
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
      * @throws LocalizedException
+     * @throws InvalidArgumentException
      */
     public function aroundDispatch(
         FrontControllerInterface $subject,
@@ -116,20 +116,14 @@ class FrontController
         if (!$this->helper->isEnabled($this->state->getAreaCode())) {
             return $proceed($request);
         }
-
+        /**
+        * If there is any technical problem while bouncing, don't block the user.
+        * Bypass bouncing and log the  error.
+        *
+        */
         try {
-            // If there is any technical problem while bouncing, don't block the user. Bypass bouncing and log the
-            // error.
-            set_error_handler(function ($errno, $errstr) {
-                throw new BouncerException("$errstr (Error level: $errno)");
-            });
-
-            $result = $this->bounce($subject, $proceed, $request);
-
-            restore_error_handler();
-
-            return $result;
-        } catch (Exception $e) {
+            return $this->bounce($subject, $proceed, $request);
+        } catch (\Exception $e) {
             $this->helper->critical('', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
                 'message' => $e->getMessage(),
@@ -142,18 +136,19 @@ class FrontController
                 throw $e;
             }
 
-            restore_error_handler();
-
             return $proceed($request);
         }
     }
 
     /**
+     * Bounce process
+     *
      * @param FrontControllerInterface $subject
      * @param Closure $proceed
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
      * @throws LocalizedException
+     * @throws InvalidArgumentException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpUnusedParameterInspection
      */
@@ -167,11 +162,12 @@ class FrontController
             return $proceed($request);
         }
         $registryBouncer = $this->registryBouncer->create();
-        $registryBouncer->init();
+        $configs = $this->helper->getBouncerConfigs();
+        $registryBouncer->init($configs);
         $registryBouncer->run();
 
         // If ban or captcha remediation wall display is detected
-        if ($registryBouncer->getRemediationDisplay()) {
+        if ($registryBouncer->hasRemediationDisplay()) {
             // Stop further processing if your condition is met
             $this->actionFlag->set('', ActionInterface::FLAG_NO_DISPATCH, true);
 

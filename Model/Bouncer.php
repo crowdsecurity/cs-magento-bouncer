@@ -35,9 +35,11 @@ use CrowdSecBouncer\AbstractBounce;
 use CrowdSecBouncer\IBounce;
 use CrowdSecBouncer\Bouncer as BouncerInstance;
 use CrowdSecBouncer\BouncerFactory;
+use Psr\Cache\InvalidArgumentException;
 
 /**
  * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Bouncer extends AbstractBounce implements IBounce
 {
@@ -68,12 +70,18 @@ class Bouncer extends AbstractBounce implements IBounce
     /** @var  BouncerFactory */
     protected $bouncerInstanceFactory;
 
-    /** bool */
+    /** @var bool */
     protected $remediationDisplay = false;
 
-    /** @var array|null */
-    protected $bouncerConfigs;
-
+    /**
+     * Constructor
+     *
+     * @param Http $response
+     * @param Session $session
+     * @param Helper $helper
+     * @param CacheFactory $cacheFactory
+     * @param BouncerFactory $bouncerInstanceFactory
+     */
     public function __construct(
         Http $response,
         Session $session,
@@ -96,45 +104,51 @@ class Bouncer extends AbstractBounce implements IBounce
         $this->logger = $this->helper->getFinalLogger();
     }
 
+    /**
+     * Remediation display setter
+     *
+     * @param bool $value
+     * @return void
+     */
     public function setRemediationDisplay(bool $value): void
     {
         $this->remediationDisplay = $value;
     }
 
-    public function getRemediationDisplay(): bool
+    /**
+     * Remediation display getter
+     *
+     * @return bool
+     */
+    public function hasRemediationDisplay(): bool
     {
         return $this->remediationDisplay;
     }
 
     /**
      * Get the bouncer instance
-     * @param array $forcedConfigs
+     *
+     * @param array $settings
+     * @param bool $forceReload
      * @return BouncerInstance
-     * @throws CrowdSecException
      */
-    public function getBouncerInstance(array $forcedConfigs = []): BouncerInstance
+    public function getBouncerInstance(array $settings = [], bool $forceReload = false): BouncerInstance
     {
-        if ($this->bouncerInstance === null || !empty($forcedConfigs)) {
-            $configs = $this->helper->getBouncerConfigs();
-            // We replace configs by forced configs
-            if (is_array($forcedConfigs)) {
-                $configs = array_merge($configs, $forcedConfigs);
-            }
-            $this->bouncerConfigs = $configs;
-            $this->logger = $configs['logger'];
-            $this->setDisplayErrors($configs['display_errors']);
+        if ($this->bouncerInstance === null || $forceReload) {
+            $this->logger = $settings['logger'];
+            $this->setDisplayErrors($settings['display_errors']);
 
             try {
                 $cache = $this->cacheFactory->create();
                 $cacheAdapter = $cache->getAdapter(
-                    $configs['cache_system'],
-                    $configs['memcached_dsn'],
-                    $configs['redis_dsn'],
-                    $configs['fs_cache_path'],
-                    $configs['forced_cache_system']
+                    $settings['cache_system'],
+                    $settings['memcached_dsn'],
+                    $settings['redis_dsn'],
+                    $settings['fs_cache_path'],
+                    $settings['forced_cache_system']
                 );
             } catch (Exception $e) {
-                throw new CrowdSecException(__($e->getMessage()));
+                throw new CrowdSecException($e->getMessage());
             }
 
             try {
@@ -142,18 +156,36 @@ class Bouncer extends AbstractBounce implements IBounce
                     $this->bouncerInstanceFactory->create(
                         ['cacheAdapter' => $cacheAdapter, 'logger' => $this->logger ]
                     );
+
                 $bouncerInstance->configure([
-                    'api_key' => $configs['api_key'],
-                    'api_url' => $configs['api_url'],
-                    'api_user_agent' => $configs['api_user_agent'],
-                    'live_mode' => $configs['live_mode'],
-                    'max_remediation_level' => $configs['max_remediation_level'],
-                    'fallback_remediation' => $configs['fallback_remediation'],
-                    'cache_expiration_for_clean_ip' => $configs['clean_ip_duration'],
-                    'cache_expiration_for_bad_ip' => $configs['bad_ip_duration'],
+                    // LAPI connection
+                    'api_key' => $settings['api_key'],
+                    'api_url' => $settings['api_url'],
+                    'api_user_agent' => $settings['api_user_agent'],
+                    'api_timeout' => $settings['api_timeout'],
+                    // Debug
+                    'debug_mode' => $settings['debug_mode'],
+                    'log_directory_path' => $settings['log_directory_path'],
+                    'forced_test_ip' => $settings['forced_test_ip'],
+                    'display_errors' => $settings['display_errors'],
+                    // Bouncer
+                    'bouncing_level' => $settings['bouncing_level'],
+                    'trust_ip_forward_array' => $settings['trust_ip_forward_array'],
+                    'fallback_remediation' => $settings['fallback_remediation'],
+                    'max_remediation_level' => $settings['max_remediation_level'],
+                    // Cache settings
+                    'stream_mode' => $settings['stream_mode'],
+                    'cache_system' => $settings['cache_system'],
+                    'fs_cache_path' => $settings['fs_cache_path'],
+                    'redis_dsn' => $settings['redis_dsn'],
+                    'memcached_dsn' => $settings['memcached_dsn'],
+                    'clean_ip_cache_duration' => $settings['clean_ip_cache_duration'],
+                    'bad_ip_cache_duration' => $settings['bad_ip_cache_duration'],
+                    // Geolocation
+                    'geolocation' => $settings['geolocation']
                 ]);
             } catch (Exception $e) {
-                throw new CrowdSecException(__($e->getMessage()));
+                throw new CrowdSecException($e->getMessage());
             }
 
             $this->bouncerInstance = $bouncerInstance;
@@ -164,19 +196,24 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Initialize the bouncer instance
+     *
+     * @param array $configs
      * @param array $forcedConfigs
      * @return BouncerInstance
-     * @throws CrowdSecException
      */
-    public function init(array $forcedConfigs = []): BouncerInstance
+    public function init(array $configs, array $forcedConfigs = []): BouncerInstance
     {
-        $this->bouncer = $this->getBouncerInstance($forcedConfigs);
+        $this->settings = array_merge($configs, $forcedConfigs);
+        $this->bouncer = $this->getBouncerInstance($this->settings);
 
         return $this->bouncer;
     }
 
     /**
-     * @return string Ex: "X-Forwarded-For"
+     * Retrieve http header by its name
+     *
+     * @param string $name
+     * @return string|null
      */
     public function getHttpRequestHeader(string $name): ?string
     {
@@ -184,7 +221,9 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return string The current IP, even if it's the IP of a proxy
+     * Get the current IP, even if it's the IP of a proxy
+     *
+     * @return string
      */
     public function getRemoteIp(): string
     {
@@ -192,7 +231,9 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return string The current HTTP method
+     * Get the current HTTP method
+     *
+     * @return string
      */
     public function getHttpMethod(): string
     {
@@ -200,9 +241,9 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return array ['hide_crowdsec_mentions': bool, color:[text:['primary' : string, 'secondary' : string, 'button' :
-     *     string, 'error_message : string' ...]]] (returns an array of option required to build the captcha wall
-     *     template)
+     * Retrieve captcha wall options
+     *
+     * @return array
      */
     public function getCaptchaWallOptions(): array
     {
@@ -210,8 +251,9 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return array ['hide_crowdsec_mentions': bool, color:[text:['primary' : string, 'secondary' : string,
-     *     'error_message : string' ...]]] (returns an array of option required to build the ban wall template)
+     * Retrieve ban wall options
+     *
+     * @return array
      */
     public function getBanWallOptions(): array
     {
@@ -219,7 +261,9 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * @return array [[string, string], ...] Returns IP ranges to trust as proxies as an array of comparables ip bounds
+     * Retrieve IP ranges to trust as proxies as an array of comparables ip bounds
+     *
+     * @return array [[string, string], ...]
      */
     public function getTrustForwardedIpBoundsList(): array
     {
@@ -227,13 +271,21 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * Return a session variable, null if not set.
+     * Get session variable value
+     *
+     * @param string $name
+     * @return mixed
      */
     public function getSessionVariable(string $name)
     {
         return $this->session->getData($name);
     }
 
+    /**
+     * Get all session variables
+     *
+     * @return mixed
+     */
     public function getAllSessionVariables()
     {
         return $this->session->getData();
@@ -241,6 +293,10 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Set a session variable.
+     *
+     * @param string $name
+     * @param mixed $value
+     * @return void
      */
     public function setSessionVariable(string $name, $value): void
     {
@@ -250,7 +306,8 @@ class Bouncer extends AbstractBounce implements IBounce
     /**
      * Unset a session variable, throw an error if this does not exist.
      *
-     * @return void;
+     * @param string $name
+     * @return void
      */
     public function unsetSessionVariable(string $name): void
     {
@@ -259,6 +316,9 @@ class Bouncer extends AbstractBounce implements IBounce
 
     /**
      * Get the value of a posted field.
+     *
+     * @param string $name
+     * @return string|null
      */
     public function getPostedVariable(string $name): ?string
     {
@@ -270,20 +330,15 @@ class Bouncer extends AbstractBounce implements IBounce
      */
     public function shouldBounceCurrentIp(): bool
     {
-        $shouldBounce = $this->isConfigValid();
-        if (!$shouldBounce) {
-            $this->logger->warning('', [
-                'type' => 'M2_INVALID_BOUNCER_CONFIG',
-                'message' => 'No bouncing because bouncer config is not valid.',
-            ]);
-        }
-
-        return $shouldBounce;
+        return true;
     }
 
     /**
      * Send HTTP response.
-     * @throws CrowdSecException
+     *
+     * @param string|null $body
+     * @param int $statusCode
+     * @return void
      */
     public function sendResponse(?string $body, int $statusCode = 200): void
     {
@@ -304,7 +359,7 @@ class Bouncer extends AbstractBounce implements IBounce
                 $this->response->setHeader('cache-control', $noCacheControl);
                 break;
             default:
-                throw new CrowdSecException(__("Unhandled code $statusCode"));
+                throw new CrowdSecException("Unhandled code $statusCode");
         }
         if (null !== $body) {
             $this->setRemediationDisplay(true);
@@ -315,14 +370,32 @@ class Bouncer extends AbstractBounce implements IBounce
     }
 
     /**
-     * Check if the bouncer configuration is correct or not.
+     * If there is any technical problem while bouncing, don't block the user.
+     *
+     * Bypass bouncing and log the error.
+     *
+     * @param array $configs
+     * @return bool
+     * @throws InvalidArgumentException
      */
-    public function isConfigValid(): bool
+    public function safelyBounce(array $configs): bool
     {
         $result = false;
-        $configs = $this->bouncerConfigs;
-        if (is_array($configs) && !empty($configs['api_url']) && !empty($configs['api_key'])) {
+        try {
+            $this->init($configs);
+            $this->run();
             $result = true;
+        } catch (CrowdSecException $e) {
+            $this->logger->error('', [
+                'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            if ($this->displayErrors) {
+                throw $e;
+            }
         }
 
         return $result;

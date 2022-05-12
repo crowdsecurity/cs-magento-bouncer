@@ -40,9 +40,17 @@ class AccountManagement extends Event implements EventInterface
      * @var string
      */
     protected $type = 'CUSTOMER_LOGIN_PROCESS';
-
+    /**
+     * @var string
+     */
     protected $process = 'customer_login';
 
+    /**
+     * Get event data
+     *
+     * @param array $objects
+     * @return array
+     */
     public function getEventData($objects = []): array
     {
         return [];

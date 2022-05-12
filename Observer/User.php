@@ -35,12 +35,20 @@ use CrowdSec\Bouncer\Event\EventInterface;
 class User extends Event implements EventInterface, ObserverInterface
 {
 
+    /**
+     * Get event data
+     *
+     * @param array $objects
+     * @return array
+     */
     public function getEventData($objects = []): array
     {
         return [];
     }
 
     /**
+     * Event observer execution
+     *
      * @param Observer $observer
      * @return $this
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)

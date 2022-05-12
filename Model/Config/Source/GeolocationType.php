@@ -24,11 +24,20 @@
  * @author   CrowdSec team
  *
  */
+namespace CrowdSec\Bouncer\Model\Config\Source;
 
-namespace CrowdSec\Bouncer\Exception;
+use CrowdSec\Bouncer\Constants;
+use Magento\Framework\Data\OptionSourceInterface;
 
-use CrowdSecBouncer\BouncerException;
-
-class CrowdSecException extends BouncerException
+class GeolocationType implements OptionSourceInterface
 {
+    /**
+     * Options getter
+     *
+     * @return array
+     */
+    public function toOptionArray(): array
+    {
+        return [['value' => Constants::GEOLOCATION_TYPE_MAXMIND, 'label' => __('MaxMind')]];
+    }
 }

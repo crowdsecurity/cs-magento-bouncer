@@ -27,6 +27,8 @@
 
 namespace CrowdSec\Bouncer\Helper;
 
+use CrowdSec\Bouncer\Constants;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -34,80 +36,99 @@ use Magento\Framework\App\Helper\Context;
 
 class Config extends AbstractHelper
 {
-    const SECTION = 'crowdsec_bouncer';
-    const API_URL_FULL_PATH = 'groups/general/groups/connection/fields/api_url/value';
-    const API_KEY_FULL_PATH = 'groups/general/groups/connection/fields/api_key/value';
-    const MEMCACHED_DSN_FULL_PATH = 'groups/advanced/groups/cache/fields/memcached_dsn/value';
-    const REDIS_DSN_FULL_PATH = 'groups/advanced/groups/cache/fields/redis_dsn/value';
-    const CACHE_TECHNOLOGY_FULL_PATH = 'groups/advanced/groups/cache/fields/technology/value';
-    const STREAM_MODE_FULL_PATH = 'groups/advanced/groups/mode/fields/stream/value';
-    const REFRESH_CRON_EXPR_FULL_PATH = 'groups/advanced/groups/mode/fields/refresh_cron_expr/value';
-    const PRUNE_CRON_EXPR_FULL_PATH = 'groups/advanced/groups/cache/fields/prune_cron_expr/value';
+    public const SECTION = 'crowdsec_bouncer';
+    public const API_URL_FULL_PATH = 'groups/general/groups/connection/fields/api_url/value';
+    public const API_KEY_FULL_PATH = 'groups/general/groups/connection/fields/api_key/value';
+    public const MEMCACHED_DSN_FULL_PATH = 'groups/advanced/groups/cache/fields/memcached_dsn/value';
+    public const REDIS_DSN_FULL_PATH = 'groups/advanced/groups/cache/fields/redis_dsn/value';
+    public const CACHE_TECHNOLOGY_FULL_PATH = 'groups/advanced/groups/cache/fields/technology/value';
+    public const STREAM_MODE_FULL_PATH = 'groups/advanced/groups/mode/fields/stream/value';
+    public const REFRESH_CRON_EXPR_FULL_PATH = 'groups/advanced/groups/mode/fields/refresh_cron_expr/value';
+    public const PRUNE_CRON_EXPR_FULL_PATH = 'groups/advanced/groups/cache/fields/prune_cron_expr/value';
 
     // General configs
-    const XML_PATH_API_URL = self::SECTION . '/general/connection/api_url';
-    const XML_PATH_API_KEY = self::SECTION . '/general/connection/api_key';
-    const XML_PATH_FRONT_ENABLED = self::SECTION . '/general/bouncing/front_enabled';
-    const XML_PATH_ADMIN_ENABLED = self::SECTION . '/general/bouncing/admin_enabled';
-    const XML_PATH_API_ENABLED = self::SECTION . '/general/bouncing/api_enabled';
-    const XML_PATH_BOUNCING_LEVEL = self::SECTION . '/general/bouncing/level';
+    public const XML_PATH_API_URL = self::SECTION . '/general/connection/api_url';
+    public const XML_PATH_API_KEY = self::SECTION . '/general/connection/api_key';
+    public const XML_PATH_FRONT_ENABLED = self::SECTION . '/general/bouncing/front_enabled';
+    public const XML_PATH_ADMIN_ENABLED = self::SECTION . '/general/bouncing/admin_enabled';
+    public const XML_PATH_API_ENABLED = self::SECTION . '/general/bouncing/api_enabled';
+    public const XML_PATH_BOUNCING_LEVEL = self::SECTION . '/general/bouncing/level';
     // Theme configs
-    const XML_PATH_THEME_CAPTCHA_TAB_TITLE = self::SECTION . '/theme/captcha/wall_tab_title';
-    const XML_PATH_THEME_CAPTCHA_TITLE = self::SECTION . '/theme/captcha/wall_title';
-    const XML_PATH_THEME_CAPTCHA_SUBTITLE = self::SECTION . '/theme/captcha/wall_subtitle';
-    const XML_PATH_THEME_CAPTCHA_REFRESH_LINK = self::SECTION . '/theme/captcha/wall_refresh_image_link';
-    const XML_PATH_THEME_CAPTCHA_PLACEHOLDER = self::SECTION . '/theme/captcha/wall_input_placeholder';
-    const XML_PATH_THEME_CAPTCHA_SEND_BUTTON = self::SECTION . '/theme/captcha/wall_send_button';
-    const XML_PATH_THEME_CAPTCHA_ERROR_MESSAGE = self::SECTION . '/theme/captcha/wall_error_message';
-    const XML_PATH_THEME_CAPTCHA_FOOTER = self::SECTION . '/theme/captcha/wall_footer';
-    const XML_PATH_THEME_BAN_TAB_TITLE = self::SECTION . '/theme/ban/wall_tab_title';
-    const XML_PATH_THEME_BAN_TITLE = self::SECTION . '/theme/ban/wall_title';
-    const XML_PATH_THEME_BAN_SUBTITLE = self::SECTION . '/theme/ban/wall_subtitle';
-    const XML_PATH_THEME_BAN_FOOTER = self::SECTION . '/theme/ban/wall_footer';
-    const XML_PATH_THEME_CUSTOM_CSS = self::SECTION . '/theme/css/custom';
-    const XML_PATH_THEME_COLOR_PRIMARY = self::SECTION . '/theme/color/text_primary';
-    const XML_PATH_THEME_COLOR_SECOND = self::SECTION . '/theme/color/text_secondary';
-    const XML_PATH_THEME_COLOR_TEXT_BUTTON = self::SECTION . '/theme/color/text_button';
-    const XML_PATH_THEME_COLOR_TEXT_ERROR = self::SECTION . '/theme/color/text_error_message';
-    const XML_PATH_THEME_COLOR_BG_PAGE = self::SECTION . '/theme/color/background_page';
-    const XML_PATH_THEME_COLOR_BG_CONTAINER = self::SECTION . '/theme/color/background_container';
-    const XML_PATH_THEME_COLOR_BG_BUTTON = self::SECTION . '/theme/color/background_button';
-    const XML_PATH_THEME_COLOR_BG_BUTTON_HOVER = self::SECTION . '/theme/color/background_button_hover';
+    public const XML_PATH_THEME_CAPTCHA_TAB_TITLE = self::SECTION . '/theme/captcha/wall_tab_title';
+    public const XML_PATH_THEME_CAPTCHA_TITLE = self::SECTION . '/theme/captcha/wall_title';
+    public const XML_PATH_THEME_CAPTCHA_SUBTITLE = self::SECTION . '/theme/captcha/wall_subtitle';
+    public const XML_PATH_THEME_CAPTCHA_REFRESH_LINK = self::SECTION . '/theme/captcha/wall_refresh_image_link';
+    public const XML_PATH_THEME_CAPTCHA_PLACEHOLDER = self::SECTION . '/theme/captcha/wall_input_placeholder';
+    public const XML_PATH_THEME_CAPTCHA_SEND_BUTTON = self::SECTION . '/theme/captcha/wall_send_button';
+    public const XML_PATH_THEME_CAPTCHA_ERROR_MESSAGE = self::SECTION . '/theme/captcha/wall_error_message';
+    public const XML_PATH_THEME_CAPTCHA_FOOTER = self::SECTION . '/theme/captcha/wall_footer';
+    public const XML_PATH_THEME_BAN_TAB_TITLE = self::SECTION . '/theme/ban/wall_tab_title';
+    public const XML_PATH_THEME_BAN_TITLE = self::SECTION . '/theme/ban/wall_title';
+    public const XML_PATH_THEME_BAN_SUBTITLE = self::SECTION . '/theme/ban/wall_subtitle';
+    public const XML_PATH_THEME_BAN_FOOTER = self::SECTION . '/theme/ban/wall_footer';
+    public const XML_PATH_THEME_CUSTOM_CSS = self::SECTION . '/theme/css/custom';
+    public const XML_PATH_THEME_COLOR_PRIMARY = self::SECTION . '/theme/color/text_primary';
+    public const XML_PATH_THEME_COLOR_SECOND = self::SECTION . '/theme/color/text_secondary';
+    public const XML_PATH_THEME_COLOR_TEXT_BUTTON = self::SECTION . '/theme/color/text_button';
+    public const XML_PATH_THEME_COLOR_TEXT_ERROR = self::SECTION . '/theme/color/text_error_message';
+    public const XML_PATH_THEME_COLOR_BG_PAGE = self::SECTION . '/theme/color/background_page';
+    public const XML_PATH_THEME_COLOR_BG_CONTAINER = self::SECTION . '/theme/color/background_container';
+    public const XML_PATH_THEME_COLOR_BG_BUTTON = self::SECTION . '/theme/color/background_button';
+    public const XML_PATH_THEME_COLOR_BG_BUTTON_HOVER = self::SECTION . '/theme/color/background_button_hover';
     // Advanced configs
-    const XML_PATH_ADVANCED_HIDE_MENTIONS = self::SECTION . '/advanced/remediation/hide_mentions';
-    const XML_PATH_ADVANCED_REMEDIATION_FALLBACK = self::SECTION . '/advanced/remediation/fallback';
-    const XML_PATH_ADVANCED_MODE_STREAM = self::SECTION . '/advanced/mode/stream';
-    const XML_PATH_ADVANCED_REFRESH_CRON_EXPR = self::SECTION . '/advanced/mode/refresh_cron_expr';
-    const XML_PATH_ADVANCED_PRUNE_CRON_EXPR = self::SECTION . '/advanced/cache/prune_cron_expr';
-    const XML_PATH_ADVANCED_CACHE_TECHNOLOGY = self::SECTION . '/advanced/cache/technology';
-    const XML_PATH_ADVANCED_CACHE_REDIS_DSN = self::SECTION . '/advanced/cache/redis_dsn';
-    const XML_PATH_ADVANCED_CACHE_MEMCACHED_DSN = self::SECTION . '/advanced/cache/memcached_dsn';
-    const XML_PATH_ADVANCED_CACHE_CLEAN = self::SECTION . '/advanced/cache/clean_ip_cache_duration';
-    const XML_PATH_ADVANCED_CACHE_BAD = self::SECTION . '/advanced/cache/bad_ip_cache_duration';
-    const XML_PATH_ADVANCED_DEBUG_LOG = self::SECTION . '/advanced/debug/log';
-    const XML_PATH_ADVANCED_DISPLAY_ERRORS = self::SECTION . '/advanced/debug/display_errors';
-    const XML_PATH_ADVANCED_DISABLE_PROD_LOG = self::SECTION . '/advanced/debug/disable_prod_log';
+    public const XML_PATH_ADVANCED_HIDE_MENTIONS = self::SECTION . '/advanced/remediation/hide_mentions';
+    public const XML_PATH_ADVANCED_REMEDIATION_FALLBACK = self::SECTION . '/advanced/remediation/fallback';
+    public const XML_PATH_ADVANCED_MODE_STREAM = self::SECTION . '/advanced/mode/stream';
+    public const XML_PATH_ADVANCED_REFRESH_CRON_EXPR = self::SECTION . '/advanced/mode/refresh_cron_expr';
+    public const XML_PATH_ADVANCED_PRUNE_CRON_EXPR = self::SECTION . '/advanced/cache/prune_cron_expr';
+    public const XML_PATH_ADVANCED_CACHE_TECHNOLOGY = self::SECTION . '/advanced/cache/technology';
+    public const XML_PATH_ADVANCED_CACHE_REDIS_DSN = self::SECTION . '/advanced/cache/redis_dsn';
+    public const XML_PATH_ADVANCED_CACHE_MEMCACHED_DSN = self::SECTION . '/advanced/cache/memcached_dsn';
+    public const XML_PATH_ADVANCED_CACHE_CLEAN = self::SECTION . '/advanced/cache/clean_ip_cache_duration';
+    public const XML_PATH_ADVANCED_CACHE_BAD = self::SECTION . '/advanced/cache/bad_ip_cache_duration';
+    public const XML_PATH_ADVANCED_DEBUG_LOG = self::SECTION . '/advanced/debug/log';
+    public const XML_PATH_ADVANCED_DISPLAY_ERRORS = self::SECTION . '/advanced/debug/display_errors';
+    public const XML_PATH_ADVANCED_DISABLE_PROD_LOG = self::SECTION . '/advanced/debug/disable_prod_log';
+    public const XML_PATH_ADVANCED_FORCED_TEST_IP = self::SECTION . '/advanced/debug/forced_test_ip';
+
+    public const XML_PATH_ADVANCED_GEOLOCATION_ENABLED = self::SECTION . '/advanced/geolocation/enabled';
+    public const XML_PATH_ADVANCED_GEOLOCATION_TYPE = self::SECTION . '/advanced/geolocation/type';
+    public const XML_PATH_ADVANCED_GEOLOCATION_SAVE_SESSION = self::SECTION . '/advanced/geolocation/save_in_session';
+    public const XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_TYPE = self::SECTION .
+                                                                 '/advanced/geolocation/maxmind_database_type';
+    public const XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_PATH = self::SECTION .
+                                                                 '/advanced/geolocation/maxmind_database_path';
+
     // Events configs
-    const XML_PATH_EVENTS_LOG_ROOT = self::SECTION . '/events/log/';
+    public const XML_PATH_EVENTS_LOG_ROOT = self::SECTION . '/events/log/';
 
     /**
      * The path of trusted forward ips as array setting
      */
-    const TRUSTED_FORWARD_IPS_PATH = self::SECTION . '/advanced/remediation/trust_ip_forward_array';
+    public const TRUSTED_FORWARD_IPS_PATH = self::SECTION . '/advanced/remediation/trust_ip_forward_array';
 
-    const TEXT_SEPARATOR = ',';
+    public const TEXT_SEPARATOR = ',';
 
     /**
      * @var Json
      */
     private $serializer;
 
+    /**
+     * @var DirectoryList
+     */
+    private $directoryList;
+
+    /**
+     * @var array
+     */
     protected $_globals = [
         'api_url' => null,
         'api_key' => null,
         'is_admin_enabled' => null,
         'is_api_enabled' => null,
         'is_debug_log' => null,
+        'forced_test_ip' => null,
         'can_display_errors' => null,
         'is_prod_log_disabled' => null,
         'is_events_log_enabled' => [],
@@ -119,9 +140,12 @@ class Config extends AbstractHelper
         'memcached_dsn' => null,
         'clean_ip_duration' => null,
         'bad_ip_duration' => null,
-        'trusted_forwarded_ip' => null
+        'trusted_forwarded_ip' => null,
+        'geolocation' => null,
     ];
-
+    /**
+     * @var null[]
+     */
     protected $_storeviews = [
         'is_front_enabled' => null,
         'bouncing_level' => null,
@@ -130,19 +154,24 @@ class Config extends AbstractHelper
 
     /**
      * Data constructor.
+     *
      * @param Context $context
      * @param Json $serializer
+     * @param DirectoryList $directoryList
      */
     public function __construct(
         Context $context,
-        Json $serializer
+        Json $serializer,
+        DirectoryList $directoryList
     ) {
         parent::__construct($context);
         $this->serializer = $serializer;
+        $this->directoryList = $directoryList;
     }
 
     /**
      * Get api url config
+     *
      * @return string
      */
     public function getApiUrl(): string
@@ -151,11 +180,12 @@ class Config extends AbstractHelper
             $this->_globals['api_url'] = trim((string)$this->scopeConfig->getValue(self::XML_PATH_API_URL));
         }
 
-        return $this->_globals['api_url'];
+        return (string) $this->_globals['api_url'];
     }
 
     /**
      * Get api key config
+     *
      * @return string
      */
     public function getApiKey(): string
@@ -164,11 +194,12 @@ class Config extends AbstractHelper
             $this->_globals['api_key'] = trim((string)$this->scopeConfig->getValue(self::XML_PATH_API_KEY));
         }
 
-        return $this->_globals['api_key'];
+        return (string) $this->_globals['api_key'];
     }
 
     /**
      * Get enabled config for front
+     *
      * @return bool
      */
     public function isFrontEnabled(): bool
@@ -180,11 +211,12 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_storeviews['is_front_enabled'];
+        return (bool) $this->_storeviews['is_front_enabled'];
     }
 
     /**
      * Get enabled config for admin
+     *
      * @return bool
      */
     public function isAdminEnabled(): bool
@@ -193,11 +225,12 @@ class Config extends AbstractHelper
             $this->_globals['is_admin_enabled'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_ADMIN_ENABLED);
         }
 
-        return $this->_globals['is_admin_enabled'];
+        return (bool) $this->_globals['is_admin_enabled'];
     }
 
     /**
      * Get enabled config for api
+     *
      * @return bool
      */
     public function isApiEnabled(): bool
@@ -206,11 +239,12 @@ class Config extends AbstractHelper
             $this->_globals['is_api_enabled'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_API_ENABLED);
         }
 
-        return $this->_globals['is_api_enabled'];
+        return (bool) $this->_globals['is_api_enabled'];
     }
 
     /**
      * Get debug log enabled config
+     *
      * @return bool
      */
     public function isDebugLog(): bool
@@ -219,11 +253,12 @@ class Config extends AbstractHelper
             $this->_globals['is_debug_log'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_DEBUG_LOG);
         }
 
-        return $this->_globals['is_debug_log'];
+        return (bool) $this->_globals['is_debug_log'];
     }
 
     /**
      * Get prod log deactivation config
+     *
      * @return bool
      */
     public function isProdLogDisabled(): bool
@@ -233,11 +268,12 @@ class Config extends AbstractHelper
                 (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_DISABLE_PROD_LOG);
         }
 
-        return $this->_globals['is_prod_log_disabled'];
+        return (bool) $this->_globals['is_prod_log_disabled'];
     }
 
     /**
      * Get events log enabled config
+     *
      * @param string $process
      * @return bool
      */
@@ -249,11 +285,12 @@ class Config extends AbstractHelper
                 $enabled && $this->scopeConfig->getValue(self::XML_PATH_EVENTS_LOG_ROOT . $process);
         }
 
-        return $this->_globals['is_events_log_enabled'][$process];
+        return (bool) $this->_globals['is_events_log_enabled'][$process];
     }
 
     /**
      * Get display errors config
+     *
      * @return bool
      */
     public function canDisplayErrors(): bool
@@ -263,11 +300,12 @@ class Config extends AbstractHelper
                 (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_DISPLAY_ERRORS);
         }
 
-        return $this->_globals['can_display_errors'];
+        return (bool) $this->_globals['can_display_errors'];
     }
 
     /**
      * Get bouncing level config
+     *
      * @return string
      */
     public function getBouncingLevel(): string
@@ -279,11 +317,72 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_storeviews['bouncing_level'];
+        return (string) $this->_storeviews['bouncing_level'];
+    }
+
+    /**
+     * Get the geolocation database absolute path
+     *
+     * @param string $relativePath
+     * @return string
+     * @throws \Magento\Framework\Exception\FileSystemException
+     */
+    public function getGeolocationDatabaseFullPath(string $relativePath): string
+    {
+        return $this->directoryList->getPath(DirectoryList::VAR_DIR) . '/' . ltrim($relativePath, '/');
+    }
+
+    /**
+     * Get geolocation config
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\FileSystemException
+     */
+    public function getGeolocation(): array
+    {
+        if (!isset($this->_globals['geolocation'])) {
+            $result = ['enabled' => false];
+            if ($this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_ENABLED)) {
+                $result['enabled'] = true;
+                $result['save_in_session'] =
+                    (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_SAVE_SESSION);
+                $type = (string)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_TYPE);
+                $result['type'] = $type;
+                if ($type === Constants::GEOLOCATION_TYPE_MAXMIND) {
+                    $result[$type]['database_type'] =
+                        (string)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_TYPE);
+                    $result[$type]['database_path'] =
+                        $this->getGeolocationDatabaseFullPath(
+                            $this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_PATH)
+                        );
+                }
+            }
+
+            $this->_globals['geolocation'] = $result;
+        }
+
+        return (array)$this->_globals['geolocation'];
+    }
+
+    /**
+     * Get forced test ip config
+     *
+     * @return string
+     */
+    public function getForcedTestIp(): string
+    {
+        if (!isset($this->_globals['forced_test_ip'])) {
+            $this->_globals['forced_test_ip'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_ADVANCED_FORCED_TEST_IP
+            );
+        }
+
+        return (string) $this->_globals['forced_test_ip'];
     }
 
     /**
      * Get stream mode config
+     *
      * @return bool
      */
     public function isStreamModeEnabled(): bool
@@ -292,11 +391,12 @@ class Config extends AbstractHelper
             $this->_globals['is_stream_mode'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_MODE_STREAM);
         }
 
-        return $this->_globals['is_stream_mode'];
+        return (bool) $this->_globals['is_stream_mode'];
     }
 
     /**
      * Get refresh cron schedule expression config
+     *
      * @return string
      */
     public function getRefreshCronExpr(): string
@@ -307,11 +407,12 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['refresh_cron_expr'];
+        return (string) $this->_globals['refresh_cron_expr'];
     }
 
     /**
      * Get pruning cron schedule expression config
+     *
      * @return string
      */
     public function getPruneCronExpr(): string
@@ -322,11 +423,12 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['prune_cron_expr'];
+        return (string) $this->_globals['prune_cron_expr'];
     }
 
     /**
      * Get cache technology config
+     *
      * @return string
      */
     public function getCacheTechnology(): string
@@ -337,11 +439,12 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['cache_technology'];
+        return (string) $this->_globals['cache_technology'];
     }
 
     /**
      * Get Redis DSN config
+     *
      * @return string
      */
     public function getRedisDSN(): string
@@ -352,11 +455,12 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['redis_dsn'];
+        return (string) $this->_globals['redis_dsn'];
     }
 
     /**
      * Get Memcached DSN config
+     *
      * @return string
      */
     public function getMemcachedDSN(): string
@@ -367,11 +471,12 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['memcached_dsn'];
+        return (string) $this->_globals['memcached_dsn'];
     }
 
     /**
      * Get clean ip cache duration config
+     *
      * @return int
      */
     public function getCleanIpCacheDuration(): int
@@ -382,11 +487,12 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['clean_ip_duration'];
+        return (int) $this->_globals['clean_ip_duration'];
     }
 
     /**
      * Get bad ip cache duration config
+     *
      * @return int
      */
     public function getBadIpCacheDuration(): int
@@ -397,11 +503,12 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_globals['bad_ip_duration'];
+        return (int) $this->_globals['bad_ip_duration'];
     }
 
     /**
      * Get bouncing level config
+     *
      * @return string
      */
     public function getRemediationFallback(): string
@@ -413,14 +520,15 @@ class Config extends AbstractHelper
             );
         }
 
-        return $this->_storeviews['remediation_fallback'];
+        return (string) $this->_storeviews['remediation_fallback'];
     }
 
     /**
      * Get trusted forwarded ips config
-     * @return mixed
+     *
+     * @return array
      */
-    public function getTrustedForwardedIps()
+    public function getTrustedForwardedIps(): array
     {
         if (!isset($this->_globals['trusted_forwarded_ip'])) {
             $trustedForwardedIps = $this->scopeConfig->getValue(self::TRUSTED_FORWARD_IPS_PATH);
@@ -429,6 +537,6 @@ class Config extends AbstractHelper
                 !empty($trustedForwardedIps) ? $this->serializer->unserialize($trustedForwardedIps) : [];
         }
 
-        return $this->_globals['trusted_forwarded_ip'];
+        return (array) $this->_globals['trusted_forwarded_ip'];
     }
 }

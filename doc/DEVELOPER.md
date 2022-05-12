@@ -50,11 +50,16 @@ release._
 
 #### DDEV installation
 
-Please follow the [official instructions](https://ddev.readthedocs.io/en/stable/#installation). On a Linux 
-distribution, this should be as simple as
-
-    sudo apt-get install linuxbrew-wrapper
-    brew tap drud/ddev && brew install ddev
+This project is fully compatible with DDEV 1.18.2 and it is recommended to use this specific version.
+For the DDEV installation, please follow the [official instructions](https://ddev.readthedocs.io/en/stable/#installation).
+On a Linux distribution, you can run:
+```
+sudo apt-get -qq update
+sudo apt-get -qq -y install libnss3-tools
+curl -LO https://raw.githubusercontent.com/drud/ddev/master/scripts/install_ddev.sh
+bash install_ddev.sh v1.18.2
+rm install_ddev.sh
+```
 
 
 #### DDEV Magento 2 environment
@@ -95,14 +100,14 @@ git clone git@github.com:julienloizelet/ddev-m2.git ./
 - Copy some configurations file:
 
 ```      
-cp .ddev/config_overrides/config.m243.yaml .ddev/config.m243.yaml
-cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
-cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-compose.playwright.yaml
+cp config_overrides/config.m243.yaml config.m243.yaml
+cp additional_docker_compose/docker-compose.crowdsec.yaml docker-compose.crowdsec.yaml
+cp additional_docker_compose/docker-compose.playwright.yaml docker-compose.playwright.yaml
 ```
 
 - Launch DDEV
 ```
-cd .ddev && ddev start
+ddev start
 ```
  This should take some times on the first launch as this will download all necessary docker images.
 
@@ -144,9 +149,9 @@ You will need your Magento 2 credentials to install the source code.
 
 #### CrowdSec Bouncer extension installation
 
-     mkdir m2-sources/my-own-modules
-     mkdir m2-sources/my-own-modules/crowdsec-bouncer
-     cd m2-sources/my-own-modules/crowdsec-bouncer
+     cd m2-sources
+     mkdir -p my-own-modules/crowdsec-bouncer
+     cd my-own-modules/crowdsec-bouncer
      git clone git@github.com:crowdsecurity/cs-magento-bouncer.git ./
      ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
      ddev composer require crowdsec/magento2-module-bouncer:@dev

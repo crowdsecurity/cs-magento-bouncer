@@ -25,10 +25,23 @@
  *
  */
 
-namespace CrowdSec\Bouncer\Exception;
+namespace CrowdSec\Bouncer\Model\Config\Source;
 
-use CrowdSecBouncer\BouncerException;
+use CrowdSec\Bouncer\Constants;
+use Magento\Framework\Data\OptionSourceInterface;
 
-class CrowdSecException extends BouncerException
+class MaxMindDatabaseType implements OptionSourceInterface
 {
+    /**
+     * Options getter
+     *
+     * @return array
+     */
+    public function toOptionArray(): array
+    {
+        return [
+            ['value' => Constants::MAXMIND_COUNTRY, 'label' => __('Country')],
+            ['value' => Constants::MAXMIND_CITY, 'label' => __('City')]
+        ];
+    }
 }

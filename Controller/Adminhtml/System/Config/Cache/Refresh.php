@@ -35,6 +35,7 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
+use Psr\Cache\InvalidArgumentException;
 
 class Refresh extends Action implements HttpPostActionInterface
 {
@@ -75,6 +76,7 @@ class Refresh extends Action implements HttpPostActionInterface
      * Refresh cache
      *
      * @return Json
+     * @throws InvalidArgumentException
      */
     public function execute(): Json
     {
@@ -82,8 +84,8 @@ class Refresh extends Action implements HttpPostActionInterface
             if (!($bouncer = $this->registryBouncer->get())) {
                 $bouncer = $this->registryBouncer->create();
             }
-
-            $refresh = $bouncer->init()->refreshBlocklistCache();
+            $configs = $this->helper->getBouncerConfigs();
+            $refresh = $bouncer->init($configs)->refreshBlocklistCache();
             $new = $refresh['new']??0;
             $deleted = $refresh['deleted']??0;
             $cacheSystem = $this->helper->getCacheTechnology();

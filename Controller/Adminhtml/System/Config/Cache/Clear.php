@@ -83,7 +83,8 @@ class Clear extends Action implements HttpPostActionInterface
                 $bouncer = $this->registryBouncer->create();
             }
 
-            $bouncer = $bouncer->init();
+            $configs = $this->helper->getBouncerConfigs();
+            $bouncer = $bouncer->init($configs);
             $result = (int) $bouncer->clearCache();
             $cacheSystem = $this->helper->getCacheTechnology();
             $cacheOptions = $this->helper->getCacheSystemOptions();

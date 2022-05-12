@@ -26,6 +26,7 @@
  */
 namespace CrowdSec\Bouncer\Logger\Handlers;
 
+use CrowdSec\Bouncer\Constants;
 use Magento\Framework\Logger\Handler\Base;
 use Monolog\Logger;
 
@@ -38,8 +39,7 @@ class Prod extends Base
     protected $loggerType = Logger::INFO;
 
     /**
-     * File name
      * @var string
      */
-    protected $fileName = '/var/log/crowdsec-bouncer-prod.log';
+    protected $fileName = Constants::CROWDSEC_LOG_PATH. '/crowdsec-bouncer-prod.log';
 }

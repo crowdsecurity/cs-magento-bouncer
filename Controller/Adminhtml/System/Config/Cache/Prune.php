@@ -83,8 +83,9 @@ class Prune extends Action implements HttpPostActionInterface
             if (!($bouncer = $this->registryBouncer->get())) {
                 $bouncer = $this->registryBouncer->create();
             }
-
-            $result = (int) $bouncer->init(['forced_cache_system' => Constants::CACHE_SYSTEM_PHPFS])->pruneCache();
+            $configs= $this->helper->getBouncerConfigs();
+            $result = (int) $bouncer->init($configs, ['forced_cache_system' => Constants::CACHE_SYSTEM_PHPFS])
+                ->pruneCache();
             $cacheOptions = $this->helper->getCacheSystemOptions();
             $cacheLabel = $cacheOptions[Constants::CACHE_SYSTEM_PHPFS] ?? __('Unknown');
             $message = __('CrowdSec cache (%1) has been pruned.', $cacheLabel);

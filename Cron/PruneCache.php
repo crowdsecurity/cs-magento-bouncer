@@ -14,9 +14,16 @@ class PruneCache
      */
     protected $helper;
     /**
+     * @var RegistryBouncer
      */
     protected $registryBouncer;
 
+    /**
+     * Constructor
+     *
+     * @param Helper $helper
+     * @param RegistryBouncer $registryBouncer
+     */
     public function __construct(Helper $helper, RegistryBouncer $registryBouncer)
     {
         $this->helper = $helper;
@@ -24,15 +31,18 @@ class PruneCache
     }
 
     /**
-     * Prune file system cache
+     *  Prune file system cache
      *
+     * @return void
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function execute(): void
     {
         if ($this->helper->getCacheTechnology() === Constants::CACHE_SYSTEM_PHPFS) {
             try {
                 $bouncer = $this->registryBouncer->create();
-                $bouncer->init()->pruneCache();
+                $configs = $this->helper->getBouncerConfigs();
+                $bouncer->init($configs)->pruneCache();
             } catch (CrowdSecException $e) {
                 $this->helper->error('', [
                     'type' => 'M2_EXCEPTION_WHILE_PRUNING_CACHE',

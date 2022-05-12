@@ -24,21 +24,43 @@ class CurrentBouncer
      */
     private $bouncerFactory;
 
+    /**
+     * Constructor
+     *
+     * @param BouncerFactory $bouncerFactory
+     */
     public function __construct(BouncerFactory $bouncerFactory)
     {
         $this->bouncerFactory = $bouncerFactory;
     }
 
+    /**
+     * Set a bouncer as a registry bouncer
+     *
+     * @param BouncerModel $bouncer
+     * @return void
+     */
     public function set(BouncerModel $bouncer): void
     {
         $this->bouncer = $bouncer;
     }
 
+    /**
+     * Retrieve the registered bouncer if any
+     *
+     * @return BouncerModel|null
+     */
     public function get(): ?BouncerModel
     {
         return $this->bouncer;
     }
 
+    /**
+     * Create a bouncer and set the result as the current registered bouncer
+     *
+     * @param array $data
+     * @return BouncerModel
+     */
     public function create(array $data = []): BouncerModel
     {
         $bouncer =  $this->bouncerFactory->create($data);

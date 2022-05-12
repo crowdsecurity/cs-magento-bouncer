@@ -47,6 +47,12 @@ class AccountCreatePostController extends Event implements EventInterface
      */
     protected $process = 'customer_register';
 
+    /**
+     * Event data
+     *
+     * @param array $objects
+     * @return array
+     */
     public function getEventData($objects = []): array
     {
         return [];

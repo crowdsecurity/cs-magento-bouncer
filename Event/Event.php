@@ -56,6 +56,11 @@ class Event
      */
     protected $process = '';
 
+    /**
+     * Constructor
+     *
+     * @param Helper $helper
+     */
     public function __construct(
         Helper $helper
     ) {
@@ -64,6 +69,7 @@ class Event
 
     /**
      * Common data for all events
+     *
      * @return array
      */
     public function getBaseData(): array
@@ -77,6 +83,8 @@ class Event
     }
 
     /**
+     * Retrieve json schema from some file
+     *
      * @param string $path
      * @return SchemaContract
      * @throws InvalidValue
@@ -94,6 +102,7 @@ class Event
 
     /**
      * Check if data event is compliant with json schema
+     *
      * @param array $eventData
      * @return bool
      */

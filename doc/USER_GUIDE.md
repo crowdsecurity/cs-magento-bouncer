@@ -130,11 +130,11 @@ mode makes it possible to never ban an IP but only to offer a Captcha, in the wo
  In the `Theme customizations` part, you can modify texts and colors of ban and captcha walls. All fields here are 
  store view scoped, so you can use different languages and designs.
 
-![Captcha customization](images/screenshots/config-captcha-wall.jpg)
+![Captcha wall customization](images/screenshots/config-captcha-wall.jpg)
 
-![Captcha customization](images/screenshots/config-ban-wall.jpg)
+![Ban wall customization](images/screenshots/config-ban-wall.jpg)
 
-![Captcha customization](images/screenshots/config-css.jpg)
+![Wall CSS](images/screenshots/config-css.jpg)
 
 
 
@@ -144,7 +144,7 @@ mode makes it possible to never ban an IP but only to offer a Captcha, in the wo
   In the `Advanced settings` part, you can enable/disable the stream mode, choose your cache system for your CrowdSec 
   LAPI, handle your remediation policy and adjust some debug and log parameters.
 
-![Captcha customization](images/screenshots/config-communication-mode.jpg)
+![Communication mode](images/screenshots/config-communication-mode.jpg)
 
 ***
 
@@ -170,7 +170,7 @@ cache refresh.
 ***
 
 
-![Captcha customization](images/screenshots/config-cache.jpg)
+![Cache](images/screenshots/config-cache.jpg)
 
 ***
 
@@ -222,7 +222,44 @@ Minimum 1 second.  Note that this setting can not be apply in stream mode.
 
 ***
 
-![Captcha customization](images/screenshots/config-remediations.jpg)
+
+![Geolocation](images/screenshots/config-geolocation.jpg)
+
+***
+
+`Geolocation → Enable geolocation feature` (`global` scope)
+
+Enable if you want to handle CrowdSec country scoped decisions.
+
+***
+
+`Geolocation → Save geolocation country result in session` (`global` scope)
+
+Enabling this option will avoid multiple call to the geolocation system (e.g. MaxMind database).
+
+***
+
+`Geolocation → Geolocation type` (`global` scope)
+
+At this time, only MaxMind type is allowed.
+
+***
+
+`Geolocation → MaxMind database type` (`global` scope)
+
+Choose between `Country` and `City` depending on your MaxMind database.
+
+***
+
+`Geolocation → MaxMind database path` (`global` scope)
+
+Relative path to the `var` folder of your Magento 2 instance.
+
+***
+
+**N.B** : There is also a test button if you want to test your geolocation settings.
+
+![Remediations](images/screenshots/config-remediations.jpg)
 
 
 ***
@@ -245,7 +282,7 @@ If you use a CDN, a reverse proxy or a load balancer, it is possible to indicate
 Enable if you want to hide CrowdSec mentions on the Ban and Captcha walls.
 ***
 
-![Captcha customization](images/screenshots/config-debug.jpg)
+![Debug](images/screenshots/config-debug.jpg)
 
 ***
 
@@ -267,13 +304,19 @@ The prod log is lighter than the debug log. But you can disable it here.
 
 ***
 
+`Configure the debug mode → Forced test IP` (`global` scope)
+
+For test purpose only. If not empty, this IP will be used for all remediations and geolocation processes.
+
+***
+
 #### Events
 
 
 In the `Events` part, you can enable business events logging. Using it in combination to a specific CrowdSec 
 scenario allows detecting suspicious behavior as credential or credit card stuffing.
 
-![Captcha customization](images/screenshots/config-event.jpg)
+![Events](images/screenshots/config-event.jpg)
 
 ***
 
