@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.2.0] - 2022-05-12
+
+### Added
+- Add geolocation feature
+- Add compatibility with Magento 2.4.4 and PHP 8.1
+
+
 ## [1.1.0] - 2022-03-11
 
 ### Added
