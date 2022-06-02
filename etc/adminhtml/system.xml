@@ -337,8 +337,8 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment><![CDATA[Enable if you want to handle country scoped decisions]]></comment>
                     </field>
-                    <field id="save_in_session" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
-                        <label>Save geolocation country result in session</label>
+                    <field id="save_result" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
+                        <label>Save geolocation country result in cache</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment><![CDATA[Enabling this option will avoid multiple call to the geolocation system (e.g. MaxMind database)]]></comment>
                         <depends>

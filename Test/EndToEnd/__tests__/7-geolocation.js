@@ -47,7 +47,7 @@ describe(`Geolocation and country scoped decision`, () => {
             "1",
         );
         await selectElement(
-            "crowdsec_bouncer_advanced_geolocation_save_in_session",
+            "crowdsec_bouncer_advanced_geolocation_save_result",
             "0",
         );
         await selectElement(
@@ -118,7 +118,7 @@ describe(`Geolocation and country scoped decision`, () => {
         await goToSettingsPage(true);
         // Prepare Geolocation test config
         await selectElement(
-            "crowdsec_bouncer_advanced_geolocation_save_in_session",
+            "crowdsec_bouncer_advanced_geolocation_save_result",
             "1",
         );
         await onAdminSaveSettings();

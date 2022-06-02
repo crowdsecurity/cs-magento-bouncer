@@ -93,7 +93,7 @@ class Config extends AbstractHelper
 
     public const XML_PATH_ADVANCED_GEOLOCATION_ENABLED = self::SECTION . '/advanced/geolocation/enabled';
     public const XML_PATH_ADVANCED_GEOLOCATION_TYPE = self::SECTION . '/advanced/geolocation/type';
-    public const XML_PATH_ADVANCED_GEOLOCATION_SAVE_SESSION = self::SECTION . '/advanced/geolocation/save_in_session';
+    public const XML_PATH_ADVANCED_GEOLOCATION_SAVE_RESULT = self::SECTION . '/advanced/geolocation/save_result';
     public const XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_TYPE = self::SECTION .
                                                                  '/advanced/geolocation/maxmind_database_type';
     public const XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_PATH = self::SECTION .
@@ -344,8 +344,8 @@ class Config extends AbstractHelper
             $result = ['enabled' => false];
             if ($this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_ENABLED)) {
                 $result['enabled'] = true;
-                $result['save_in_session'] =
-                    (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_SAVE_SESSION);
+                $result['save_result'] =
+                    (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_SAVE_RESULT);
                 $type = (string)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_TYPE);
                 $result['type'] = $type;
                 if ($type === Constants::GEOLOCATION_TYPE_MAXMIND) {

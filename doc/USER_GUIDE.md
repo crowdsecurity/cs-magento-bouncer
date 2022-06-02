@@ -233,7 +233,7 @@ Enable if you want to handle CrowdSec country scoped decisions.
 
 ***
 
-`Geolocation → Save geolocation country result in session` (`global` scope)
+`Geolocation → Save geolocation country result in cache` (`global` scope)
 
 Enabling this option will avoid multiple call to the geolocation system (e.g. MaxMind database).
 

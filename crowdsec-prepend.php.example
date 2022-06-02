@@ -34,7 +34,6 @@
 
 use CrowdSec\Bouncer\Helper\Data;
 use CrowdSec\Bouncer\Model\Bouncer;
-use CrowdSec\Bouncer\Model\Session;
 use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Registry\CurrentBouncer;
 use Magento\Framework\App\AreaList;
@@ -80,8 +79,6 @@ try {
     if ($bouncerRegistry->get()) {
         return;
     }
-    // Handle session start
-    $session = $objectManager->get(Session::class);
     /** @var Bouncer $bouncer */
     $bouncer = $bouncerRegistry->create();
     $configs = $helper->getBouncerConfigs();

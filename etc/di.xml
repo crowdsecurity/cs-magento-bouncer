@@ -63,21 +63,4 @@
         <!-- Event logging:customer register -->
         <plugin name="crowdsec-customer-account-create-post" type="CrowdSec\Bouncer\Plugin\Customer\AccountCreatePostController" sortOrder="10" />
     </type>
-    <!-- Session -->
-    <virtualType name="CrowdSec\Bouncer\Model\Session\Storage" type="Magento\Framework\Session\Storage">
-        <arguments>
-            <argument name="namespace" xsi:type="string">crowdsec</argument>
-        </arguments>
-    </virtualType>
-    <type name="CrowdSec\Bouncer\Model\Session">
-        <arguments>
-            <argument name="storage" xsi:type="object">CrowdSec\Bouncer\Model\Session\Storage</argument>
-        </arguments>
-    </type>
-    <!-- Bouncer -->
-    <type name="CrowdSec\Bouncer\Model\Bouncer">
-        <arguments>
-            <argument name="session" xsi:type="object">CrowdSec\Bouncer\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
 </config>
