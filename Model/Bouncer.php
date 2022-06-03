@@ -144,6 +144,7 @@ class Bouncer extends AbstractBounce implements IBounce
             }
 
             try {
+                /** @var BouncerInstance $bouncerInstance */
                 $bouncerInstance =
                     $this->bouncerInstanceFactory->create(
                         ['cacheAdapter' => $cacheAdapter, 'logger' => $this->logger ]
