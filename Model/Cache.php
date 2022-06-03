@@ -27,6 +27,9 @@
 
 namespace CrowdSec\Bouncer\Model;
 
+use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSec\Bouncer\Constants;
+use CrowdSecBouncer\Fixes\Memcached\TagAwareAdapter as MemcachedTagAwareAdapter;
 use ErrorException;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
@@ -35,8 +38,6 @@ use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
-use CrowdSec\Bouncer\Constants;
 
 class Cache
 {
@@ -77,7 +78,7 @@ class Cache
                                ' Please set a Memcached DSN or select another cache technology.'
                         );
                     }
-                    $cacheAdapterInstance = new TagAwareAdapter(
+                    $cacheAdapterInstance = new MemcachedTagAwareAdapter(
                         new MemcachedAdapter(MemcachedAdapter::createConnection($memcachedDsn))
                     );
                     break;

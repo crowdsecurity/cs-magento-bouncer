@@ -29,7 +29,7 @@
     "require": {
         "php": "^7.2|^7.3|^7.4|^8.1",
         "magento/framework": ">=102",
-        "crowdsec/bouncer": "0.22.0",
+        "crowdsec/bouncer": "0.22.1",
         "swaggest/json-schema": "0.12.39",
         "crowdsec/magento-symfony-cache": "1.0.0 || 2.1.0"
     },
