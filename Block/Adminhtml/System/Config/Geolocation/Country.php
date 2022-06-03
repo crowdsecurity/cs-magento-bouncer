@@ -68,7 +68,6 @@ class Country extends Button
      */
     protected $_saveResultField = 'crowdsec_bouncer_advanced_geolocation_save_result';
 
-
     /** @var string  */
     protected $template = 'CrowdSec_Bouncer::system/config/geolocation/country.phtml';
     /** @var string  */

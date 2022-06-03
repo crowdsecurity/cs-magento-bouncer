@@ -68,6 +68,7 @@ class Country extends Action implements HttpPostActionInterface
      * @param Helper $helper
      * @param Geolocation $geolocation
      * @param DirectoryList $directoryList
+     * @param RegistryBouncer $registryBouncer
      */
     public function __construct(
         Context $context,
