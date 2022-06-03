@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2022-06-09
+
+### Added
+- Add configuration to set captcha flow cache lifetime
+- Add configuration to set geolocation result cache lifetime
+### Changed
+- Use cache instead of session to store some values
+### Fixed
+- Fix wrong deleted decisions count during cache refresh
 
 ## [1.2.0] - 2022-05-12
 
