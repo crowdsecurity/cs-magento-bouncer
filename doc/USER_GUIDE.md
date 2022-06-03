@@ -223,6 +223,24 @@ Minimum 1 second.  Note that this setting can not be apply in stream mode.
 ***
 
 
+`Cache configuration → Captcha flow cache duration` (`global` scope)
+
+The lifetime of cached captcha flow for some IP. If a user has to interact with a captcha wall, we store in cache some values in order to know if he has to resolve or not the captcha again.
+
+Minimum 1 second.
+
+***
+
+`Cache configuration → Geolocation cache duration` (`global` scope)
+
+The lifetime of cached country result for some IP. Note that this setting can not be apply only if the
+`Geolocation → Save geolocation country result in cache` below is enabled.
+
+Minimum 1 second.
+
+***
+
+
 ![Geolocation](images/screenshots/config-geolocation.jpg)
 
 ***

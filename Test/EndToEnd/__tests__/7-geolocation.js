@@ -137,6 +137,7 @@ describe(`Geolocation and country scoped decision`, () => {
             "crowdsec_bouncer_advanced_geolocation_maxmind_database_path",
             "crowdsec/GeoLite2-FAKE.mmdb",
         );
+        await wait(1000);
         await page.click("#crowdsec_bouncer_advanced_geolocation_geolocalize");
         await expect(page).toMatchText(
             "#geolocation_test_result",
@@ -154,6 +155,7 @@ describe(`Geolocation and country scoped decision`, () => {
             "crowdsec_bouncer_advanced_geolocation_maxmind_database_path",
             "crowdsec/GeoLite2-City.mmdb",
         );
+        await wait(1000);
 
         await page.click("#crowdsec_bouncer_advanced_geolocation_geolocalize");
         await expect(page).toMatchText(
@@ -165,6 +167,7 @@ describe(`Geolocation and country scoped decision`, () => {
             "crowdsec_bouncer_advanced_geolocation_maxmind_database_path",
             "crowdsec/GeoLite2-FAKE.mmdb",
         );
+        await wait(1000);
         await page.click("#crowdsec_bouncer_advanced_geolocation_geolocalize");
         // Should not call the database
         await expect(page).toMatchText(

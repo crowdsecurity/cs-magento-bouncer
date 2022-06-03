@@ -174,6 +174,8 @@ class Bouncer extends AbstractBounce implements IBounce
                     'memcached_dsn' => $settings['memcached_dsn'],
                     'clean_ip_cache_duration' => $settings['clean_ip_cache_duration'],
                     'bad_ip_cache_duration' => $settings['bad_ip_cache_duration'],
+                    'captcha_cache_duration' => $settings['captcha_cache_duration'],
+                    'geolocation_cache_duration' => $settings['geolocation_cache_duration'],
                     // Geolocation
                     'geolocation' => $settings['geolocation']
                 ]);
