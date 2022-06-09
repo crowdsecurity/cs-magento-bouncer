@@ -11,7 +11,6 @@ const {
     selectElement,
     onAdminSaveSettings,
     wait,
-    flushCache,
     publicHomepageShouldBeBanWall,
     publicHomepageShouldBeCaptchaWallWithMentions,
     publicHomepageShouldBeAccessible,
@@ -47,7 +46,7 @@ describe(`Geolocation and country scoped decision`, () => {
             "1",
         );
         await selectElement(
-            "crowdsec_bouncer_advanced_geolocation_save_in_session",
+            "crowdsec_bouncer_advanced_geolocation_save_result",
             "0",
         );
         await selectElement(
@@ -114,38 +113,68 @@ describe(`Geolocation and country scoped decision`, () => {
         await publicHomepageShouldBeAccessible();
     });
 
-    it("Should save geolocation country result in session", async () => {
+    it("Should call or not call the GeoIp database depending on save result config", async () => {
         await goToSettingsPage(true);
-        // Prepare Geolocation test config
+
+        // Do not save result
         await selectElement(
-            "crowdsec_bouncer_advanced_geolocation_save_in_session",
+            "crowdsec_bouncer_advanced_geolocation_save_result",
+            "0",
+        );
+
+        // Set a good path to simulate bad database
+        await fillInput(
+            "crowdsec_bouncer_advanced_geolocation_maxmind_database_path",
+            "crowdsec/GeoLite2-City.mmdb",
+        );
+        await page.click("#crowdsec_bouncer_advanced_geolocation_geolocalize");
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#geolocation_test_result",
+            /Geolocation test result: success./,
+        );
+        // Set a bad path to simulate bad database
+        await fillInput(
+            "crowdsec_bouncer_advanced_geolocation_maxmind_database_path",
+            "crowdsec/GeoLite2-FAKE.mmdb",
+        );
+
+        await page.click("#crowdsec_bouncer_advanced_geolocation_geolocalize");
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#geolocation_test_result",
+            /Geolocation test result: failed./,
+        );
+
+        // Save result
+        await selectElement(
+            "crowdsec_bouncer_advanced_geolocation_save_result",
             "1",
         );
-        await onAdminSaveSettings();
-        await addDecision("FR", "ban", 15 * 60, "Country");
-        await wait(1000);
-        await publicHomepageShouldBeBanWall();
 
-        await goToSettingsPage(true);
+        // Set a good path to simulate bad database
         await fillInput(
-            "crowdsec_bouncer_advanced_debug_forced_test_ip",
-            JAPAN_IP,
+            "crowdsec_bouncer_advanced_geolocation_maxmind_database_path",
+            "crowdsec/GeoLite2-City.mmdb",
+        );
+        await page.click("#crowdsec_bouncer_advanced_geolocation_geolocalize");
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#geolocation_test_result",
+            /Geolocation test result: success./,
+        );
+        // Set a bad path to simulate bad database
+        await fillInput(
+            "crowdsec_bouncer_advanced_geolocation_maxmind_database_path",
+            "crowdsec/GeoLite2-FAKE.mmdb",
         );
 
-        await onAdminSaveSettings();
-        await deleteFileContent(DEBUG_LOG_PATH);
-        let logContent = await getFileContent(DEBUG_LOG_PATH);
-        await expect(logContent).toBe("");
-        await publicHomepageShouldBeBanWall();
-
-        logContent = await getFileContent(DEBUG_LOG_PATH);
-        await expect(logContent).toMatch(
-            new RegExp(
-                `"type":"BAD_VALUE","value":"FR","scope":"Country","remediation":"ban"`,
-            ),
-        );
-        await expect(logContent).toMatch(
-            new RegExp(`"type":"FINAL_REMEDIATION","ip":"${JAPAN_IP}"`),
+        await page.click("#crowdsec_bouncer_advanced_geolocation_geolocalize");
+        await wait(2000);
+        // Should not call the database
+        await expect(page).toMatchText(
+            "#geolocation_test_result",
+            /Geolocation test result: success./,
         );
     });
 });

@@ -418,6 +418,8 @@ class Data extends Config
                 'memcached_dsn' => $this->getMemcachedDSN(),
                 'clean_ip_cache_duration' => $this->getCleanIpCacheDuration(),
                 'bad_ip_cache_duration' => $this->getBadIpCacheDuration(),
+                'captcha_cache_duration' => $this->getCaptchaCacheDuration(),
+                'geolocation_cache_duration' => $this->getGeolocationCacheDuration(),
                 // Geolocation
                 'geolocation' => $this->getGeolocation(),
                 // Extra configs

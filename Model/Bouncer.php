@@ -38,7 +38,7 @@ use CrowdSecBouncer\BouncerFactory;
 use Psr\Cache\InvalidArgumentException;
 
 /**
- * @SuppressWarnings(PHPMD.CookieAndSessionMisuse)
+ *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class Bouncer extends AbstractBounce implements IBounce
@@ -48,11 +48,6 @@ class Bouncer extends AbstractBounce implements IBounce
      * @var Http
      */
     protected $response;
-
-    /**
-     * @var Session
-     */
-    protected $session;
 
     /**
      * @var Helper
@@ -77,20 +72,17 @@ class Bouncer extends AbstractBounce implements IBounce
      * Constructor
      *
      * @param Http $response
-     * @param Session $session
      * @param Helper $helper
      * @param CacheFactory $cacheFactory
      * @param BouncerFactory $bouncerInstanceFactory
      */
     public function __construct(
         Http $response,
-        Session $session,
         Helper $helper,
         CacheFactory $cacheFactory,
         BouncerFactory $bouncerInstanceFactory
     ) {
         $this->response = $response;
-        $this->session = $session;
         $this->helper = $helper;
         $this->cacheFactory = $cacheFactory;
         $this->bouncerInstanceFactory = $bouncerInstanceFactory;
@@ -152,6 +144,7 @@ class Bouncer extends AbstractBounce implements IBounce
             }
 
             try {
+                /** @var BouncerInstance $bouncerInstance */
                 $bouncerInstance =
                     $this->bouncerInstanceFactory->create(
                         ['cacheAdapter' => $cacheAdapter, 'logger' => $this->logger ]
@@ -181,6 +174,8 @@ class Bouncer extends AbstractBounce implements IBounce
                     'memcached_dsn' => $settings['memcached_dsn'],
                     'clean_ip_cache_duration' => $settings['clean_ip_cache_duration'],
                     'bad_ip_cache_duration' => $settings['bad_ip_cache_duration'],
+                    'captcha_cache_duration' => $settings['captcha_cache_duration'],
+                    'geolocation_cache_duration' => $settings['geolocation_cache_duration'],
                     // Geolocation
                     'geolocation' => $settings['geolocation']
                 ]);
@@ -268,50 +263,6 @@ class Bouncer extends AbstractBounce implements IBounce
     public function getTrustForwardedIpBoundsList(): array
     {
         return $this->helper->getTrustedForwardedIps();
-    }
-
-    /**
-     * Get session variable value
-     *
-     * @param string $name
-     * @return mixed
-     */
-    public function getSessionVariable(string $name)
-    {
-        return $this->session->getData($name);
-    }
-
-    /**
-     * Get all session variables
-     *
-     * @return mixed
-     */
-    public function getAllSessionVariables()
-    {
-        return $this->session->getData();
-    }
-
-    /**
-     * Set a session variable.
-     *
-     * @param string $name
-     * @param mixed $value
-     * @return void
-     */
-    public function setSessionVariable(string $name, $value): void
-    {
-        $this->session->setData($name, $value);
-    }
-
-    /**
-     * Unset a session variable, throw an error if this does not exist.
-     *
-     * @param string $name
-     * @return void
-     */
-    public function unsetSessionVariable(string $name): void
-    {
-        $this->session->unsetData($name);
     }
 
     /**

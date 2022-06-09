@@ -71,6 +71,8 @@
                     <technology>phpfs</technology>
                     <clean_ip_cache_duration>60</clean_ip_cache_duration>
                     <bad_ip_cache_duration>120</bad_ip_cache_duration>
+                    <captcha_cache_duration>86400</captcha_cache_duration>
+                    <geolocation_cache_duration>86400</geolocation_cache_duration>
                     <prune_cron_expr><![CDATA[0 0 30 2 *]]></prune_cron_expr>
                 </cache>
             </advanced>

@@ -27,14 +27,17 @@
 
 namespace CrowdSec\Bouncer\Model;
 
+use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSec\Bouncer\Constants;
+use CrowdSecBouncer\Fixes\Memcached\TagAwareAdapter as MemcachedTagAwareAdapter;
 use ErrorException;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
-use CrowdSec\Bouncer\Constants;
 
 class Cache
 {
@@ -65,7 +68,7 @@ class Cache
             $cacheSystem = $forcedCacheSystem ?: $cacheSystem;
             switch ($cacheSystem) {
                 case Constants::CACHE_SYSTEM_PHPFS:
-                    $cacheAdapterInstance = new PhpFilesAdapter('', 0, $fsCachePath);
+                    $cacheAdapterInstance = new TagAwareAdapter(new PhpFilesAdapter('', 0, $fsCachePath));
                     break;
 
                 case Constants::CACHE_SYSTEM_MEMCACHED:
@@ -75,7 +78,9 @@ class Cache
                                ' Please set a Memcached DSN or select another cache technology.'
                         );
                     }
-                    $cacheAdapterInstance = new MemcachedAdapter(MemcachedAdapter::createConnection($memcachedDsn));
+                    $cacheAdapterInstance = new MemcachedTagAwareAdapter(
+                        new MemcachedAdapter(MemcachedAdapter::createConnection($memcachedDsn))
+                    );
                     break;
                 case Constants::CACHE_SYSTEM_REDIS:
                     if (empty($redisDsn)) {
@@ -84,7 +89,7 @@ class Cache
                     }
 
                     try {
-                        $cacheAdapterInstance = new RedisAdapter(RedisAdapter::createConnection($redisDsn));
+                        $cacheAdapterInstance = new RedisTagAwareAdapter(RedisAdapter::createConnection($redisDsn));
                     } catch (InvalidArgumentException $e) {
                         throw new CrowdSecException('Error when connecting to Redis.' .
                                ' Please fix the Redis DSN or select another cache technology.');

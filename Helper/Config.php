@@ -86,6 +86,8 @@ class Config extends AbstractHelper
     public const XML_PATH_ADVANCED_CACHE_MEMCACHED_DSN = self::SECTION . '/advanced/cache/memcached_dsn';
     public const XML_PATH_ADVANCED_CACHE_CLEAN = self::SECTION . '/advanced/cache/clean_ip_cache_duration';
     public const XML_PATH_ADVANCED_CACHE_BAD = self::SECTION . '/advanced/cache/bad_ip_cache_duration';
+    public const XML_PATH_ADVANCED_CACHE_CAPTCHA = self::SECTION . '/advanced/cache/captcha_cache_duration';
+    public const XML_PATH_ADVANCED_CACHE_GEO = self::SECTION . '/advanced/cache/geolocation_cache_duration';
     public const XML_PATH_ADVANCED_DEBUG_LOG = self::SECTION . '/advanced/debug/log';
     public const XML_PATH_ADVANCED_DISPLAY_ERRORS = self::SECTION . '/advanced/debug/display_errors';
     public const XML_PATH_ADVANCED_DISABLE_PROD_LOG = self::SECTION . '/advanced/debug/disable_prod_log';
@@ -93,7 +95,7 @@ class Config extends AbstractHelper
 
     public const XML_PATH_ADVANCED_GEOLOCATION_ENABLED = self::SECTION . '/advanced/geolocation/enabled';
     public const XML_PATH_ADVANCED_GEOLOCATION_TYPE = self::SECTION . '/advanced/geolocation/type';
-    public const XML_PATH_ADVANCED_GEOLOCATION_SAVE_SESSION = self::SECTION . '/advanced/geolocation/save_in_session';
+    public const XML_PATH_ADVANCED_GEOLOCATION_SAVE_RESULT = self::SECTION . '/advanced/geolocation/save_result';
     public const XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_TYPE = self::SECTION .
                                                                  '/advanced/geolocation/maxmind_database_type';
     public const XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_PATH = self::SECTION .
@@ -140,6 +142,8 @@ class Config extends AbstractHelper
         'memcached_dsn' => null,
         'clean_ip_duration' => null,
         'bad_ip_duration' => null,
+        'captcha_duration' => null,
+        'geolocation_duration' => null,
         'trusted_forwarded_ip' => null,
         'geolocation' => null,
     ];
@@ -344,8 +348,8 @@ class Config extends AbstractHelper
             $result = ['enabled' => false];
             if ($this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_ENABLED)) {
                 $result['enabled'] = true;
-                $result['save_in_session'] =
-                    (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_SAVE_SESSION);
+                $result['save_result'] =
+                    (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_SAVE_RESULT);
                 $type = (string)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_TYPE);
                 $result['type'] = $type;
                 if ($type === Constants::GEOLOCATION_TYPE_MAXMIND) {
@@ -504,6 +508,38 @@ class Config extends AbstractHelper
         }
 
         return (int) $this->_globals['bad_ip_duration'];
+    }
+
+    /**
+     * Get captcha cache duration config
+     *
+     * @return int
+     */
+    public function getCaptchaCacheDuration(): int
+    {
+        if (!isset($this->_globals['captcha_duration'])) {
+            $this->_globals['captcha_duration'] = (int)$this->scopeConfig->getValue(
+                self::XML_PATH_ADVANCED_CACHE_CAPTCHA
+            );
+        }
+
+        return (int) $this->_globals['captcha_duration'];
+    }
+
+    /**
+     * Get geolocation cache duration config
+     *
+     * @return int
+     */
+    public function getGeolocationCacheDuration(): int
+    {
+        if (!isset($this->_globals['geolocation_duration'])) {
+            $this->_globals['geolocation_duration'] = (int)$this->scopeConfig->getValue(
+                self::XML_PATH_ADVANCED_CACHE_GEO
+            );
+        }
+
+        return (int) $this->_globals['geolocation_duration'];
     }
 
     /**

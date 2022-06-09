@@ -28,6 +28,7 @@
 namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Geolocation;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use Exception;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -57,24 +58,32 @@ class Country extends Action implements HttpPostActionInterface
     protected $directoryList;
 
     /**
+     * @var RegistryBouncer
+     */
+    protected $registryBouncer;
+
+    /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param Helper $helper
      * @param Geolocation $geolocation
      * @param DirectoryList $directoryList
+     * @param RegistryBouncer $registryBouncer
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         Helper $helper,
         Geolocation $geolocation,
-        DirectoryList $directoryList
+        DirectoryList $directoryList,
+        RegistryBouncer $registryBouncer
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->helper = $helper;
         $this->geolocation = $geolocation;
         $this->directoryList = $directoryList;
+        $this->registryBouncer = $registryBouncer;
     }
 
     /**
@@ -85,15 +94,22 @@ class Country extends Action implements HttpPostActionInterface
     public function execute(): Json
     {
         try {
+            if (!($bouncer = $this->registryBouncer->get())) {
+                $bouncer = $this->registryBouncer->create();
+            }
+            $configs = $this->helper->getBouncerConfigs();
+            $bouncer = $bouncer->init($configs);
+            $apiCache = $bouncer->getApiCache();
 
             $type = $this->getRequest()->getParam('geolocation_type');
             $maxmindType = $this->getRequest()->getParam('geolocation_maxmind_database_type');
             $maxmindPath = $this->getRequest()->getParam('geolocation_maxmind_database_path');
             $forcedIP = $this->getRequest()->getParam('forced_test_ip');
+            $saveResult = (bool) $this->getRequest()->getParam('save_result');
             $ip = !empty($forcedIP) ? $forcedIP : $this->helper->getRemoteIp();
             $geolocConfig = [
                 'type' => $type,
-                'save_in_session' => false,
+                'save_result' => $saveResult,
             ];
             if ($type === Constants::GEOLOCATION_TYPE_MAXMIND) {
                 $geolocConfig['maxmind'] = [
@@ -102,7 +118,7 @@ class Country extends Action implements HttpPostActionInterface
                 ];
             }
 
-            $countryResult = $this->geolocation->getCountryResult($geolocConfig, $ip);
+            $countryResult = $this->geolocation->getCountryResult($geolocConfig, $ip, $apiCache);
             $countryMessage = null;
             $result = false;
             $message = __('Geolocation test result: failed.');

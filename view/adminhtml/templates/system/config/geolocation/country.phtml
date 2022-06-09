@@ -38,6 +38,7 @@ $geolocationTypeField = $escaper->escapeJs($block->getGeolocationTypeField());
 $geolocationMaxmindDatabaseTypeField = $escaper->escapeJs($block->getGeolocationMaxmindDatabaseTypeField());
 $geolocationMaxmindDatabasePathField = $escaper->escapeJs($block->getGeolocationMaxmindDatabasePathField());
 $forcedTestIpField = $escaper->escapeJs($block->getForcedTestIpField());
+$saveResultField = $escaper->escapeJs($block->getSaveResultField());
 
 
  $scriptString = <<<script
@@ -52,6 +53,7 @@ require(['prototype'], function(){
             geolocation_maxmind_database_type: $('{$geolocationMaxmindDatabaseTypeField}').value,
             geolocation_maxmind_database_path: $('{$geolocationMaxmindDatabasePathField}').value,
             forced_test_ip: $('{$forcedTestIpField}').value,
+            save_result: $('{$saveResultField}').value,
         };
 
         new Ajax.Request('{$ajaxUrl}', {
