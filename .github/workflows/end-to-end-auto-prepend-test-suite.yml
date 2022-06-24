@@ -1,4 +1,4 @@
-name: End-to-end auto-prepend-file mode test suite
+name: End-to-end auto-prepend-file mode tests
 on:
     push:
         branches:

@@ -1,4 +1,4 @@
-name: Installation and Varnish test suite
+name: Installation and Varnish tests
 on:
   push:
     branches:

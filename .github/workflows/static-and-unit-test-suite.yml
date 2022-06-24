@@ -1,4 +1,4 @@
-name: Static and unit test suite
+name: Coding standards
 on:
     push:
         branches:
