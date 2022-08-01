@@ -15,16 +15,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        m2-version: [ "2.3.0", "2.4.3", "2.4.4" ]
-        php-version: [ "7.2", "7.3", "7.4", "8.1" ]
+        # First and last patch for the current and previous minor, greatest php version
+        m2-version: [ "2.3.0", "2.3.7", "2.4.0", "2.4.4" ]
+        php-version: [ "7.2", "7.4", "8.1" ]
         exclude:
           - { php-version: "7.4", m2-version: "2.3.0" }
-          - { php-version: "7.3", m2-version: "2.3.0" }
           - { php-version: "8.1", m2-version: "2.3.0" }
-          - { php-version: "7.2", m2-version: "2.4.3" }
-          - { php-version: "8.1", m2-version: "2.4.3" }
+          - { php-version: "7.2", m2-version: "2.3.7" }
+          - { php-version: "8.1", m2-version: "2.3.7" }
+          - { php-version: "7.2", m2-version: "2.4.0" }
+          - { php-version: "8.1", m2-version: "2.4.0" }
           - { php-version: "7.2", m2-version: "2.4.4" }
-          - { php-version: "7.3", m2-version: "2.4.4" }
+          - { php-version: "7.4", m2-version: "2.4.4" }
 
     name: Static and unit test suite
     runs-on: ubuntu-latest
@@ -42,7 +44,7 @@ jobs:
 
       - name: Install DDEV
         env:
-          DDEV_VERSION: v1.19.1
+          DDEV_VERSION: v1.19.3
         run: |
           # @see https://ddev.readthedocs.io/en/stable/#installationupgrade-script-linux-and-macos-armarm64-and-amd64-architectures
           sudo apt-get -qq update
@@ -77,7 +79,7 @@ jobs:
           ddev php -r "echo phpversion('memcached');"
 
       - name: Force allow plugin for some versions
-        if: contains(fromJson('["2.4.3"]'),matrix.m2-version)
+        if: contains(fromJson('["2.3.7"]'),matrix.m2-version)
         run: ddev composer config --global allow-plugins true -n
 
       - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
@@ -125,7 +127,7 @@ jobs:
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
       - name: Add Coding Standard and PHPStan for Magento 2.3
-        if: startsWith(matrix.m2-version, '2.3')
+        if: contains(fromJson('["2.3.0"]'),matrix.m2-version)
         run: |
           ddev composer require squizlabs/php_codesniffer:^3.4 magento/magento-coding-standard
           ddev exec vendor/bin/phpcs --config-set installed_paths ../../magento/magento-coding-standard/

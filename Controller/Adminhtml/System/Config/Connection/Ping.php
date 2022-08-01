@@ -29,6 +29,7 @@ namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Connection;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
 use Exception;
+use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
@@ -76,9 +77,11 @@ class Ping extends Action implements HttpPostActionInterface
      * Test connection
      *
      * @return Json
+     * @throws LogicException
      */
     public function execute(): Json
     {
+        $useCurl = "";
         try {
             $baseUri = $this->getRequest()->getParam('api_url');
             $userAgent = Constants::BASE_USER_AGENT;

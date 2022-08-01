@@ -15,14 +15,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        m2-version: [ "2.3.5", "2.4.3", "2.4.4" ]
-        php-version: [ "7.2", "7.4", "8.1" ]
+        # Last 2 patches for the current minor, and last one for the previous minor, greatest php version
+        m2-version: [ "2.3.7", "2.4.3", "2.4.4" ]
+        php-version: [ "7.4", "8.1" ]
         exclude:
-          - { php-version: "7.4", m2-version: "2.3.5" }
-          - { php-version: "8.1", m2-version: "2.3.5" }
-          - { php-version: "7.2", m2-version: "2.4.3" }
+          - { php-version: "8.1", m2-version: "2.3.7" }
           - { php-version: "8.1", m2-version: "2.4.3" }
-          - { php-version: "7.2", m2-version: "2.4.4" }
           - { php-version: "7.4", m2-version: "2.4.4" }
 
     name: End-to-end test suite
@@ -43,7 +41,7 @@ jobs:
 
       - name: Install DDEV
         env:
-          DDEV_VERSION: v1.19.1
+          DDEV_VERSION: v1.19.3
         run: |
           # @see https://ddev.readthedocs.io/en/stable/#installationupgrade-script-linux-and-macos-armarm64-and-amd64-architectures
           sudo apt-get -qq update
@@ -80,7 +78,7 @@ jobs:
           ddev php -r "echo phpversion('memcached');"
 
       - name: Force allow plugin for some versions
-        if: contains(fromJson('["2.4.3"]'),matrix.m2-version)
+        if: contains(fromJson('["2.3.7","2.4.3"]'),matrix.m2-version)
         run: ddev composer config --global allow-plugins true -n
 
       - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
