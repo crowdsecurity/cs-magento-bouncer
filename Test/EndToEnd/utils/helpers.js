@@ -232,6 +232,7 @@ const computeCurrentPageRemediation = async (
         return "bypass";
     }
     await expect(title).toContain("Oops");
+    await page.waitForSelector(".desc");
     const description = await page.$eval(".desc", (el) => el.innerText);
     const banText = "cyber";
     const captchaText = "check";

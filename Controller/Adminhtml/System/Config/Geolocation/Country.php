@@ -28,7 +28,7 @@
 namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Geolocation;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
 use Exception;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -58,9 +58,9 @@ class Country extends Action implements HttpPostActionInterface
     protected $directoryList;
 
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * @param Context $context
@@ -68,7 +68,7 @@ class Country extends Action implements HttpPostActionInterface
      * @param Helper $helper
      * @param Geolocation $geolocation
      * @param DirectoryList $directoryList
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      */
     public function __construct(
         Context $context,
@@ -76,14 +76,14 @@ class Country extends Action implements HttpPostActionInterface
         Helper $helper,
         Geolocation $geolocation,
         DirectoryList $directoryList,
-        RegistryBouncer $registryBouncer
+        RegistryBounce $registryBounce
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->helper = $helper;
         $this->geolocation = $geolocation;
         $this->directoryList = $directoryList;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
     }
 
     /**
@@ -94,11 +94,11 @@ class Country extends Action implements HttpPostActionInterface
     public function execute(): Json
     {
         try {
-            if (!($bouncer = $this->registryBouncer->get())) {
-                $bouncer = $this->registryBouncer->create();
+            if (!($bounce = $this->registryBounce->get())) {
+                $bounce = $this->registryBounce->create();
             }
             $configs = $this->helper->getBouncerConfigs();
-            $bouncer = $bouncer->init($configs);
+            $bouncer = $bounce->init($configs);
             $apiCache = $bouncer->getApiCache();
 
             $type = $this->getRequest()->getParam('geolocation_type');

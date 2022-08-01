@@ -443,6 +443,10 @@
                         <label><![CDATA[Forced test IP ]]></label>
                         <comment><![CDATA[Do not use in production. For test purpose only. If not empty, it will be used for all remediations and geolocation processes.]]></comment>
                     </field>
+                    <field id="forced_test_forwarded_ip" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
+                        <label><![CDATA[Forced test forwarded IP ]]></label>
+                        <comment><![CDATA[Do not use in production. For test purpose only. This Ip will be used instead of the current X-Forwarded-For Ip if any.]]></comment>
+                    </field>
                 </group>
             </group>
             <!-- Events -->

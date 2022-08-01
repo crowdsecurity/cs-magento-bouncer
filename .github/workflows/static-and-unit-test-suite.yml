@@ -107,7 +107,7 @@ jobs:
             -   name: Clone M2 Crowdsec Bouncer files
                 uses: actions/checkout@v2
                 with:
-                    path: my-own-modules/crowdsec-bouncer
+                    path: my-own-modules/${{ env.EXTENSION_PATH }}
 
             -   name: Prepare composer repositories
                 run: |

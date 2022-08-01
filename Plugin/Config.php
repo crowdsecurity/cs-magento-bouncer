@@ -29,14 +29,13 @@ namespace CrowdSec\Bouncer\Plugin;
 
 use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
 use Exception;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Message\ManagerInterface;
 use CrowdSec\Bouncer\Constants;
 use Magento\Framework\Phrase;
 use Magento\Framework\App\Config\Storage\WriterInterface;
-use CrowdSecBouncer\RestClient;
 use Psr\Cache\InvalidArgumentException;
 use Magento\Config\Model\Config as MagentoConfig;
 
@@ -60,40 +59,34 @@ class Config
      */
     private $configWriter;
 
-    /** @var  RestClient */
-    protected $restClient;
-
     /**
      * @var Helper
      */
     protected $helper;
 
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * Constructor
      *
      * @param ManagerInterface $messageManager
      * @param Helper $helper
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      * @param WriterInterface $configWriter
-     * @param RestClient $restClient
      */
     public function __construct(
         ManagerInterface $messageManager,
         Helper           $helper,
-        RegistryBouncer  $registryBouncer,
-        WriterInterface  $configWriter,
-        RestClient       $restClient
+        RegistryBounce  $registryBounce,
+        WriterInterface  $configWriter
     ) {
         $this->messageManager = $messageManager;
         $this->helper = $helper;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
         $this->configWriter = $configWriter;
-        $this->restClient = $restClient;
     }
 
     /**
@@ -373,9 +366,22 @@ class Config
         // Test connection if params changed
         if (($newUrl && $newKey) && ($oldUrl !== $newUrl || $oldKey !== $newKey)) {
             try {
-                $this->helper->ping($this->restClient, $newUrl, Constants::BASE_USER_AGENT, $newKey);
+                // Try the adapter connection (Redis or Memcached will crash if the connection is incorrect)
+                if (!($bounce = $this->registryBounce->get())) {
+                    $bounce = $this->registryBounce->create();
+                }
+                $configs = $this->helper->getBouncerConfigs();
+                $currentConfigs = [
+                    'api_url' => $newUrl,
+                    'api_key' => $newKey,
+                ];
+                $bouncer = $bounce->init(array_merge($configs, $currentConfigs));
+                $restClient = $bouncer->getRestClient();
+
+                $this->helper->ping($restClient);
             } catch (Exception $e) {
-                throw new CrowdSecException("Connection test failed with url \'$newUrl\' and key \'$newKey\'");
+                throw new CrowdSecException("Connection test failed with url \'$newUrl\' and key \'$newKey\': "
+                                            .$e->getMessage());
             }
         }
     }
@@ -456,18 +462,16 @@ class Config
         if ($cacheChanged) {
             try {
                 // Try the adapter connection (Redis or Memcached will crash if the connection is incorrect)
-                if (!($bouncer = $this->registryBouncer->get())) {
-                    $bouncer = $this->registryBouncer->create();
+                if (!($bounce = $this->registryBounce->get())) {
+                    $bounce = $this->registryBounce->create();
                 }
                 $configs = $this->helper->getBouncerConfigs();
-                $bouncer->init(
-                    $configs,
-                    [
-                        'forced_cache_system' => $cacheSystem,
-                        'memcached_dsn' => $memcachedDsn,
-                        'redis_dsn' => $redisDsn
-                    ]
-                )->testConnection();
+                $currentConfigs = [
+                    'cache_system' => $cacheSystem,
+                    'memcached_dsn' => $memcachedDsn,
+                    'redis_dsn' => $redisDsn
+                ];
+                $bounce->init(array_merge($configs, $currentConfigs))->testConnection();
                 $cacheMessage = __('CrowdSec new cache (%1) has been successfully tested.', $cacheLabel);
                 $this->messageManager->addNoticeMessage($cacheMessage);
             } catch (Exception $e) {
@@ -504,19 +508,17 @@ class Config
         Phrase $preMessage = null
     ): void {
         try {
-            if (!($bouncer = $this->registryBouncer->get())) {
-                $bouncer = $this->registryBouncer->create();
+            if (!($bounce = $this->registryBounce->get())) {
+                $bounce = $this->registryBounce->create();
             }
             $configs = $this->helper->getBouncerConfigs();
+            $currentConfigs = [
+                'cache_system' => $cacheSystem,
+                'memcached_dsn' => $memcachedDsn,
+                'redis_dsn' => $redisDsn
+            ];
             $clearCacheResult =
-                $bouncer->init(
-                    $configs,
-                    [
-                        'forced_cache_system' => $cacheSystem,
-                        'memcached_dsn' => $memcachedDsn,
-                        'redis_dsn' => $redisDsn
-                    ]
-                )->clearCache();
+                $bounce->init(array_merge($configs, $currentConfigs))->clearCache();
             $this->displayCacheClearMessage($clearCacheResult, $cacheLabel, $preMessage);
         } catch (CrowdSecException $e) {
             $this->helper->error('', [
@@ -550,19 +552,16 @@ class Config
         Phrase $cacheLabel
     ): void {
         try {
-            if (!($bouncer = $this->registryBouncer->get())) {
-                $bouncer = $this->registryBouncer->create();
+            if (!($bounce = $this->registryBounce->get())) {
+                $bounce = $this->registryBounce->create();
             }
             $configs = $this->helper->getBouncerConfigs();
-            $warmUpCacheResult =
-                $bouncer->init(
-                    $configs,
-                    [
-                        'forced_cache_system' => $cacheSystem,
-                        'memcached_dsn' => $memcachedDsn,
-                        'redis_dsn' => $redisDsn
-                    ]
-                )->warmBlocklistCacheUp();
+            $currentConfigs = [
+                'cache_system' => $cacheSystem,
+                'memcached_dsn' => $memcachedDsn,
+                'redis_dsn' => $redisDsn
+            ];
+            $warmUpCacheResult = $bounce->init(array_merge($configs, $currentConfigs))->warmBlocklistCacheUp();
             $this->displayCacheWarmUpMessage($warmUpCacheResult, $cacheLabel);
         } catch (CrowdSecException $e) {
             $this->helper->error('', [

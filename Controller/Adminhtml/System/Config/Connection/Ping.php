@@ -33,9 +33,8 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
 use CrowdSec\Bouncer\Helper\Data as Helper;
-use CrowdSecBouncer\RestClient;
 use CrowdSec\Bouncer\Constants;
 
 class Ping extends Action implements HttpPostActionInterface
@@ -46,37 +45,31 @@ class Ping extends Action implements HttpPostActionInterface
     protected $resultJsonFactory;
 
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * @var Helper
      */
     protected $helper;
 
-    /** @var  RestClient */
-    protected $restClient;
-
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      * @param Helper $helper
-     * @param RestClient $restClient
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        RegistryBouncer $registryBouncer,
-        Helper $helper,
-        RestClient $restClient
+        RegistryBounce $registryBounce,
+        Helper $helper
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
         $this->helper = $helper;
-        $this->restClient = $restClient;
     }
 
     /**
@@ -90,7 +83,14 @@ class Ping extends Action implements HttpPostActionInterface
             $baseUri = $this->getRequest()->getParam('api_url');
             $userAgent = Constants::BASE_USER_AGENT;
             $apiKey = $this->getRequest()->getParam('bouncer_key');
-            $this->helper->ping($this->restClient, $baseUri, $userAgent, $apiKey);
+            $configs = $this->helper->getBouncerConfigs();
+            $currentConfigs = ['api_url' => $baseUri, 'api_user_agent' => $userAgent, 'api_key' => $apiKey];
+            $finalConfigs = array_merge($configs, $currentConfigs);
+            /** @var \CrowdSec\Bouncer\Model\Bounce $bounce */
+            $bounce = $this->registryBounce->create();
+            $bouncer = $bounce->init($finalConfigs);
+            $restClient = $bouncer->getRestClient();
+            $this->helper->ping($restClient);
             $result = 1;
             $message = __('Connection test result: success.');
         } catch (Exception $e) {

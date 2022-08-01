@@ -4,7 +4,7 @@ namespace CrowdSec\Bouncer\Cron;
 
 use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
 
 class RefreshCache
 {
@@ -13,20 +13,20 @@ class RefreshCache
      */
     protected $helper;
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * Constructor
      *
      * @param Helper $helper
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      */
-    public function __construct(Helper $helper, RegistryBouncer $registryBouncer)
+    public function __construct(Helper $helper, RegistryBounce $registryBounce)
     {
         $this->helper = $helper;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
     }
 
     /**
@@ -40,9 +40,9 @@ class RefreshCache
     {
         if ($this->helper->isStreamModeEnabled()) {
             try {
-                $bouncer = $this->registryBouncer->create();
+                $bounce = $this->registryBounce->create();
                 $configs = $this->helper->getBouncerConfigs();
-                $bouncer->init($configs)->refreshBlocklistCache();
+                $bounce->init($configs)->refreshBlocklistCache();
             } catch (CrowdSecException $e) {
                 $this->helper->error('', [
                     'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',

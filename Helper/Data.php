@@ -29,7 +29,7 @@ namespace CrowdSec\Bouncer\Helper;
 
 use CrowdSec\Bouncer\Constants;
 use CrowdSec\Bouncer\Exception\CrowdSecException;
-use CrowdSecBouncer\RestClient;
+use CrowdSecBouncer\RestClient\ClientAbstract;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\Area;
 use Magento\Store\Model\ScopeInterface;
@@ -100,14 +100,14 @@ class Data extends Config
      *
      * @return Logger
      */
-    public function getFinalLogger(): Logger
+    public function getFinalLogger(array $configs = []): Logger
     {
         if ($this->_finalLogger === null) {
             $this->_finalLogger = $this->_selfLogger;
-            if ($this->isProdLogDisabled()) {
+            if ($this->isProdLogDisabled() || !empty($configs['disable_prod_log'])) {
                 $this->_finalLogger->popHandler();
             }
-            if ($this->isDebugLog()) {
+            if ($this->isDebugLog() || !empty($configs['debug_mode'])) {
                 $debugHandler = $this->_debugHandler->create();
                 $this->_finalLogger->pushHandler($debugHandler);
             }
@@ -404,6 +404,7 @@ class Data extends Config
                 'debug_mode' => $this->isDebugLog(),
                 'log_directory_path' =>Constants::CROWDSEC_LOG_PATH,
                 'forced_test_ip' => $this->getForcedTestIp(),
+                'forced_test_forwarded_ip' => $this->getForcedTestForwardedIp(),
                 'display_errors' => $this->canDisplayErrors(),
                 // Bouncer behavior
                 'bouncing_level' => $bouncingLevel,
@@ -423,7 +424,6 @@ class Data extends Config
                 // Geolocation
                 'geolocation' => $this->getGeolocation(),
                 // Extra configs
-                'forced_cache_system' => null,
                 'logger' => $logger,
             ];
         }
@@ -449,21 +449,11 @@ class Data extends Config
     /**
      * Make a rest request
      *
-     * @param RestClient $restClient
-     * @param string $baseUri
-     * @param string $userAgent
-     * @param string $apiKey
-     * @param int $timeout
+     * @param ClientAbstract $restClient
      * @return void
      */
-    public function ping(RestClient $restClient, string $baseUri, string $userAgent, string $apiKey, int $timeout = 1)
+    public function ping(ClientAbstract $restClient)
     {
-        $restClient->configure($baseUri, [
-            'User-Agent' => $userAgent,
-            'X-Api-Key' => $apiKey,
-            'Accept' => 'application/json',
-        ], $timeout);
-
         $restClient->request('/v1/decisions', []);
     }
 }

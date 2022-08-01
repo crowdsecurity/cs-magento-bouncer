@@ -33,9 +33,9 @@
  */
 
 use CrowdSec\Bouncer\Helper\Data;
-use CrowdSec\Bouncer\Model\Bouncer;
+use CrowdSec\Bouncer\Model\Bounce;
 use CrowdSec\Bouncer\Exception\CrowdSecException;
-use CrowdSec\Bouncer\Registry\CurrentBouncer;
+use CrowdSec\Bouncer\Registry\CurrentBounce;
 use Magento\Framework\App\AreaList;
 use Magento\Framework\App\Bootstrap;
 use Magento\Framework\App\Request\Http as Request;
@@ -74,18 +74,18 @@ try {
     if (!$helper->isEnabled($state->getAreaCode())) {
         return;
     }
-    $bouncerRegistry = $objectManager->get(CurrentBouncer::class);
+    $bounceRegistry = $objectManager->get(CurrentBounce::class);
     // Avoid multiple call
-    if ($bouncerRegistry->get()) {
+    if ($bounceRegistry->get()) {
         return;
     }
-    /** @var Bouncer $bouncer */
-    $bouncer = $bouncerRegistry->create();
+    /** @var Bounce $bounce */
+    $bounce = $bounceRegistry->create();
     $configs = $helper->getBouncerConfigs();
-    $bouncer->init($configs);
-    $bouncer->run();
+    $bounce->init($configs);
+    $bounce->run();
     // If ban or captcha remediation wall display is detected
-    if ($bouncer->hasRemediationDisplay()) {
+    if ($bounce->hasRemediationDisplay()) {
         $response = $objectManager->get(Response::class);
         $response->sendResponse();
         // phpcs:ignore Magento2.Security.LanguageConstruct.ExitUsage

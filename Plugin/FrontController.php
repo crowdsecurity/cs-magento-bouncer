@@ -35,7 +35,7 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\App\ActionFlag;
 use Magento\Framework\App\State;
 use CrowdSec\Bouncer\Helper\Data as HelperData;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Cache\InvalidArgumentException;
 
@@ -61,9 +61,9 @@ class FrontController
     protected $helper;
 
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * @var ResponseInterface
@@ -75,7 +75,7 @@ class FrontController
      * @param HelperData $helper
      * @param ActionFlag $actionFlag
      * @param State $state
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      * @param ResponseInterface $response
      *
      */
@@ -83,13 +83,13 @@ class FrontController
         HelperData $helper,
         ActionFlag $actionFlag,
         State $state,
-        RegistryBouncer $registryBouncer,
+        RegistryBounce $registryBounce,
         ResponseInterface $response
     ) {
         $this->helper = $helper;
         $this->actionFlag = $actionFlag;
         $this->state = $state;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
         $this->response = $response;
     }
 
@@ -158,16 +158,16 @@ class FrontController
         RequestInterface $request
     ) {
         // Avoid multiple call
-        if ($this->registryBouncer->get()) {
+        if ($this->registryBounce->get()) {
             return $proceed($request);
         }
-        $registryBouncer = $this->registryBouncer->create();
+        $registryBounce = $this->registryBounce->create();
         $configs = $this->helper->getBouncerConfigs();
-        $registryBouncer->init($configs);
-        $registryBouncer->run();
+        $registryBounce->init($configs);
+        $registryBounce->run();
 
         // If ban or captcha remediation wall display is detected
-        if ($registryBouncer->hasRemediationDisplay()) {
+        if ($registryBounce->hasRemediationDisplay()) {
             // Stop further processing if your condition is met
             $this->actionFlag->set('', ActionInterface::FLAG_NO_DISPATCH, true);
 
