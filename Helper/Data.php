@@ -30,8 +30,10 @@ namespace CrowdSec\Bouncer\Helper;
 use CrowdSec\Bouncer\Constants;
 use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSecBouncer\RestClient\ClientAbstract;
+use LogicException;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\Area;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Store\Model\ScopeInterface;
 use CrowdSec\Bouncer\Logger\Logger;
 use CrowdSec\Bouncer\Logger\Handlers\DebugFactory as DebugHandler;
@@ -98,7 +100,9 @@ class Data extends Config
     /**
      * Manage logger and its handlers
      *
+     * @param array $configs
      * @return Logger
+     * @throws LogicException
      */
     public function getFinalLogger(array $configs = []): Logger
     {
@@ -153,7 +157,7 @@ class Data extends Config
      * @return bool
      * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
-    protected function _getBooleanSetting($path, $scope = ScopeInterface::SCOPE_STORE): bool
+    protected function _getBooleanSetting(string $path, string $scope = ScopeInterface::SCOPE_STORE): bool
     {
         return (bool)$this->scopeConfig->getValue($path, $scope);
     }
@@ -165,7 +169,7 @@ class Data extends Config
      * @param string $scope
      * @return string
      */
-    protected function _getStringSetting($path, $scope = ScopeInterface::SCOPE_STORE): string
+    protected function _getStringSetting(string $path, string $scope = ScopeInterface::SCOPE_STORE): string
     {
         return trim((string)$this->scopeConfig->getValue($path, $scope));
     }
@@ -322,6 +326,7 @@ class Data extends Config
      * @param mixed $message
      * @param array $context
      * @return void
+     * @throws LogicException
      */
     public function debug($message, array $context = []): void
     {
@@ -336,6 +341,7 @@ class Data extends Config
      * @param mixed $message
      * @param array $context
      * @return void
+     * @throws LogicException
      */
     public function critical($message, array $context = []): void
     {
@@ -348,6 +354,7 @@ class Data extends Config
      * @param mixed $message
      * @param array $context
      * @return void
+     * @throws LogicException
      */
     public function error($message, array $context = []): void
     {
@@ -372,7 +379,9 @@ class Data extends Config
      * Generate a config array in order to instantiate a bouncer
      *
      * @return array
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws CrowdSecException
+     * @throws LogicException
+     * @throws FileSystemException
      */
     public function getBouncerConfigs(): array
     {
@@ -400,6 +409,7 @@ class Data extends Config
                 'api_key' => $this->getApiKey(),
                 'api_user_agent' => Constants::BASE_USER_AGENT,
                 'api_timeout' => Constants::API_TIMEOUT,
+                'use_curl' => $this->isUseCurl(),
                 // Debug
                 'debug_mode' => $this->isDebugLog(),
                 'log_directory_path' =>Constants::CROWDSEC_LOG_PATH,
@@ -434,9 +444,10 @@ class Data extends Config
     /**
      * Check if a cron expression is valid
      *
-     * @see \Magento\Cron\Model\Schedule::setCronExpr
      * @param string $expr
      * @return void
+     * @throws CrowdSecException
+     * @see \Magento\Cron\Model\Schedule::setCronExpr
      */
     public function validateCronExpr(string $expr)
     {

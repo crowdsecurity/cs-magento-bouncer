@@ -49,6 +49,7 @@ class Config extends AbstractHelper
     // General configs
     public const XML_PATH_API_URL = self::SECTION . '/general/connection/api_url';
     public const XML_PATH_API_KEY = self::SECTION . '/general/connection/api_key';
+    public const XML_PATH_USE_CURL = self::SECTION . '/general/connection/use_curl';
     public const XML_PATH_FRONT_ENABLED = self::SECTION . '/general/bouncing/front_enabled';
     public const XML_PATH_ADMIN_ENABLED = self::SECTION . '/general/bouncing/admin_enabled';
     public const XML_PATH_API_ENABLED = self::SECTION . '/general/bouncing/api_enabled';
@@ -128,6 +129,7 @@ class Config extends AbstractHelper
     protected $_globals = [
         'api_url' => null,
         'api_key' => null,
+        'use_curl' => null,
         'is_admin_enabled' => null,
         'is_api_enabled' => null,
         'is_debug_log' => null,
@@ -201,6 +203,20 @@ class Config extends AbstractHelper
         }
 
         return (string) $this->_globals['api_key'];
+    }
+
+    /**
+     * Get use curl config
+     *
+     * @return bool
+     */
+    public function isUseCurl(): bool
+    {
+        if (!isset($this->_globals['use_curl'])) {
+            $this->_globals['use_curl'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_USE_CURL);
+        }
+
+        return (bool) $this->_globals['use_curl'];
     }
 
     /**

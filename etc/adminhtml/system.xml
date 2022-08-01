@@ -52,7 +52,12 @@
                         <comment><![CDATA[Generated with the cscli command, ex: <em>cscli bouncers add magento2-bouncer</em>]]></comment>
                         <validate>required-entry</validate>
                     </field>
-                    <field id="test"  translate="button_label" sortOrder="300" showInDefault="1">
+                    <field id="use_curl" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
+                        <label>Use cURL</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Enable if you want to call LAPI with <i>cURL</i> instead of <i>file_get_contents</i>.]]></comment>
+                    </field>
+                    <field id="test"  translate="button_label" sortOrder="400" showInDefault="1">
                         <button_label>Test connection</button_label>
                         <frontend_model>CrowdSec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping</frontend_model>
                     </field>
@@ -445,7 +450,7 @@
                     </field>
                     <field id="forced_test_forwarded_ip" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
                         <label><![CDATA[Forced test forwarded IP ]]></label>
-                        <comment><![CDATA[Do not use in production. For test purpose only. This Ip will be used instead of the current X-Forwarded-For Ip if any.]]></comment>
+                        <comment><![CDATA[Do not use in production. For test purpose only. This IP will be used instead of the current X-Forwarded-For IP if any.]]></comment>
                     </field>
                 </group>
             </group>

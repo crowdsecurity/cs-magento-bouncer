@@ -151,6 +151,32 @@ describe(`Live mode run`, () => {
     });
 });
 
+describe(`Test cURL in Live mode`, () => {
+    it("Should configure curl", async () => {
+        await goToSettingsPage();
+        await selectElement(
+            "crowdsec_bouncer_general_connection_use_curl",
+            "1",
+        );
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Connection test result: success.*Use cURL: true/,
+        );
+        await onAdminSaveSettings();
+    });
+
+    it("Should display the homepage with no remediation", async () => {
+        await removeAllDecisions();
+        await publicHomepageShouldBeAccessible();
+    });
+
+    it("Should display a ban wall", async () => {
+        await banIpForSeconds(15 * 60, CURRENT_IP);
+        await publicHomepageShouldBeBanWall();
+    });
+});
+
 describe(`Test cache in Live mode`, () => {
     it("Should configure the cache", async () => {
         await goToSettingsPage();

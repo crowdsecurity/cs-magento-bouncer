@@ -328,6 +328,12 @@ For test purpose only. If not empty, this IP will be used for all remediations a
 
 ***
 
+`Configure the debug mode → Forced test forwarded IP` (`global` scope)
+
+For test purpose only. This IP will be used instead of the current `X-Forwarded-For` IP if any.
+
+***
+
 #### Events
 
 

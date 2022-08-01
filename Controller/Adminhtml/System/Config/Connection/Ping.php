@@ -83,10 +83,16 @@ class Ping extends Action implements HttpPostActionInterface
             $baseUri = $this->getRequest()->getParam('api_url');
             $userAgent = Constants::BASE_USER_AGENT;
             $apiKey = $this->getRequest()->getParam('bouncer_key');
+            $useCurl = (bool) $this->getRequest()->getParam('use_curl', false);
             $configs = $this->helper->getBouncerConfigs();
-            $currentConfigs = ['api_url' => $baseUri, 'api_user_agent' => $userAgent, 'api_key' => $apiKey];
+            $currentConfigs = [
+                'api_url' => $baseUri,
+                'api_user_agent' => $userAgent,
+                'api_key' => $apiKey,
+                'use_curl' => $useCurl
+            ];
+            $useCurl = $useCurl ? __('true') : __('false');
             $finalConfigs = array_merge($configs, $currentConfigs);
-            /** @var \CrowdSec\Bouncer\Model\Bounce $bounce */
             $bounce = $this->registryBounce->create();
             $bouncer = $bounce->init($finalConfigs);
             $restClient = $bouncer->getRestClient();
@@ -109,7 +115,12 @@ class Ping extends Action implements HttpPostActionInterface
 
         return $resultJson->setData([
             'connection' => $result,
-            'message' => $message .'<br><br>'. __('Tested url: %1 <br> Tested key: %2', $baseUri??"", $apiKey??""),
+            'message' => $message .'<br><br>'. __(
+                'Tested url: %1 <br> Tested key: %2 <br> Use cURL: %3',
+                $baseUri??"",
+                $apiKey??"",
+                $useCurl
+            ),
         ]);
     }
 }

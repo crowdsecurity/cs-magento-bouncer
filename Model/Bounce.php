@@ -128,10 +128,12 @@ class Bounce extends AbstractBounce
                     'api_url' => $settings['api_url'],
                     'api_user_agent' => $settings['api_user_agent'],
                     'api_timeout' => $settings['api_timeout'],
+                    'use_curl' => $settings['use_curl'],
                     // Debug
                     'debug_mode' => $settings['debug_mode'],
                     'log_directory_path' => $settings['log_directory_path'],
                     'forced_test_ip' => $settings['forced_test_ip'],
+                    'forced_test_forwarded_ip' => $settings['forced_test_forwarded_ip'],
                     'display_errors' => $settings['display_errors'],
                     // Bouncer
                     'bouncing_level' => $settings['bouncing_level'],

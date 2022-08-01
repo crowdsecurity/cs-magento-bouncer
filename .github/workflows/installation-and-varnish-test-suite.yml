@@ -79,6 +79,17 @@ jobs:
           sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           ddev start
 
+      - name: Some DEBUG information
+        run: |
+          ddev --version
+          ddev exec php -v
+          ddev exec -s crowdsec crowdsec -version
+          ddev php -r "echo phpversion('memcached');"
+
+      - name: Force allow plugin for some versions
+        if: contains(fromJson('["2.4.3"]'),matrix.m2-version)
+        run: ddev composer config --global allow-plugins true -n
+
       - name: Handle Varnish ACL
         run: |
           ddev replace-acl $(ddev find-ip ddev-router)

@@ -38,7 +38,8 @@
 
             params = {
                 api_url: $('<?= $block->escapeJs($block->getUrlField()) ?>').value,
-                bouncer_key: $('<?= $block->escapeJs($block->getKeyField()) ?>').value
+                bouncer_key: $('<?= $block->escapeJs($block->getKeyField()) ?>').value,
+                use_curl: $('<?= $block->escapeJs($block->getUseCurlField()) ?>').value
             };
 
             new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
