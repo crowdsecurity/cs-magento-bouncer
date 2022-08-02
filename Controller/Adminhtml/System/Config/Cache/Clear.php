@@ -28,13 +28,16 @@
 namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Cache;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
+use Exception;
+use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
+use Psr\Cache\CacheException;
+use Psr\Cache\InvalidArgumentException;
 
 class Clear extends Action implements HttpPostActionInterface
 {
@@ -75,6 +78,9 @@ class Clear extends Action implements HttpPostActionInterface
      * Clear cache
      *
      * @return Json
+     * @throws LogicException
+     * @throws CacheException
+     * @throws InvalidArgumentException
      */
     public function execute(): Json
     {
@@ -99,7 +105,7 @@ class Clear extends Action implements HttpPostActionInterface
                 $message .=  ' '.__("$decisionsMessage", $decisionsCount);
             }
 
-        } catch (CrowdSecException $e) {
+        } catch (Exception $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_CLEARING_CACHE',
                 'message' => $e->getMessage(),

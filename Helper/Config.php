@@ -28,7 +28,9 @@
 namespace CrowdSec\Bouncer\Helper;
 
 use CrowdSec\Bouncer\Constants;
+use InvalidArgumentException;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -347,7 +349,7 @@ class Config extends AbstractHelper
      *
      * @param string $relativePath
      * @return string
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws FileSystemException
      */
     public function getGeolocationDatabaseFullPath(string $relativePath): string
     {
@@ -358,7 +360,7 @@ class Config extends AbstractHelper
      * Get geolocation config
      *
      * @return array
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws FileSystemException
      */
     public function getGeolocation(): array
     {
@@ -597,6 +599,7 @@ class Config extends AbstractHelper
      * Get trusted forwarded ips config
      *
      * @return array
+     * @throws InvalidArgumentException
      */
     public function getTrustedForwardedIps(): array
     {

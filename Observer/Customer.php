@@ -27,6 +27,7 @@
 
 namespace CrowdSec\Bouncer\Observer;
 
+use LogicException;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use CrowdSec\Bouncer\Event\Event;
@@ -40,7 +41,7 @@ class Customer extends Event implements EventInterface, ObserverInterface
      * @param array $objects
      * @return array|string[]
      */
-    public function getEventData($objects = []): array
+    public function getEventData(array $objects = []): array
     {
         $customer = $objects['customer'] ?? null;
         return $customer ? ['customer_id' => (string)$customer->getId()] : [];
@@ -50,9 +51,10 @@ class Customer extends Event implements EventInterface, ObserverInterface
      * Event observer execution
      *
      * @param Observer $observer
-     * @return $this|void
+     * @return $this
+     * @throws LogicException
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): Customer
     {
         if ($this->helper->isEventsLogEnabled($this->process)) {
             $customer = $observer->getCustomer();

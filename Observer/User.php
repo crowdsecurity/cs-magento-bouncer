@@ -27,6 +27,7 @@
 
 namespace CrowdSec\Bouncer\Observer;
 
+use LogicException;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use CrowdSec\Bouncer\Event\Event;
@@ -41,7 +42,7 @@ class User extends Event implements EventInterface, ObserverInterface
      * @param array $objects
      * @return array
      */
-    public function getEventData($objects = []): array
+    public function getEventData(array $objects = []): array
     {
         return [];
     }
@@ -52,6 +53,7 @@ class User extends Event implements EventInterface, ObserverInterface
      * @param Observer $observer
      * @return $this
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws LogicException
      */
     public function execute(Observer $observer): User
     {

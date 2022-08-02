@@ -38,6 +38,8 @@ use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Constants;
 use CrowdSecBouncer\Geolocation;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Psr\Cache\CacheException;
+use Psr\Cache\InvalidArgumentException;
 
 class Country extends Action implements HttpPostActionInterface
 {
@@ -90,6 +92,8 @@ class Country extends Action implements HttpPostActionInterface
      * Test geolocation
      *
      * @return Json
+     * @throws CacheException
+     * @throws InvalidArgumentException
      */
     public function execute(): Json
     {

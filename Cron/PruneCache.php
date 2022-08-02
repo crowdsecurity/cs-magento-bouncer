@@ -3,9 +3,10 @@
 namespace CrowdSec\Bouncer\Cron;
 
 use CrowdSec\Bouncer\Constants;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use Exception;
+use LogicException;
 
 class PruneCache
 {
@@ -34,7 +35,7 @@ class PruneCache
      *  Prune file system cache
      *
      * @return void
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws LogicException
      */
     public function execute(): void
     {
@@ -43,7 +44,7 @@ class PruneCache
                 $bounce = $this->registryBounce->create();
                 $configs = $this->helper->getBouncerConfigs();
                 $bounce->init($configs)->pruneCache();
-            } catch (CrowdSecException $e) {
+            } catch (Exception $e) {
                 $this->helper->error('', [
                     'type' => 'M2_EXCEPTION_WHILE_PRUNING_CACHE',
                     'message' => $e->getMessage(),

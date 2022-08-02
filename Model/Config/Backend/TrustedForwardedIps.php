@@ -28,13 +28,13 @@
 namespace CrowdSec\Bouncer\Model\Config\Backend;
 
 use CrowdSec\Bouncer\Helper\Config;
+use CrowdSecBouncer\BouncerException;
 use Exception;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\App\Config\Value;
 use Magento\Framework\Data\Collection\AbstractDb;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
@@ -91,7 +91,7 @@ class TrustedForwardedIps extends Value
      * Update array config for Ips
      *
      * @return Value
-     * @throws CrowdSecException
+     * @throws BouncerException
      */
     public function afterSave(): Value
     {
@@ -104,14 +104,14 @@ class TrustedForwardedIps extends Value
                     if (false !== strpos($stringRange, '/')) {
                         $range = Factory::parseRangeString($stringRange);
                         if (null === $range) {
-                            throw new CrowdSecException('Invalid IP List format.');
+                            throw new BouncerException('Invalid IP List format.');
                         }
                         $bounds = [$range->getComparableStartString(), $range->getComparableEndString()];
                         $comparableIpBoundsList = [$bounds];
                     } else {
                         $address = Factory::parseAddressString($stringRange, 3);
                         if (null === $address) {
-                            throw new CrowdSecException('Invalid IP List format.');
+                            throw new BouncerException('Invalid IP List format.');
                         }
                         $comparableString = $address->getComparableString();
                         $comparableIpBoundsList[] = [$comparableString, $comparableString];
@@ -126,7 +126,7 @@ class TrustedForwardedIps extends Value
                 );
             } catch (Exception $e) {
                 $this->_logger->error($e->getMessage());
-                throw new CrowdSecException('CrowdSec Trusted forward ips settings can\'t be saved');
+                throw new BouncerException('CrowdSec Trusted forward ips settings can\'t be saved');
             }
         }
 

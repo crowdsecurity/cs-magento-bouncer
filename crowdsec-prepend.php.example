@@ -34,7 +34,6 @@
 
 use CrowdSec\Bouncer\Helper\Data;
 use CrowdSec\Bouncer\Model\Bounce;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Registry\CurrentBounce;
 use Magento\Framework\App\AreaList;
 use Magento\Framework\App\Bootstrap;
@@ -91,7 +90,7 @@ try {
         // phpcs:ignore Magento2.Security.LanguageConstruct.ExitUsage
         exit(0);
     }
-} catch (CrowdSecException $e) {
+} catch (Exception $e) {
     $helper->critical('', [
         'type' => 'M2_EXCEPTION_WHILE_PREPEND_BOUNCING',
         'message' => $e->getMessage(),

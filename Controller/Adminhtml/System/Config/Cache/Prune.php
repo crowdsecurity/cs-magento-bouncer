@@ -28,12 +28,13 @@
 namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Cache;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
+use Exception;
+use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Constants;
 
@@ -76,8 +77,7 @@ class Prune extends Action implements HttpPostActionInterface
      * Prune cache
      *
      * @return Json
-     * @throws \CrowdSecBouncer\BouncerException
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws LogicException
      */
     public function execute(): Json
     {
@@ -92,7 +92,7 @@ class Prune extends Action implements HttpPostActionInterface
             $cacheLabel = $cacheOptions[Constants::CACHE_SYSTEM_PHPFS] ?? __('Unknown');
             $message = __('CrowdSec cache (%1) has been pruned.', $cacheLabel);
 
-        } catch (CrowdSecException $e) {
+        } catch (Exception $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_PRUNING_CACHE',
                 'message' => $e->getMessage(),

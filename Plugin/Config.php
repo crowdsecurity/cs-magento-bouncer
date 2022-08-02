@@ -27,15 +27,16 @@
 
 namespace CrowdSec\Bouncer\Plugin;
 
-use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use CrowdSecBouncer\BouncerException;
 use Exception;
-use Magento\Framework\Exception\FileSystemException;
+use LogicException;
 use Magento\Framework\Message\ManagerInterface;
 use CrowdSec\Bouncer\Constants;
 use Magento\Framework\Phrase;
 use Magento\Framework\App\Config\Storage\WriterInterface;
+use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 use Magento\Config\Model\Config as MagentoConfig;
 
@@ -94,8 +95,7 @@ class Config
      *
      * @param MagentoConfig $subject
      * @return null
-     * @throws CrowdSecException|InvalidArgumentException
-     * @throws FileSystemException
+     * @throws LogicException|BouncerException|CacheException
      */
     public function beforeSave(
         MagentoConfig $subject
@@ -193,8 +193,8 @@ class Config
      * @param string $newRedisDsn
      * @param string $newMemcachedDsn
      * @param Phrase $newCacheLabel
-     * @throws InvalidArgumentException
-     * @throws FileSystemException
+     * @throws LogicException
+     * @throws BouncerException|CacheException
      */
     public function _handleStreamMode(
         bool   $oldStreamMode,
@@ -239,8 +239,9 @@ class Config
      * @param string $newRedisDsn
      * @param string $newMemcachedDsn
      * @param Phrase $newCacheLabel
-     * @throws InvalidArgumentException
-     * @throws FileSystemException
+     * @throws BouncerException
+     * @throws LogicException
+     * @throws CacheException
      */
     protected function _handleWarmUp(
         bool   $oldStreamMode,
@@ -254,7 +255,7 @@ class Config
     ) {
         $shouldWarmUp = false;
         if ($newStreamMode === true) {
-            if ($oldStreamMode !== $newStreamMode) {
+            if ($oldStreamMode !== true) {
                 $shouldWarmUp = true;
             }
             if ($refreshCronExprChanged) {
@@ -278,6 +279,7 @@ class Config
      * @param bool $cronExprChanged
      * @param string $newCronExpr
      * @return void
+     * @throws BouncerException
      */
     protected function _handleRefreshCronExpr(
         bool   $oldStreamMode,
@@ -295,7 +297,7 @@ class Config
                 $cronMessage = __('Cache refresh cron has been disabled.');
                 $this->messageManager->addNoticeMessage($cronMessage);
             } catch (Exception $e) {
-                throw new CrowdSecException('Disabled refresh cron expression can\'t be saved: '. $e->getMessage());
+                throw new BouncerException('Disabled refresh cron expression can\'t be saved: '. $e->getMessage());
             }
         } elseif ($cronExprChanged) {
             // Check expression
@@ -303,7 +305,7 @@ class Config
                 $this->helper->validateCronExpr($newCronExpr);
             } catch (Exception $e) {
                 $this->messageManager->getMessages(true);
-                throw new CrowdSecException("Refresh cron expression ($newCronExpr) is not valid.");
+                throw new BouncerException("Refresh cron expression ($newCronExpr) is not valid.");
             }
         }
     }
@@ -316,6 +318,7 @@ class Config
      * @param bool $cronExprChanged
      * @param string $newCronExpr
      * @return void
+     * @throws BouncerException
      */
     protected function _handlePruneCronExpr(
         string $oldCacheSystem,
@@ -335,7 +338,7 @@ class Config
                 $cronMessage = __('File system cache pruning cron has been disabled.');
                 $this->messageManager->addNoticeMessage($cronMessage);
             } catch (Exception $e) {
-                throw new CrowdSecException('Disabled pruning cron expression can\'t be saved: '. $e->getMessage());
+                throw new BouncerException('Disabled pruning cron expression can\'t be saved: '. $e->getMessage());
             }
         } elseif ($cronExprChanged) {
             // Check expression
@@ -343,7 +346,7 @@ class Config
                 $this->helper->validateCronExpr($newCronExpr);
             } catch (Exception $e) {
                 $this->messageManager->getMessages(true);
-                throw new CrowdSecException("Pruning cron expression ($newCronExpr) is not valid.");
+                throw new BouncerException("Pruning cron expression ($newCronExpr) is not valid.");
             }
         }
     }
@@ -356,6 +359,7 @@ class Config
      * @param string $oldKey
      * @param string $newKey
      * @return void
+     * @throws BouncerException
      */
     protected function _handleConnectionChanges(
         string $oldUrl,
@@ -380,7 +384,7 @@ class Config
 
                 $this->helper->ping($restClient);
             } catch (Exception $e) {
-                throw new CrowdSecException("Connection test failed with url \'$newUrl\' and key \'$newKey\': "
+                throw new BouncerException("Connection test failed with url \'$newUrl\' and key \'$newKey\': "
                                             .$e->getMessage());
             }
         }
@@ -396,7 +400,7 @@ class Config
      * @param string $newMemcachedDsn
      * @param Phrase $newCacheLabel
      * @throws InvalidArgumentException
-     * @throws FileSystemException
+     * @throws LogicException
      */
     protected function _handleNewClearCache(
         bool   $oldStreamMode,
@@ -408,7 +412,7 @@ class Config
     ) {
         $shouldClearCache = false;
         if ($newStreamMode === false) {
-            if ($oldStreamMode !== $newStreamMode) {
+            if ($oldStreamMode !== false) {
                 $shouldClearCache = true;
             }
         }
@@ -427,8 +431,8 @@ class Config
      * @param string $oldMemcachedDsn
      * @param string $oldRedisDsn
      * @param Phrase $oldCacheLabel
-     * @throws FileSystemException
      * @throws InvalidArgumentException
+     * @throws LogicException
      */
     protected function _handleOldClearCache(
         bool   $cacheChanged,
@@ -450,7 +454,7 @@ class Config
      * @param string $memcachedDsn
      * @param string $redisDsn
      * @param Phrase $cacheLabel
-     * @throws CrowdSecException|InvalidArgumentException
+     * @throws InvalidArgumentException|LogicException|BouncerException
      */
     protected function _handleTestCache(
         bool   $cacheChanged,
@@ -484,7 +488,7 @@ class Config
                 ]);
                 $cacheMessage =
                     "Technical error while testing the $cacheLabel cache: " . $e->getMessage();
-                throw new CrowdSecException($cacheMessage);
+                throw new BouncerException($cacheMessage);
             }
         }
     }
@@ -498,7 +502,7 @@ class Config
      * @param Phrase $cacheLabel
      * @param Phrase|null $preMessage
      * @throws InvalidArgumentException
-     * @throws FileSystemException
+     * @throws LogicException
      */
     protected function _clearCache(
         string  $cacheSystem,
@@ -520,7 +524,7 @@ class Config
             $clearCacheResult =
                 $bounce->init(array_merge($configs, $currentConfigs))->clearCache();
             $this->displayCacheClearMessage($clearCacheResult, $cacheLabel, $preMessage);
-        } catch (CrowdSecException $e) {
+        } catch (Exception $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_CLEARING_CACHE',
                 'message' => $e->getMessage(),
@@ -542,8 +546,10 @@ class Config
      * @param string $redisDsn
      * @param Phrase $cacheLabel
      * @return void
-     * @throws FileSystemException
+     * @throws BouncerException
      * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws CacheException
      */
     protected function _warmUpCache(
         string $cacheSystem,
@@ -563,7 +569,7 @@ class Config
             ];
             $warmUpCacheResult = $bounce->init(array_merge($configs, $currentConfigs))->warmBlocklistCacheUp();
             $this->displayCacheWarmUpMessage($warmUpCacheResult, $cacheLabel);
-        } catch (CrowdSecException $e) {
+        } catch (Exception $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_WARMING_UP_CACHE',
                 'message' => $e->getMessage(),
@@ -574,7 +580,7 @@ class Config
 
             $cacheMessage =
                 "Technical error while warming up the $cacheLabel cache: " . $e->getMessage();
-            throw new CrowdSecException($cacheMessage);
+            throw new BouncerException($cacheMessage);
         }
     }
 

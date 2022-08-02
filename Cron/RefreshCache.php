@@ -2,9 +2,12 @@
 
 namespace CrowdSec\Bouncer\Cron;
 
-use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use Exception;
+use LogicException;
+use Psr\Cache\CacheException;
+use Psr\Cache\InvalidArgumentException;
 
 class RefreshCache
 {
@@ -33,8 +36,9 @@ class RefreshCache
      * Refresh cache in Stream Mode
      *
      * @return void
-     * @throws \Magento\Framework\Exception\FileSystemException
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws LogicException
+     * @throws CacheException
+     * @throws InvalidArgumentException
      */
     public function execute(): void
     {
@@ -43,7 +47,7 @@ class RefreshCache
                 $bounce = $this->registryBounce->create();
                 $configs = $this->helper->getBouncerConfigs();
                 $bounce->init($configs)->refreshBlocklistCache();
-            } catch (CrowdSecException $e) {
+            } catch (Exception $e) {
                 $this->helper->error('', [
                     'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                     'message' => $e->getMessage(),

@@ -25,9 +25,13 @@
  *
  */
 
+
 namespace CrowdSec\Bouncer\Plugin;
 
 use Closure;
+use CrowdSecBouncer\BouncerException;
+use Exception;
+use LogicException;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\FrontControllerInterface;
 use Magento\Framework\App\RequestInterface;
@@ -36,11 +40,14 @@ use Magento\Framework\App\ActionFlag;
 use Magento\Framework\App\State;
 use CrowdSec\Bouncer\Helper\Data as HelperData;
 use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\LocalizedException;
-use Psr\Cache\InvalidArgumentException;
+use Psr\Cache\CacheException;
 
 /**
  * Plugin to handle controller request before Full Page Cache
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.UnusedFormalParameter)
  */
 class FrontController
 {
@@ -101,7 +108,9 @@ class FrontController
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
      * @throws LocalizedException
-     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws BouncerException
+     * @throws CacheException
      */
     public function aroundDispatch(
         FrontControllerInterface $subject,
@@ -123,7 +132,7 @@ class FrontController
         */
         try {
             return $this->bounce($subject, $proceed, $request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->helper->critical('', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
                 'message' => $e->getMessage(),
@@ -147,9 +156,10 @@ class FrontController
      * @param Closure $proceed
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
-     * @throws LocalizedException
-     * @throws InvalidArgumentException
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws LogicException
+     * @throws BouncerException
+     * @throws FileSystemException
+     * @throws CacheException
      * @noinspection PhpUnusedParameterInspection
      */
     private function bounce(

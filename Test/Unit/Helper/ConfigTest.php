@@ -27,12 +27,17 @@
 
 namespace CrowdSec\Bouncer\Test\Unit\Helper;
 
+use Magento\Framework\App\Helper\Context;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use CrowdSec\Bouncer\Helper\Config;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
 
-class ConfigTest extends \PHPUnit\Framework\TestCase
+class ConfigTest extends TestCase
 {
     /**
      * @var Config
@@ -40,7 +45,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
     protected $helper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var PHPUnit_Framework_MockObject_MockObject
      */
     private $scopeConfig;
 
@@ -50,67 +55,81 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         $className = Config::class;
         $arguments = $objectManagerHelper->getConstructArguments($className);
 
-        /** @var \Magento\Framework\App\Helper\Context $context */
+        /** @var Context $context */
         $context = $arguments['context'];
         $this->scopeConfig = $context->getScopeConfig();
 
         $this->helper = $objectManagerHelper->getObject($className, $arguments);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
     public function testIsFrontEnabled()
     {
-        $scopeResult = true;
         $this->scopeConfig->expects($this->once())->method('getValue')->with(
             Config::XML_PATH_FRONT_ENABLED,
             ScopeInterface::SCOPE_STORE
         )
-            ->willReturn($scopeResult);
+            ->willReturn(true);
         $result = $this->helper->isFrontEnabled();
 
-        $this->assertEquals($result, $scopeResult);
+        $this->assertEquals(true, $result);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
     public function testIsFrontDisabled()
     {
-        $scopeResult = false;
         $this->scopeConfig->expects($this->once())->method('getValue')->with(
             Config::XML_PATH_FRONT_ENABLED,
             ScopeInterface::SCOPE_STORE
         )
-            ->willReturn($scopeResult);
+            ->willReturn(false);
         $result = $this->helper->isFrontEnabled();
 
-        $this->assertEquals($result, $scopeResult);
+        $this->assertEquals(false, $result);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
     public function testIsAdminEnabled()
     {
-        $scopeResult = true;
         $this->scopeConfig->expects($this->once())->method('getValue')->with(
             Config::XML_PATH_ADMIN_ENABLED
         )
-            ->willReturn($scopeResult);
+            ->willReturn(true);
         $result = $this->helper->isAdminEnabled();
 
-        $this->assertEquals($result, $scopeResult);
+        $this->assertEquals(true, $result);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
     public function testIsAdminDisabled()
     {
-        $scopeResult = false;
         $this->scopeConfig->expects($this->once())->method('getValue')->with(
             Config::XML_PATH_ADMIN_ENABLED
         )
-            ->willReturn($scopeResult);
+            ->willReturn(false);
         $result = $this->helper->isAdminEnabled();
 
-        $this->assertEquals($result, $scopeResult);
+        $this->assertEquals(false, $result);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
     public function testIsDebugLog()
     {
-        $scopeResult = true;
-
         $this->scopeConfig->expects($this->any())
             ->method('getValue')
             ->willReturnMap(
@@ -119,18 +138,21 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
                         Config::XML_PATH_ADVANCED_DEBUG_LOG,
                         ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
                         null,
-                        $scopeResult,
+                        true,
                     ]
 
                 ]
             );
         $result = $this->helper->isDebugLog();
-        $this->assertEquals($result, $scopeResult);
+        $this->assertEquals(true, $result);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     * @throws ExpectationFailedException
+     */
     public function testIsNotDebugLog()
     {
-        $scopeResult = false;
         $this->scopeConfig->expects($this->any())
             ->method('getValue')
             ->willReturnMap(
@@ -139,12 +161,12 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
                         Config::XML_PATH_ADVANCED_DEBUG_LOG,
                         ScopeConfigInterface::SCOPE_TYPE_DEFAULT,
                         null,
-                        $scopeResult,
+                        false,
                     ]
 
                 ]
             );
         $result = $this->helper->isDebugLog();
-        $this->assertEquals($result, $scopeResult);
+        $this->assertEquals(false, $result);
     }
 }

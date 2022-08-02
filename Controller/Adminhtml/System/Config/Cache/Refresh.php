@@ -28,13 +28,15 @@
 namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Cache;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
+use Exception;
+use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
+use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 
 class Refresh extends Action implements HttpPostActionInterface
@@ -77,6 +79,8 @@ class Refresh extends Action implements HttpPostActionInterface
      *
      * @return Json
      * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws CacheException
      */
     public function execute(): Json
     {
@@ -98,7 +102,7 @@ class Refresh extends Action implements HttpPostActionInterface
                 $deleted
             );
             $result = 1;
-        } catch (CrowdSecException $e) {
+        } catch (Exception $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                 'message' => $e->getMessage(),

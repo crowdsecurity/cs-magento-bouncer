@@ -27,9 +27,9 @@
 
 namespace CrowdSec\Bouncer\Model;
 
-use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSecBouncer\BouncerException;
 use Exception;
+use LogicException;
 use Magento\Framework\App\Response\Http;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSecBouncer\AbstractBounce;
@@ -82,6 +82,7 @@ class Bounce extends AbstractBounce
      *
      * @param array $configs
      * @return void
+     * @throws LogicException
      */
     public function initLogger(array $configs): void
     {
@@ -114,12 +115,12 @@ class Bounce extends AbstractBounce
      *
      * @param array $settings
      * @return BouncerInstance
-     * @throws CrowdSecException
+     * @throws LogicException|BouncerException
      */
     public function getBouncerInstance(array $settings = []): BouncerInstance
     {
         if ($this->bouncerInstance === null) {
-            $this->logger = $settings['logger'];
+            $this->logger = $this->helper->getFinalLogger();
 
             try {
                 $configs = [
@@ -131,6 +132,7 @@ class Bounce extends AbstractBounce
                     'use_curl' => $settings['use_curl'],
                     // Debug
                     'debug_mode' => $settings['debug_mode'],
+                    //'disable_prod_log' => $settings['disable_prod_log'],
                     'log_directory_path' => $settings['log_directory_path'],
                     'forced_test_ip' => $settings['forced_test_ip'],
                     'forced_test_forwarded_ip' => $settings['forced_test_forwarded_ip'],
@@ -160,7 +162,7 @@ class Bounce extends AbstractBounce
                     );
 
             } catch (Exception $e) {
-                throw new CrowdSecException($e->getMessage());
+                throw new BouncerException($e->getMessage());
             }
 
             $this->bouncerInstance = $bouncerInstance;
@@ -174,7 +176,7 @@ class Bounce extends AbstractBounce
      *
      * @param array $configs
      * @return BouncerInstance
-     * @throws CrowdSecException
+     * @throws LogicException|BouncerException
      */
     public function init(array $configs): BouncerInstance
     {
@@ -239,6 +241,7 @@ class Bounce extends AbstractBounce
      * Retrieve IP ranges to trust as proxies as an array of comparables ip bounds
      *
      * @return array [[string, string], ...]
+     * @throws \InvalidArgumentException
      */
     public function getTrustForwardedIpBoundsList(): array
     {
@@ -270,8 +273,7 @@ class Bounce extends AbstractBounce
      * @param string|null $body
      * @param int $statusCode
      * @return void
-     * @throws CrowdSecException
-     * @throws \Laminas\Http\Exception\InvalidArgumentException
+     * @throws \Laminas\Http\Exception\InvalidArgumentException|BouncerException
      */
     public function sendResponse(?string $body, int $statusCode = 200): void
     {
@@ -292,7 +294,7 @@ class Bounce extends AbstractBounce
                 $this->response->setHeader('cache-control', $noCacheControl);
                 break;
             default:
-                throw new CrowdSecException("Unhandled code $statusCode");
+                throw new BouncerException("Unhandled code $statusCode");
         }
         if (null !== $body) {
             $this->setRemediationDisplay(true);
@@ -309,10 +311,9 @@ class Bounce extends AbstractBounce
      *
      * @param array $configs
      * @return bool
-     * @throws CrowdSecException
      * @throws InvalidArgumentException
      * @throws BouncerException
-     * @throws CacheException
+     * @throws CacheException|LogicException
      */
     public function safelyBounce(array $configs): bool
     {
@@ -321,7 +322,7 @@ class Bounce extends AbstractBounce
             $this->init($configs);
             $this->run();
             $result = true;
-        } catch (CrowdSecException $e) {
+        } catch (Exception $e) {
             $this->logger->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
                 'message' => $e->getMessage(),

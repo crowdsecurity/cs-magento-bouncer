@@ -27,6 +27,7 @@
 
 namespace CrowdSec\Bouncer\Observer;
 
+use LogicException;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use CrowdSec\Bouncer\Event\Event;
@@ -40,7 +41,7 @@ class Payment extends Event implements EventInterface, ObserverInterface
      * @param array $objects
      * @return array
      */
-    public function getEventData($objects = []): array
+    public function getEventData(array $objects = []): array
     {
         $payment = $objects['payment'] ?? null;
 
@@ -51,9 +52,10 @@ class Payment extends Event implements EventInterface, ObserverInterface
      * Event observer execution
      *
      * @param Observer $observer
-     * @return $this|void
+     * @return $this
+     * @throws LogicException
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): Payment
     {
         if ($this->helper->isEventsLogEnabled($this->process)) {
             $payment = $observer->getPayment();

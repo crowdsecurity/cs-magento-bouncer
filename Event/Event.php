@@ -30,6 +30,7 @@ namespace CrowdSec\Bouncer\Event;
 use Exception;
 use CrowdSec\Bouncer\Helper\Event as Helper;
 use CrowdSec\Bouncer\Constants;
+use LogicException;
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\SchemaContract;
@@ -105,6 +106,7 @@ class Event
      *
      * @param array $eventData
      * @return bool
+     * @throws LogicException
      */
     public function validateEvent(array $eventData): bool
     {

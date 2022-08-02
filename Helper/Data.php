@@ -28,7 +28,7 @@
 namespace CrowdSec\Bouncer\Helper;
 
 use CrowdSec\Bouncer\Constants;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSecBouncer\BouncerException;
 use CrowdSecBouncer\RestClient\ClientAbstract;
 use LogicException;
 use Magento\Framework\App\Helper\Context;
@@ -379,9 +379,8 @@ class Data extends Config
      * Generate a config array in order to instantiate a bouncer
      *
      * @return array
-     * @throws CrowdSecException
      * @throws LogicException
-     * @throws FileSystemException
+     * @throws FileSystemException|BouncerException
      */
     public function getBouncerConfigs(): array
     {
@@ -398,10 +397,8 @@ class Data extends Config
                     $maxRemediationLevel = Constants::REMEDIATION_BAN;
                     break;
                 default:
-                    throw new CrowdSecException("Unknown $bouncingLevel");
+                    throw new BouncerException("Unknown $bouncingLevel");
             }
-
-            $logger = $this->getFinalLogger();
 
             $this->_bouncerConfigs = [
                 // API connection
@@ -412,6 +409,7 @@ class Data extends Config
                 'use_curl' => $this->isUseCurl(),
                 // Debug
                 'debug_mode' => $this->isDebugLog(),
+                'disable_prod_log' => $this->isProdLogDisabled(),
                 'log_directory_path' =>Constants::CROWDSEC_LOG_PATH,
                 'forced_test_ip' => $this->getForcedTestIp(),
                 'forced_test_forwarded_ip' => $this->getForcedTestForwardedIp(),
@@ -433,8 +431,6 @@ class Data extends Config
                 'geolocation_cache_duration' => $this->getGeolocationCacheDuration(),
                 // Geolocation
                 'geolocation' => $this->getGeolocation(),
-                // Extra configs
-                'logger' => $logger,
             ];
         }
 
@@ -446,14 +442,14 @@ class Data extends Config
      *
      * @param string $expr
      * @return void
-     * @throws CrowdSecException
+     * @throws BouncerException
      * @see \Magento\Cron\Model\Schedule::setCronExpr
      */
     public function validateCronExpr(string $expr)
     {
         $e = preg_split('#\s+#', $expr, -1, PREG_SPLIT_NO_EMPTY);
         if (count($e) < 5 || count($e) > 6) {
-            throw new CrowdSecException("Invalid cron expression: $expr");
+            throw new BouncerException("Invalid cron expression: $expr");
         }
     }
 
