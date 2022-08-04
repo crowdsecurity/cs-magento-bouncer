@@ -29,7 +29,7 @@ namespace CrowdSec\Bouncer\Helper;
 
 use CrowdSec\Bouncer\Constants;
 use CrowdSecBouncer\BouncerException;
-use CrowdSecBouncer\RestClient\ClientAbstract;
+use CrowdSecBouncer\RestClient\AbstractClient;
 use LogicException;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\Area;
@@ -456,10 +456,10 @@ class Data extends Config
     /**
      * Make a rest request
      *
-     * @param ClientAbstract $restClient
+     * @param AbstractClient $restClient
      * @return void
      */
-    public function ping(ClientAbstract $restClient)
+    public function ping(AbstractClient $restClient)
     {
         $restClient->request('/v1/decisions', []);
     }

@@ -132,7 +132,7 @@ class Bounce extends AbstractBounce
                     'use_curl' => $settings['use_curl'],
                     // Debug
                     'debug_mode' => $settings['debug_mode'],
-                    //'disable_prod_log' => $settings['disable_prod_log'],
+                    'disable_prod_log' => $settings['disable_prod_log'],
                     'log_directory_path' => $settings['log_directory_path'],
                     'forced_test_ip' => $settings['forced_test_ip'],
                     'forced_test_forwarded_ip' => $settings['forced_test_forwarded_ip'],
