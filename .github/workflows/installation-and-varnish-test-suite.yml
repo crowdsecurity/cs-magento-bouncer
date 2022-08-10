@@ -16,11 +16,11 @@ jobs:
       fail-fast: false
       matrix:
         # Last one for the current and previous minor, greatest php version
-        m2-version: [ "2.3.7", "2.4.4" ]
+        m2-version: [ "2.3.7", "2.4.5" ]
         php-version: [ "7.4", "8.1" ]
         exclude:
           - { php-version: "8.1", m2-version: "2.3.7" }
-          - { php-version: "7.4", m2-version: "2.4.4" }
+          - { php-version: "7.4", m2-version: "2.4.5" }
 
 
     name: Installation and Varnish test suite

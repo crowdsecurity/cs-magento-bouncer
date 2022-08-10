@@ -89,12 +89,11 @@ commands, you must respect the sub folders naming: `.ddev`, `my-own-modules` and
 
 - Create an empty folder that will contain all necessary sources (Magento 2 and this extension):
 ``` 
-mkdir m2-sources
+mkdir m2-sources && cd m2-sources
 ```
 - Create an empty `.ddev` folder for DDEV and clone our pre-configured DDEV repo:
 ```
-mkdir m2-sources/.ddev
-cd m2-sources/.ddev
+mkdir .ddev && cd .ddev
 git clone git@github.com:julienloizelet/ddev-m2.git ./
 ```
 - Copy some configurations file:
@@ -150,8 +149,7 @@ You will need your Magento 2 credentials to install the source code.
 #### CrowdSec Bouncer extension installation
 
      cd m2-sources
-     mkdir -p my-own-modules/crowdsec-bouncer
-     cd my-own-modules/crowdsec-bouncer
+     mkdir -p my-own-modules/crowdsec-bouncer && cd my-own-modules/crowdsec-bouncer
      git clone git@github.com:crowdsecurity/cs-magento-bouncer.git ./
      ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
      ddev composer require crowdsec/magento2-module-bouncer:@dev
