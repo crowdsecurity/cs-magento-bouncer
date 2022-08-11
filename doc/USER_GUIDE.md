@@ -28,7 +28,7 @@
 
 ## Description
 
-The `CrowdSec Bouncer` extension for Magento 2 has been designed to protect Magento 2 websites from all kinds of attacks by using [CrowdSec](https://crowdsec.net/) technology.
+The `CrowdSec Bouncer` extension for Magento 2 has been designed to protect Magento 2 websites from all kinds of attacks by using [CrowdSec](https://www.crowdsec.net/) technology.
 
 ## Prerequisites
 
