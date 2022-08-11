@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Add configuration to use `cURL` instead of `file_get_contents` to call LAPI.
+- Add configuration `forced_test_forwarded_ip` for testing purpose.
 
 ## [1.3.0] - 2022-06-09
 
