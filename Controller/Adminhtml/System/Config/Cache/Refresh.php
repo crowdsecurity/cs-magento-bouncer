@@ -28,13 +28,15 @@
 namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Cache;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
+use Exception;
+use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
 use CrowdSec\Bouncer\Helper\Data as Helper;
+use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 
 class Refresh extends Action implements HttpPostActionInterface
@@ -45,9 +47,9 @@ class Refresh extends Action implements HttpPostActionInterface
     protected $resultJsonFactory;
 
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * @var Helper
@@ -57,18 +59,18 @@ class Refresh extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      * @param Helper $helper
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        RegistryBouncer $registryBouncer,
+        RegistryBounce $registryBounce,
         Helper $helper
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
         $this->helper = $helper;
     }
 
@@ -77,15 +79,17 @@ class Refresh extends Action implements HttpPostActionInterface
      *
      * @return Json
      * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws CacheException
      */
     public function execute(): Json
     {
         try {
-            if (!($bouncer = $this->registryBouncer->get())) {
-                $bouncer = $this->registryBouncer->create();
+            if (!($bounce = $this->registryBounce->get())) {
+                $bounce = $this->registryBounce->create();
             }
             $configs = $this->helper->getBouncerConfigs();
-            $refresh = $bouncer->init($configs)->refreshBlocklistCache();
+            $refresh = $bounce->init($configs)->refreshBlocklistCache();
             $new = $refresh['new']??0;
             $deleted = $refresh['deleted']??0;
             $cacheSystem = $this->helper->getCacheTechnology();
@@ -98,7 +102,7 @@ class Refresh extends Action implements HttpPostActionInterface
                 $deleted
             );
             $result = 1;
-        } catch (CrowdSecException $e) {
+        } catch (Exception $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                 'message' => $e->getMessage(),

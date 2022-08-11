@@ -36,6 +36,7 @@ $ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
 $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Connection ping.')));
 $urlField = $escaper->escapeJs($block->getUrlField());
 $keyField = $escaper->escapeJs($block->getKeyField());
+$useCurlField = $escaper->escapeJs($block->getUseCurlField());
 
  $scriptString = <<<script
 require(['prototype'], function(){
@@ -46,7 +47,8 @@ require(['prototype'], function(){
 
         params = {
             api_url: $('{$urlField}').value,
-            bouncer_key: $('{$keyField}').value
+            bouncer_key: $('{$keyField}').value,
+            use_curl: $('{$useCurlField}').value
         };
 
         new Ajax.Request('{$ajaxUrl}', {

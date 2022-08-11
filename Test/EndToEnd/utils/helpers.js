@@ -121,6 +121,7 @@ const setDefaultConfig = async (save = true, direct = true) => {
         LAPI_URL_FROM_M2,
     );
     await fillInput("crowdsec_bouncer_general_connection_api_key", BOUNCER_KEY);
+    await selectElement("crowdsec_bouncer_general_connection_use_curl", "0");
     await page.click("#crowdsec_bouncer_general_connection_test");
     await expect(page).toMatchText(
         "#lapi_ping_result",
@@ -232,6 +233,7 @@ const computeCurrentPageRemediation = async (
         return "bypass";
     }
     await expect(title).toContain("Oops");
+    await page.waitForSelector(".desc");
     const description = await page.$eval(".desc", (el) => el.innerText);
     const banText = "cyber";
     const captchaText = "check";

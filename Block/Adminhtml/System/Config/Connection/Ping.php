@@ -46,6 +46,12 @@ class Ping extends Button
      * @var string
      */
     protected $_bouncerKeyField = 'crowdsec_bouncer_general_connection_api_key';
+    /**
+     * Use curl field name
+     *
+     * @var string
+     */
+    protected $_useCurlField = 'crowdsec_bouncer_general_connection_use_curl';
 
     /** @var string  */
     protected $template = 'CrowdSec_Bouncer::system/config/connection/ping.phtml';
@@ -70,6 +76,16 @@ class Ping extends Button
     public function getKeyField(): string
     {
         return $this->_bouncerKeyField;
+    }
+
+    /**
+     * Get use curl field Name
+     *
+     * @return string
+     */
+    public function getUseCurlField(): string
+    {
+        return $this->_useCurlField;
     }
 
     /**

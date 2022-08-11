@@ -29,6 +29,7 @@ namespace CrowdSec\Bouncer\Plugin\Customer;
 
 use CrowdSec\Bouncer\Event\Event;
 use CrowdSec\Bouncer\Event\EventInterface;
+use LogicException;
 
 /**
  * Plugin to handle log before authenticate
@@ -51,7 +52,7 @@ class AccountManagement extends Event implements EventInterface
      * @param array $objects
      * @return array
      */
-    public function getEventData($objects = []): array
+    public function getEventData(array $objects = []): array
     {
         return [];
     }
@@ -63,6 +64,7 @@ class AccountManagement extends Event implements EventInterface
      * @noinspection PhpUnusedParameterInspection
      * @noinspection PhpMissingParamTypeInspection
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws LogicException
      */
     public function beforeAuthenticate($subject)
     {

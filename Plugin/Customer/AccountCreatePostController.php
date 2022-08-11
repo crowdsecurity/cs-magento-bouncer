@@ -29,6 +29,7 @@ namespace CrowdSec\Bouncer\Plugin\Customer;
 
 use CrowdSec\Bouncer\Event\Event;
 use CrowdSec\Bouncer\Event\EventInterface;
+use LogicException;
 use Magento\Customer\Controller\Account\CreatePost;
 
 /**
@@ -53,7 +54,7 @@ class AccountCreatePostController extends Event implements EventInterface
      * @param array $objects
      * @return array
      */
-    public function getEventData($objects = []): array
+    public function getEventData(array $objects = []): array
     {
         return [];
     }
@@ -64,6 +65,7 @@ class AccountCreatePostController extends Event implements EventInterface
      * @param CreatePost $subject
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParamTypeInspection
+     * @throws LogicException
      */
     public function beforeExecute($subject)
     {

@@ -28,12 +28,13 @@
 namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Cache;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
+use Exception;
+use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Constants;
 
@@ -45,9 +46,9 @@ class Prune extends Action implements HttpPostActionInterface
     protected $resultJsonFactory;
 
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * @var Helper
@@ -57,18 +58,18 @@ class Prune extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      * @param Helper $helper
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        RegistryBouncer $registryBouncer,
+        RegistryBounce $registryBounce,
         Helper $helper
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
         $this->helper = $helper;
     }
 
@@ -76,21 +77,22 @@ class Prune extends Action implements HttpPostActionInterface
      * Prune cache
      *
      * @return Json
+     * @throws LogicException
      */
     public function execute(): Json
     {
         try {
-            if (!($bouncer = $this->registryBouncer->get())) {
-                $bouncer = $this->registryBouncer->create();
+            if (!($bounce = $this->registryBounce->get())) {
+                $bounce = $this->registryBounce->create();
             }
             $configs= $this->helper->getBouncerConfigs();
-            $result = (int) $bouncer->init($configs, ['forced_cache_system' => Constants::CACHE_SYSTEM_PHPFS])
-                ->pruneCache();
+            $finalConfigs = array_merge($configs, ['cache_system' => Constants::CACHE_SYSTEM_PHPFS]);
+            $result = (int) $bounce->init($finalConfigs)->pruneCache();
             $cacheOptions = $this->helper->getCacheSystemOptions();
             $cacheLabel = $cacheOptions[Constants::CACHE_SYSTEM_PHPFS] ?? __('Unknown');
             $message = __('CrowdSec cache (%1) has been pruned.', $cacheLabel);
 
-        } catch (CrowdSecException $e) {
+        } catch (Exception $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_PRUNING_CACHE',
                 'message' => $e->getMessage(),

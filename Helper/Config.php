@@ -28,7 +28,9 @@
 namespace CrowdSec\Bouncer\Helper;
 
 use CrowdSec\Bouncer\Constants;
+use InvalidArgumentException;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -49,6 +51,7 @@ class Config extends AbstractHelper
     // General configs
     public const XML_PATH_API_URL = self::SECTION . '/general/connection/api_url';
     public const XML_PATH_API_KEY = self::SECTION . '/general/connection/api_key';
+    public const XML_PATH_USE_CURL = self::SECTION . '/general/connection/use_curl';
     public const XML_PATH_FRONT_ENABLED = self::SECTION . '/general/bouncing/front_enabled';
     public const XML_PATH_ADMIN_ENABLED = self::SECTION . '/general/bouncing/admin_enabled';
     public const XML_PATH_API_ENABLED = self::SECTION . '/general/bouncing/api_enabled';
@@ -92,6 +95,7 @@ class Config extends AbstractHelper
     public const XML_PATH_ADVANCED_DISPLAY_ERRORS = self::SECTION . '/advanced/debug/display_errors';
     public const XML_PATH_ADVANCED_DISABLE_PROD_LOG = self::SECTION . '/advanced/debug/disable_prod_log';
     public const XML_PATH_ADVANCED_FORCED_TEST_IP = self::SECTION . '/advanced/debug/forced_test_ip';
+    public const XML_PATH_ADVANCED_FORCED_TEST_FWD_IP = self::SECTION . '/advanced/debug/forced_test_forwarded_ip';
 
     public const XML_PATH_ADVANCED_GEOLOCATION_ENABLED = self::SECTION . '/advanced/geolocation/enabled';
     public const XML_PATH_ADVANCED_GEOLOCATION_TYPE = self::SECTION . '/advanced/geolocation/type';
@@ -127,10 +131,12 @@ class Config extends AbstractHelper
     protected $_globals = [
         'api_url' => null,
         'api_key' => null,
+        'use_curl' => null,
         'is_admin_enabled' => null,
         'is_api_enabled' => null,
         'is_debug_log' => null,
         'forced_test_ip' => null,
+        'forced_test_forwarded_ip' => null,
         'can_display_errors' => null,
         'is_prod_log_disabled' => null,
         'is_events_log_enabled' => [],
@@ -199,6 +205,20 @@ class Config extends AbstractHelper
         }
 
         return (string) $this->_globals['api_key'];
+    }
+
+    /**
+     * Get use curl config
+     *
+     * @return bool
+     */
+    public function isUseCurl(): bool
+    {
+        if (!isset($this->_globals['use_curl'])) {
+            $this->_globals['use_curl'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_USE_CURL);
+        }
+
+        return (bool) $this->_globals['use_curl'];
     }
 
     /**
@@ -329,7 +349,7 @@ class Config extends AbstractHelper
      *
      * @param string $relativePath
      * @return string
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws FileSystemException
      */
     public function getGeolocationDatabaseFullPath(string $relativePath): string
     {
@@ -340,7 +360,7 @@ class Config extends AbstractHelper
      * Get geolocation config
      *
      * @return array
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws FileSystemException
      */
     public function getGeolocation(): array
     {
@@ -382,6 +402,22 @@ class Config extends AbstractHelper
         }
 
         return (string) $this->_globals['forced_test_ip'];
+    }
+
+    /**
+     * Get forced test forwarded ip config
+     *
+     * @return string
+     */
+    public function getForcedTestForwardedIp(): string
+    {
+        if (!isset($this->_globals['forced_test_forwarded_ip'])) {
+            $this->_globals['forced_test_forwarded_ip'] = (string)$this->scopeConfig->getValue(
+                self::XML_PATH_ADVANCED_FORCED_TEST_FWD_IP
+            );
+        }
+
+        return (string) $this->_globals['forced_test_forwarded_ip'];
     }
 
     /**
@@ -563,6 +599,7 @@ class Config extends AbstractHelper
      * Get trusted forwarded ips config
      *
      * @return array
+     * @throws InvalidArgumentException
      */
     public function getTrustedForwardedIps(): array
     {

@@ -29,13 +29,13 @@ namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Connection;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
 use Exception;
+use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
 use CrowdSec\Bouncer\Helper\Data as Helper;
-use CrowdSecBouncer\RestClient;
 use CrowdSec\Bouncer\Constants;
 
 class Ping extends Action implements HttpPostActionInterface
@@ -46,51 +46,60 @@ class Ping extends Action implements HttpPostActionInterface
     protected $resultJsonFactory;
 
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * @var Helper
      */
     protected $helper;
 
-    /** @var  RestClient */
-    protected $restClient;
-
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      * @param Helper $helper
-     * @param RestClient $restClient
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        RegistryBouncer $registryBouncer,
-        Helper $helper,
-        RestClient $restClient
+        RegistryBounce $registryBounce,
+        Helper $helper
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
         $this->helper = $helper;
-        $this->restClient = $restClient;
     }
 
     /**
      * Test connection
      *
      * @return Json
+     * @throws LogicException
      */
     public function execute(): Json
     {
+        $useCurl = "";
         try {
             $baseUri = $this->getRequest()->getParam('api_url');
             $userAgent = Constants::BASE_USER_AGENT;
             $apiKey = $this->getRequest()->getParam('bouncer_key');
-            $this->helper->ping($this->restClient, $baseUri, $userAgent, $apiKey);
+            $useCurl = (bool) $this->getRequest()->getParam('use_curl', false);
+            $configs = $this->helper->getBouncerConfigs();
+            $currentConfigs = [
+                'api_url' => $baseUri,
+                'api_user_agent' => $userAgent,
+                'api_key' => $apiKey,
+                'use_curl' => $useCurl
+            ];
+            $useCurl = $useCurl ? __('true') : __('false');
+            $finalConfigs = array_merge($configs, $currentConfigs);
+            $bounce = $this->registryBounce->create();
+            $bouncer = $bounce->init($finalConfigs);
+            $restClient = $bouncer->getRestClient();
+            $this->helper->ping($restClient);
             $result = 1;
             $message = __('Connection test result: success.');
         } catch (Exception $e) {
@@ -109,7 +118,12 @@ class Ping extends Action implements HttpPostActionInterface
 
         return $resultJson->setData([
             'connection' => $result,
-            'message' => $message .'<br><br>'. __('Tested url: %1 <br> Tested key: %2', $baseUri??"", $apiKey??""),
+            'message' => $message .'<br><br>'. __(
+                'Tested url: %1 <br> Tested key: %2 <br> Use cURL: %3',
+                $baseUri??"",
+                $apiKey??"",
+                $useCurl
+            ),
         ]);
     }
 }

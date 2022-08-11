@@ -2,9 +2,12 @@
 
 namespace CrowdSec\Bouncer\Cron;
 
-use CrowdSec\Bouncer\Exception\CrowdSecException;
 use CrowdSec\Bouncer\Helper\Data as Helper;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use Exception;
+use LogicException;
+use Psr\Cache\CacheException;
+use Psr\Cache\InvalidArgumentException;
 
 class RefreshCache
 {
@@ -13,37 +16,38 @@ class RefreshCache
      */
     protected $helper;
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * Constructor
      *
      * @param Helper $helper
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      */
-    public function __construct(Helper $helper, RegistryBouncer $registryBouncer)
+    public function __construct(Helper $helper, RegistryBounce $registryBounce)
     {
         $this->helper = $helper;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
     }
 
     /**
      * Refresh cache in Stream Mode
      *
      * @return void
-     * @throws \Magento\Framework\Exception\FileSystemException
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws LogicException
+     * @throws CacheException
+     * @throws InvalidArgumentException
      */
     public function execute(): void
     {
         if ($this->helper->isStreamModeEnabled()) {
             try {
-                $bouncer = $this->registryBouncer->create();
+                $bounce = $this->registryBounce->create();
                 $configs = $this->helper->getBouncerConfigs();
-                $bouncer->init($configs)->refreshBlocklistCache();
-            } catch (CrowdSecException $e) {
+                $bounce->init($configs)->refreshBlocklistCache();
+            } catch (Exception $e) {
                 $this->helper->error('', [
                     'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                     'message' => $e->getMessage(),

@@ -28,10 +28,12 @@
 namespace CrowdSec\Bouncer\Helper;
 
 use CrowdSec\Bouncer\Constants;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
-use CrowdSecBouncer\RestClient;
+use CrowdSecBouncer\BouncerException;
+use CrowdSecBouncer\RestClient\AbstractClient;
+use LogicException;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\Area;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Store\Model\ScopeInterface;
 use CrowdSec\Bouncer\Logger\Logger;
 use CrowdSec\Bouncer\Logger\Handlers\DebugFactory as DebugHandler;
@@ -98,16 +100,18 @@ class Data extends Config
     /**
      * Manage logger and its handlers
      *
+     * @param array $configs
      * @return Logger
+     * @throws LogicException
      */
-    public function getFinalLogger(): Logger
+    public function getFinalLogger(array $configs = []): Logger
     {
         if ($this->_finalLogger === null) {
             $this->_finalLogger = $this->_selfLogger;
-            if ($this->isProdLogDisabled()) {
+            if ($this->isProdLogDisabled() || !empty($configs['disable_prod_log'])) {
                 $this->_finalLogger->popHandler();
             }
-            if ($this->isDebugLog()) {
+            if ($this->isDebugLog() || !empty($configs['debug_mode'])) {
                 $debugHandler = $this->_debugHandler->create();
                 $this->_finalLogger->pushHandler($debugHandler);
             }
@@ -153,7 +157,7 @@ class Data extends Config
      * @return bool
      * @SuppressWarnings(PHPMD.BooleanGetMethodName)
      */
-    protected function _getBooleanSetting($path, $scope = ScopeInterface::SCOPE_STORE): bool
+    protected function _getBooleanSetting(string $path, string $scope = ScopeInterface::SCOPE_STORE): bool
     {
         return (bool)$this->scopeConfig->getValue($path, $scope);
     }
@@ -165,7 +169,7 @@ class Data extends Config
      * @param string $scope
      * @return string
      */
-    protected function _getStringSetting($path, $scope = ScopeInterface::SCOPE_STORE): string
+    protected function _getStringSetting(string $path, string $scope = ScopeInterface::SCOPE_STORE): string
     {
         return trim((string)$this->scopeConfig->getValue($path, $scope));
     }
@@ -322,6 +326,7 @@ class Data extends Config
      * @param mixed $message
      * @param array $context
      * @return void
+     * @throws LogicException
      */
     public function debug($message, array $context = []): void
     {
@@ -336,6 +341,7 @@ class Data extends Config
      * @param mixed $message
      * @param array $context
      * @return void
+     * @throws LogicException
      */
     public function critical($message, array $context = []): void
     {
@@ -348,6 +354,7 @@ class Data extends Config
      * @param mixed $message
      * @param array $context
      * @return void
+     * @throws LogicException
      */
     public function error($message, array $context = []): void
     {
@@ -372,7 +379,8 @@ class Data extends Config
      * Generate a config array in order to instantiate a bouncer
      *
      * @return array
-     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws LogicException
+     * @throws FileSystemException|BouncerException
      */
     public function getBouncerConfigs(): array
     {
@@ -389,10 +397,8 @@ class Data extends Config
                     $maxRemediationLevel = Constants::REMEDIATION_BAN;
                     break;
                 default:
-                    throw new CrowdSecException("Unknown $bouncingLevel");
+                    throw new BouncerException("Unknown $bouncingLevel");
             }
-
-            $logger = $this->getFinalLogger();
 
             $this->_bouncerConfigs = [
                 // API connection
@@ -400,10 +406,13 @@ class Data extends Config
                 'api_key' => $this->getApiKey(),
                 'api_user_agent' => Constants::BASE_USER_AGENT,
                 'api_timeout' => Constants::API_TIMEOUT,
+                'use_curl' => $this->isUseCurl(),
                 // Debug
                 'debug_mode' => $this->isDebugLog(),
+                'disable_prod_log' => $this->isProdLogDisabled(),
                 'log_directory_path' =>Constants::CROWDSEC_LOG_PATH,
                 'forced_test_ip' => $this->getForcedTestIp(),
+                'forced_test_forwarded_ip' => $this->getForcedTestForwardedIp(),
                 'display_errors' => $this->canDisplayErrors(),
                 // Bouncer behavior
                 'bouncing_level' => $bouncingLevel,
@@ -422,9 +431,6 @@ class Data extends Config
                 'geolocation_cache_duration' => $this->getGeolocationCacheDuration(),
                 // Geolocation
                 'geolocation' => $this->getGeolocation(),
-                // Extra configs
-                'forced_cache_system' => null,
-                'logger' => $logger,
             ];
         }
 
@@ -434,36 +440,27 @@ class Data extends Config
     /**
      * Check if a cron expression is valid
      *
-     * @see \Magento\Cron\Model\Schedule::setCronExpr
      * @param string $expr
      * @return void
+     * @throws BouncerException
+     * @see \Magento\Cron\Model\Schedule::setCronExpr
      */
     public function validateCronExpr(string $expr)
     {
         $e = preg_split('#\s+#', $expr, -1, PREG_SPLIT_NO_EMPTY);
         if (count($e) < 5 || count($e) > 6) {
-            throw new CrowdSecException("Invalid cron expression: $expr");
+            throw new BouncerException("Invalid cron expression: $expr");
         }
     }
 
     /**
      * Make a rest request
      *
-     * @param RestClient $restClient
-     * @param string $baseUri
-     * @param string $userAgent
-     * @param string $apiKey
-     * @param int $timeout
+     * @param AbstractClient $restClient
      * @return void
      */
-    public function ping(RestClient $restClient, string $baseUri, string $userAgent, string $apiKey, int $timeout = 1)
+    public function ping(AbstractClient $restClient)
     {
-        $restClient->configure($baseUri, [
-            'User-Agent' => $userAgent,
-            'X-Api-Key' => $apiKey,
-            'Accept' => 'application/json',
-        ], $timeout);
-
         $restClient->request('/v1/decisions', []);
     }
 }

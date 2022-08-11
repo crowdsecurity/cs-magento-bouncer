@@ -15,19 +15,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        m2-version: [ "2.3.0", "2.4.0", "2.4.3", "2.4.4" ]
-        php-version: [ "7.2", "7.3", "7.4", "8.1" ]
+        # Last one for the current and previous minor, greatest php version
+        m2-version: [ "2.3.7", "2.4.5" ]
+        php-version: [ "7.4", "8.1" ]
         exclude:
-          - { php-version: "7.3", m2-version: "2.3.0" }
-          - { php-version: "7.4", m2-version: "2.3.0" }
-          - { php-version: "8.1", m2-version: "2.3.0" }
-          - { php-version: "7.2", m2-version: "2.4.3" }
-          - { php-version: "8.1", m2-version: "2.4.3" }
-          - { php-version: "7.2", m2-version: "2.4.0" }
-          - { php-version: "7.3", m2-version: "2.4.0" }
-          - { php-version: "8.1", m2-version: "2.4.0" }
-          - { php-version: "7.2", m2-version: "2.4.4" }
-          - { php-version: "7.3", m2-version: "2.4.4" }
+          - { php-version: "8.1", m2-version: "2.3.7" }
+          - { php-version: "7.4", m2-version: "2.4.5" }
 
 
     name: Installation and Varnish test suite
@@ -49,7 +42,7 @@ jobs:
 
       - name: Install DDEV
         env:
-          DDEV_VERSION: v1.19.1
+          DDEV_VERSION: v1.20.0
         run: |
           # @see https://ddev.readthedocs.io/en/stable/#installationupgrade-script-linux-and-macos-armarm64-and-amd64-architectures
           sudo apt-get -qq update
@@ -78,6 +71,17 @@ jobs:
           cp .ddev/additional_docker_compose/docker-compose.varnish.yaml .ddev/docker-compose.varnish.yaml
           sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
           ddev start
+
+      - name: Some DEBUG information
+        run: |
+          ddev --version
+          ddev exec php -v
+          ddev exec -s crowdsec crowdsec -version
+          ddev php -r "echo phpversion('memcached');"
+
+      - name: Force allow plugin for some versions
+        if: contains(fromJson('["2.3.7"]'),matrix.m2-version)
+        run: ddev composer config --global allow-plugins true -n
 
       - name: Handle Varnish ACL
         run: |
@@ -161,6 +165,7 @@ jobs:
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
+          sleep 1
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -175,6 +180,7 @@ jobs:
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
+          sleep 1
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -189,6 +195,7 @@ jobs:
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
+          sleep 1
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -203,6 +210,7 @@ jobs:
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
+          sleep 1
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/category-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -217,6 +225,7 @@ jobs:
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
+          sleep 1
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/category-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -231,6 +240,7 @@ jobs:
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
+          sleep 1
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -253,6 +263,7 @@ jobs:
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
+          sleep 1
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -267,6 +278,7 @@ jobs:
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
+          sleep 1
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -277,14 +289,15 @@ jobs:
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
-            echo $VERIF
+            echo "Test 5 failed"
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
+          sleep 1
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
-            echo "Test 5 failed"
+            echo "Test 6 failed"
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
@@ -299,6 +312,7 @@ jobs:
             echo "Bad Varnish x-eqp-cache : ${VERIF}"
             exit 1
           fi
+          sleep 1
           VERIF=$(ddev exec curl -sSL -D - https://${{ env.M2_VERSION_CODE }}.ddev.site | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then

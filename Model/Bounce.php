@@ -27,21 +27,18 @@
 
 namespace CrowdSec\Bouncer\Model;
 
-use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSecBouncer\BouncerException;
 use Exception;
+use LogicException;
 use Magento\Framework\App\Response\Http;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSecBouncer\AbstractBounce;
-use CrowdSecBouncer\IBounce;
 use CrowdSecBouncer\Bouncer as BouncerInstance;
 use CrowdSecBouncer\BouncerFactory;
+use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 
-/**
- *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
-class Bouncer extends AbstractBounce implements IBounce
+class Bounce extends AbstractBounce
 {
 
     /**
@@ -53,11 +50,6 @@ class Bouncer extends AbstractBounce implements IBounce
      * @var Helper
      */
     protected $helper;
-
-    /**
-     * @var CacheFactory
-     */
-    protected $cacheFactory;
 
     /** @var BouncerInstance */
     protected $bouncerInstance;
@@ -73,27 +65,28 @@ class Bouncer extends AbstractBounce implements IBounce
      *
      * @param Http $response
      * @param Helper $helper
-     * @param CacheFactory $cacheFactory
      * @param BouncerFactory $bouncerInstanceFactory
      */
     public function __construct(
         Http $response,
         Helper $helper,
-        CacheFactory $cacheFactory,
         BouncerFactory $bouncerInstanceFactory
     ) {
         $this->response = $response;
         $this->helper = $helper;
-        $this->cacheFactory = $cacheFactory;
         $this->bouncerInstanceFactory = $bouncerInstanceFactory;
     }
 
     /**
      * Init the logger.
+     *
+     * @param array $configs
+     * @return void
+     * @throws LogicException
      */
-    public function initLogger(): void
+    public function initLogger(array $configs): void
     {
-        $this->logger = $this->helper->getFinalLogger();
+        $this->logger = $this->helper->getFinalLogger($configs);
     }
 
     /**
@@ -121,45 +114,28 @@ class Bouncer extends AbstractBounce implements IBounce
      * Get the bouncer instance
      *
      * @param array $settings
-     * @param bool $forceReload
      * @return BouncerInstance
+     * @throws LogicException|BouncerException
      */
-    public function getBouncerInstance(array $settings = [], bool $forceReload = false): BouncerInstance
+    public function getBouncerInstance(array $settings = []): BouncerInstance
     {
-        if ($this->bouncerInstance === null || $forceReload) {
-            $this->logger = $settings['logger'];
-            $this->setDisplayErrors($settings['display_errors']);
+        if ($this->bouncerInstance === null) {
+            $this->logger = $this->helper->getFinalLogger();
 
             try {
-                $cache = $this->cacheFactory->create();
-                $cacheAdapter = $cache->getAdapter(
-                    $settings['cache_system'],
-                    $settings['memcached_dsn'],
-                    $settings['redis_dsn'],
-                    $settings['fs_cache_path'],
-                    $settings['forced_cache_system']
-                );
-            } catch (Exception $e) {
-                throw new CrowdSecException($e->getMessage());
-            }
-
-            try {
-                /** @var BouncerInstance $bouncerInstance */
-                $bouncerInstance =
-                    $this->bouncerInstanceFactory->create(
-                        ['cacheAdapter' => $cacheAdapter, 'logger' => $this->logger ]
-                    );
-
-                $bouncerInstance->configure([
+                $configs = [
                     // LAPI connection
                     'api_key' => $settings['api_key'],
                     'api_url' => $settings['api_url'],
                     'api_user_agent' => $settings['api_user_agent'],
                     'api_timeout' => $settings['api_timeout'],
+                    'use_curl' => $settings['use_curl'],
                     // Debug
                     'debug_mode' => $settings['debug_mode'],
+                    'disable_prod_log' => $settings['disable_prod_log'],
                     'log_directory_path' => $settings['log_directory_path'],
                     'forced_test_ip' => $settings['forced_test_ip'],
+                    'forced_test_forwarded_ip' => $settings['forced_test_forwarded_ip'],
                     'display_errors' => $settings['display_errors'],
                     // Bouncer
                     'bouncing_level' => $settings['bouncing_level'],
@@ -178,9 +154,15 @@ class Bouncer extends AbstractBounce implements IBounce
                     'geolocation_cache_duration' => $settings['geolocation_cache_duration'],
                     // Geolocation
                     'geolocation' => $settings['geolocation']
-                ]);
+                ];
+                /** @var BouncerInstance $bouncerInstance */
+                $bouncerInstance =
+                    $this->bouncerInstanceFactory->create(
+                        ['configs' => $configs, 'logger' => $this->logger ]
+                    );
+
             } catch (Exception $e) {
-                throw new CrowdSecException($e->getMessage());
+                throw new BouncerException($e->getMessage());
             }
 
             $this->bouncerInstance = $bouncerInstance;
@@ -193,12 +175,12 @@ class Bouncer extends AbstractBounce implements IBounce
      * Initialize the bouncer instance
      *
      * @param array $configs
-     * @param array $forcedConfigs
      * @return BouncerInstance
+     * @throws LogicException|BouncerException
      */
-    public function init(array $configs, array $forcedConfigs = []): BouncerInstance
+    public function init(array $configs): BouncerInstance
     {
-        $this->settings = array_merge($configs, $forcedConfigs);
+        $this->settings = $configs;
         $this->bouncer = $this->getBouncerInstance($this->settings);
 
         return $this->bouncer;
@@ -259,6 +241,7 @@ class Bouncer extends AbstractBounce implements IBounce
      * Retrieve IP ranges to trust as proxies as an array of comparables ip bounds
      *
      * @return array [[string, string], ...]
+     * @throws \InvalidArgumentException
      */
     public function getTrustForwardedIpBoundsList(): array
     {
@@ -290,6 +273,7 @@ class Bouncer extends AbstractBounce implements IBounce
      * @param string|null $body
      * @param int $statusCode
      * @return void
+     * @throws \Laminas\Http\Exception\InvalidArgumentException|BouncerException
      */
     public function sendResponse(?string $body, int $statusCode = 200): void
     {
@@ -310,7 +294,7 @@ class Bouncer extends AbstractBounce implements IBounce
                 $this->response->setHeader('cache-control', $noCacheControl);
                 break;
             default:
-                throw new CrowdSecException("Unhandled code $statusCode");
+                throw new BouncerException("Unhandled code $statusCode");
         }
         if (null !== $body) {
             $this->setRemediationDisplay(true);
@@ -328,6 +312,8 @@ class Bouncer extends AbstractBounce implements IBounce
      * @param array $configs
      * @return bool
      * @throws InvalidArgumentException
+     * @throws BouncerException
+     * @throws CacheException|LogicException
      */
     public function safelyBounce(array $configs): bool
     {
@@ -336,7 +322,7 @@ class Bouncer extends AbstractBounce implements IBounce
             $this->init($configs);
             $this->run();
             $result = true;
-        } catch (CrowdSecException $e) {
+        } catch (Exception $e) {
             $this->logger->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
                 'message' => $e->getMessage(),
@@ -344,7 +330,7 @@ class Bouncer extends AbstractBounce implements IBounce
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ]);
-            if ($this->displayErrors) {
+            if (!empty($configs['display_errors'])) {
                 throw $e;
             }
         }

@@ -25,9 +25,13 @@
  *
  */
 
+
 namespace CrowdSec\Bouncer\Plugin;
 
 use Closure;
+use CrowdSecBouncer\BouncerException;
+use Exception;
+use LogicException;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\FrontControllerInterface;
 use Magento\Framework\App\RequestInterface;
@@ -35,12 +39,15 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\App\ActionFlag;
 use Magento\Framework\App\State;
 use CrowdSec\Bouncer\Helper\Data as HelperData;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\LocalizedException;
-use Psr\Cache\InvalidArgumentException;
+use Psr\Cache\CacheException;
 
 /**
  * Plugin to handle controller request before Full Page Cache
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.UnusedFormalParameter)
  */
 class FrontController
 {
@@ -61,9 +68,9 @@ class FrontController
     protected $helper;
 
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * @var ResponseInterface
@@ -75,7 +82,7 @@ class FrontController
      * @param HelperData $helper
      * @param ActionFlag $actionFlag
      * @param State $state
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      * @param ResponseInterface $response
      *
      */
@@ -83,13 +90,13 @@ class FrontController
         HelperData $helper,
         ActionFlag $actionFlag,
         State $state,
-        RegistryBouncer $registryBouncer,
+        RegistryBounce $registryBounce,
         ResponseInterface $response
     ) {
         $this->helper = $helper;
         $this->actionFlag = $actionFlag;
         $this->state = $state;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
         $this->response = $response;
     }
 
@@ -101,7 +108,9 @@ class FrontController
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
      * @throws LocalizedException
-     * @throws InvalidArgumentException
+     * @throws LogicException
+     * @throws BouncerException
+     * @throws CacheException
      */
     public function aroundDispatch(
         FrontControllerInterface $subject,
@@ -123,7 +132,7 @@ class FrontController
         */
         try {
             return $this->bounce($subject, $proceed, $request);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->helper->critical('', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
                 'message' => $e->getMessage(),
@@ -147,9 +156,10 @@ class FrontController
      * @param Closure $proceed
      * @param RequestInterface $request
      * @return ResponseInterface|mixed
-     * @throws LocalizedException
-     * @throws InvalidArgumentException
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws LogicException
+     * @throws BouncerException
+     * @throws FileSystemException
+     * @throws CacheException
      * @noinspection PhpUnusedParameterInspection
      */
     private function bounce(
@@ -158,16 +168,16 @@ class FrontController
         RequestInterface $request
     ) {
         // Avoid multiple call
-        if ($this->registryBouncer->get()) {
+        if ($this->registryBounce->get()) {
             return $proceed($request);
         }
-        $registryBouncer = $this->registryBouncer->create();
+        $registryBounce = $this->registryBounce->create();
         $configs = $this->helper->getBouncerConfigs();
-        $registryBouncer->init($configs);
-        $registryBouncer->run();
+        $registryBounce->init($configs);
+        $registryBounce->run();
 
         // If ban or captcha remediation wall display is detected
-        if ($registryBouncer->hasRemediationDisplay()) {
+        if ($registryBounce->hasRemediationDisplay()) {
             // Stop further processing if your condition is met
             $this->actionFlag->set('', ActionInterface::FLAG_NO_DISPATCH, true);
 

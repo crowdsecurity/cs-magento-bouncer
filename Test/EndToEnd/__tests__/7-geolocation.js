@@ -18,7 +18,7 @@ const {
 
 const { addDecision } = require("../utils/watcherClient");
 
-const { DEBUG_LOG_PATH, FRANCE_IP, JAPAN_IP } = require("../utils/constants");
+const { DEBUG_LOG_PATH, FRANCE_IP } = require("../utils/constants");
 
 describe(`Geolocation and country scoped decision`, () => {
     beforeAll(async () => {

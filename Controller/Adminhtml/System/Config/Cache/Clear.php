@@ -28,13 +28,16 @@
 namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Cache;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
+use Exception;
+use LogicException;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
-use CrowdSec\Bouncer\Exception\CrowdSecException;
+use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
 use CrowdSec\Bouncer\Helper\Data as Helper;
+use Psr\Cache\CacheException;
+use Psr\Cache\InvalidArgumentException;
 
 class Clear extends Action implements HttpPostActionInterface
 {
@@ -44,9 +47,9 @@ class Clear extends Action implements HttpPostActionInterface
     protected $resultJsonFactory;
 
     /**
-     * @var RegistryBouncer
+     * @var RegistryBounce
      */
-    protected $registryBouncer;
+    protected $registryBounce;
 
     /**
      * @var Helper
@@ -56,18 +59,18 @@ class Clear extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
-     * @param RegistryBouncer $registryBouncer
+     * @param RegistryBounce $registryBounce
      * @param Helper $helper
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        RegistryBouncer $registryBouncer,
+        RegistryBounce $registryBounce,
         Helper $helper
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->registryBouncer = $registryBouncer;
+        $this->registryBounce = $registryBounce;
         $this->helper = $helper;
     }
 
@@ -75,16 +78,19 @@ class Clear extends Action implements HttpPostActionInterface
      * Clear cache
      *
      * @return Json
+     * @throws LogicException
+     * @throws CacheException
+     * @throws InvalidArgumentException
      */
     public function execute(): Json
     {
         try {
-            if (!($bouncer = $this->registryBouncer->get())) {
-                $bouncer = $this->registryBouncer->create();
+            if (!($bounce = $this->registryBounce->get())) {
+                $bounce = $this->registryBounce->create();
             }
 
             $configs = $this->helper->getBouncerConfigs();
-            $bouncer = $bouncer->init($configs);
+            $bouncer = $bounce->init($configs);
             $result = (int) $bouncer->clearCache();
             $cacheSystem = $this->helper->getCacheTechnology();
             $cacheOptions = $this->helper->getCacheSystemOptions();
@@ -99,7 +105,7 @@ class Clear extends Action implements HttpPostActionInterface
                 $message .=  ' '.__("$decisionsMessage", $decisionsCount);
             }
 
-        } catch (CrowdSecException $e) {
+        } catch (Exception $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_CLEARING_CACHE',
                 'message' => $e->getMessage(),
