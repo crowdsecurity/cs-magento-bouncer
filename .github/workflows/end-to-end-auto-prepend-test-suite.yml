@@ -33,81 +33,20 @@ jobs:
 
     steps:
 
-      - name: Clone DDEV files
-        uses: actions/checkout@v2
+      - name: Install Magento 2
+        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.0.0
         with:
-          path: .ddev
-          repository: julienloizelet/ddev-m2
+          php_version: ${{ matrix.php-version }}
+          magento_version: ${{ matrix.m2-version }}
+          composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
+          magento_repository: "https://repo.magento.com/"
 
-      - name: Install DDEV
-        env:
-          DDEV_VERSION: v1.20.0
+      - name: Add CrowdSec and Playwright to DDEV
         run: |
-          # @see https://ddev.readthedocs.io/en/stable/#installationupgrade-script-linux-and-macos-armarm64-and-amd64-architectures
-          sudo apt-get -qq update
-          sudo apt-get -qq -y install libnss3-tools
-          curl -LO https://raw.githubusercontent.com/drud/ddev/master/scripts/install_ddev.sh
-          bash install_ddev.sh ${{env.DDEV_VERSION}}
-          ddev config global --instrumentation-opt-in=false --omit-containers=dba,ddev-ssh-agent
-          rm install_ddev.sh
-
-      - name: Set M2_VERSION_CODE env
-        # used in some directory path and conventional file naming
-        # Example : 2.4.3 => m243
-        run: |
-          echo "M2_VERSION_CODE=$(echo m${{ matrix.m2-version }} | sed 's/\.//g' )" >> $GITHUB_ENV
-
-      - name: Set ELASTIC_INSTALL_STRING env for 2.4
-        if: startsWith(matrix.m2-version, '2.4')
-        run: echo "ELASTIC_INSTALL_STRING='--elasticsearch-host=elasticsearch'" >> $GITHUB_ENV
-
-      - name: Start DDEV for ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
-        run: |
-          cp .ddev/config_overrides/config.${{ env.M2_VERSION_CODE }}.yaml .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
+          cp .ddev/additional_docker_compose/docker-compose.playwright-alone.yaml .ddev/docker-compose.playwright.yaml
           cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
-          cp .ddev/additional_docker_compose/docker-compose.playwright.yaml .ddev/docker-compose.playwright.yaml
           cp .ddev/custom_files/varnish-profile.xml varnish-profile.xml
-          sed -i -e 's/^php_version:.*/php_version: ${{ matrix.php-version }}/g' .ddev/config.${{ env.M2_VERSION_CODE }}.yaml
-          ddev start
-
-      - name: Some DEBUG information
-        run: |
-          ddev --version
-          ddev exec php -v
-          ddev exec -s crowdsec crowdsec -version
-          ddev php -r "echo phpversion('memcached');"
-
-      - name: Force allow plugin for some versions
-        if: contains(fromJson('["2.3.7","2.4.3"]'),matrix.m2-version)
-        run: ddev composer config --global allow-plugins true -n
-
-      - name: Install Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
-        # We don't use "ddev composer" create as it restarts all containers
-        run: |
-          ddev composer config --global http-basic.repo.magento.com ${{ secrets.MAGENTO_MARKETPLACE_USERNAME }} ${{ secrets.MAGENTO_MARKETPLACE_PASSWORD }}
-          ddev exec composer create --repository=https://repo.magento.com/ magento/project-community-edition ${{ env.M2_VERSION_CODE }} ${{ matrix.m2-version }}
-          cp -r ${{ env.M2_VERSION_CODE }}/. ${{ github.workspace }}
-          rm -rf ${{ env.M2_VERSION_CODE }}
-
-      - name: Setup Magento ${{ matrix.m2-version }} with PHP ${{ matrix.php-version }}
-        run: |
-          ddev magento setup:install \
-                           --base-url=https://${{ env.M2_VERSION_CODE }}.ddev.site/ \
-                           --db-host=db \
-                           --db-name=db \
-                           --db-user=db \
-                           --db-password=db \
-                           --backend-frontname=admin \
-                           --admin-firstname=admin \
-                           --admin-lastname=admin \
-                           --admin-email=admin@admin.com \
-                           --admin-user=admin \
-                           --admin-password=admin123 \
-                           --language=en_US \
-                           --currency=USD \
-                           --timezone=America/Chicago \
-                           --use-rewrites=1 \
-                           ${{ env.ELASTIC_INSTALL_STRING }}
+          ddev restart
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
         uses: actions/checkout@v2
