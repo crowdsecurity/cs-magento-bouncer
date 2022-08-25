@@ -208,7 +208,7 @@ describe(`Test cache in Live mode`, () => {
         await publicHomepageShouldBeAccessible();
     });
 
-    it("Should log miss then it", async () => {
+    it("Should log miss then hit", async () => {
         await goToSettingsPage();
         await page.click("#crowdsec_bouncer_advanced_cache_clear_cache");
         await expect(page).toMatchText(
