@@ -18,6 +18,8 @@ const { AGENT_TLS_PATH } = process.env;
 const AGENT_CERT_PATH = `${AGENT_TLS_PATH}/agent.pem`;
 const AGENT_KEY_PATH = `${AGENT_TLS_PATH}/agent-key.pem`;
 const CA_CERT_PATH = `${AGENT_TLS_PATH}/ca-chain.pem`;
+const WATCHER_LOGIN = "watcherLogin";
+const WATCHER_PASSWORD = "watcherPassword";
 
 module.exports = {
     ADMIN_URL,
@@ -38,4 +40,6 @@ module.exports = {
     AGENT_CERT_PATH,
     AGENT_KEY_PATH,
     CA_CERT_PATH,
+    WATCHER_LOGIN,
+    WATCHER_PASSWORD,
 };

@@ -7,6 +7,8 @@ const {
     AGENT_CERT_PATH,
     AGENT_KEY_PATH,
     CA_CERT_PATH,
+    WATCHER_LOGIN,
+    WATCHER_PASSWORD,
 } = require("./constants");
 
 const httpsAgent = new https.Agent({
@@ -21,8 +23,6 @@ const httpClient = axios.create({
     timeout: 5000,
     httpsAgent,
 });
-
-
 
 let authenticated = false;
 
@@ -106,10 +106,17 @@ const cidrToRange = (cidrParam) => {
 
 const auth = async () => {
     if (authenticated) {
+        console.log("iiiiiiiiiiiiiiiiiii");
         return;
     }
     try {
-        const response = await httpClient.post("/v1/watchers/login");
+        console.log("aaaaaaaaaaaaaaaaaaa");
+        const response = await httpClient.post("/v1/watchers/login", {
+            machine_id: WATCHER_LOGIN,
+            password: WATCHER_PASSWORD,
+        });
+
+        console.log(`${response.data}`);
 
         httpClient.defaults.headers.common.Authorization = `Bearer ${response.data.token}`;
         authenticated = true;

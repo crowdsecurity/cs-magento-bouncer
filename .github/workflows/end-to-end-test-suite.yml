@@ -116,6 +116,15 @@ jobs:
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/1-config.js"
+          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/
+          PENDING_TESTS=$(grep -oP '"numPendingTests":\K(.*),"numRuntimeErrorTestSuites"' .test-results.json | sed  's/,"numRuntimeErrorTestSuites"//g')
+          if [[ $PENDING_TESTS == "0" ]]
+          then
+              echo "No pending tests: OK"
+          else
+              echo "There are pending tests: $PENDING_TESTS (KO)"
+              exit 1
+          fi
 
       - name: Run live mode test
         run: |
@@ -141,7 +150,7 @@ jobs:
           then
               echo "No pending tests: OK"
           else
-              echo "There are pending tests: $PENDING_TESTS (KO°"
+              echo "There are pending tests: $PENDING_TESTS (KO)"
               exit 1
           fi
 
@@ -149,19 +158,55 @@ jobs:
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/4-cron.js"
+          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/
+          PENDING_TESTS=$(grep -oP '"numPendingTests":\K(.*),"numRuntimeErrorTestSuites"' .test-results.json | sed  's/,"numRuntimeErrorTestSuites"//g')
+          if [[ $PENDING_TESTS == "0" ]]
+          then
+              echo "No pending tests: OK"
+          else
+              echo "There are pending tests: $PENDING_TESTS (KO)"
+              exit 1
+          fi
 
       - name: Run api tests
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/5-api.js"
+          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/
+          PENDING_TESTS=$(grep -oP '"numPendingTests":\K(.*),"numRuntimeErrorTestSuites"' .test-results.json | sed  's/,"numRuntimeErrorTestSuites"//g')
+          if [[ $PENDING_TESTS == "0" ]]
+          then
+              echo "No pending tests: OK"
+          else
+              echo "There are pending tests: $PENDING_TESTS (KO)"
+              exit 1
+          fi
 
       - name: Run events logging test
         run: |
           ddev magento config:set admin/captcha/enable 0
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/6-events.js"
+          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/
+          PENDING_TESTS=$(grep -oP '"numPendingTests":\K(.*),"numRuntimeErrorTestSuites"' .test-results.json | sed  's/,"numRuntimeErrorTestSuites"//g')
+          if [[ $PENDING_TESTS == "0" ]]
+          then
+              echo "No pending tests: OK"
+          else
+              echo "There are pending tests: $PENDING_TESTS (KO)"
+              exit 1
+          fi
 
       - name: Run geolocation test
         run: |
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           ./run-tests.sh ci "./__tests__/7-geolocation.js"
+          cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/
+          PENDING_TESTS=$(grep -oP '"numPendingTests":\K(.*),"numRuntimeErrorTestSuites"' .test-results.json | sed  's/,"numRuntimeErrorTestSuites"//g')
+          if [[ $PENDING_TESTS == "0" ]]
+          then
+              echo "No pending tests: OK"
+          else
+              echo "There are pending tests: $PENDING_TESTS (KO)"
+              exit 1
+          fi
