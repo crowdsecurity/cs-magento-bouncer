@@ -1,15 +1,28 @@
 const axios = require("axios").default;
+const https = require("https");
+const fs = require("fs");
 
 const {
     LAPI_URL_FROM_PLAYWRIGHT,
-    WATCHER_LOGIN,
-    WATCHER_PASSWORD,
+    AGENT_CERT_PATH,
+    AGENT_KEY_PATH,
+    CA_CERT_PATH,
 } = require("./constants");
+
+const httpsAgent = new https.Agent({
+    rejectUnauthorized: true,
+    cert: fs.readFileSync(AGENT_CERT_PATH),
+    key: fs.readFileSync(AGENT_KEY_PATH),
+    ca: fs.readFileSync(CA_CERT_PATH),
+});
 
 const httpClient = axios.create({
     baseURL: LAPI_URL_FROM_PLAYWRIGHT,
     timeout: 5000,
+    httpsAgent,
 });
+
+
 
 let authenticated = false;
 
@@ -96,19 +109,11 @@ const auth = async () => {
         return;
     }
     try {
-        const response = await httpClient.post("/v1/watchers/login", {
-            machine_id: WATCHER_LOGIN,
-            password: WATCHER_PASSWORD,
-        });
+        const response = await httpClient.post("/v1/watchers/login");
 
         httpClient.defaults.headers.common.Authorization = `Bearer ${response.data.token}`;
         authenticated = true;
     } catch (error) {
-        console.debug(
-            "WATCHER_LOGIN, WATCHER_PASSWORD",
-            WATCHER_LOGIN,
-            WATCHER_PASSWORD,
-        );
         console.error(error);
     }
 };

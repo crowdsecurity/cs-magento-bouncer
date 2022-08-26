@@ -62,6 +62,7 @@ case $TYPE in
     TIMEOUT=31000
     HEADLESS=false
     SLOWMO=150
+    AGENT_TLS_PATH="../../../../cfssl"
     ;;
 
   "docker")
@@ -73,6 +74,7 @@ case $TYPE in
     TIMEOUT=31000
     HEADLESS=true
     SLOWMO=0
+    AGENT_TLS_PATH="/var/www/html/cfssl"
     ;;
 
   "ci")
@@ -84,6 +86,7 @@ case $TYPE in
     TIMEOUT=60000
     HEADLESS=true
     SLOWMO=0
+    AGENT_TLS_PATH="/var/www/html/cfssl"
     ;;
 
   *)
@@ -108,6 +111,7 @@ TIMEOUT=$TIMEOUT \
 HEADLESS=$HEADLESS \
 FAIL_FAST=$FAIL_FAST \
 SLOWMO=$SLOWMO \
+AGENT_TLS_PATH=$AGENT_TLS_PATH \
 yarn --cwd $YARN_PATH test \
     $JEST_PARAMS \
     --json \

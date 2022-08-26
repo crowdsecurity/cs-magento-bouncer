@@ -6,8 +6,6 @@ const ADMIN_PASSWORD = "admin123";
 const LAPI_URL_FROM_M2 = "https://crowdsec:8080";
 const { LAPI_URL_FROM_PLAYWRIGHT } = process.env;
 const { BOUNCER_KEY } = process.env;
-const WATCHER_LOGIN = "watcherLogin";
-const WATCHER_PASSWORD = "watcherPassword";
 const { DEBUG } = process.env;
 const { TIMEOUT } = process.env;
 const { CURRENT_IP } = process.env;
@@ -16,6 +14,10 @@ const DEBUG_LOG_PATH = `${__dirname}/../../../../../var/log/crowdsec-bouncer-deb
 const EVENT_LOG_PATH = `${__dirname}/../../../../../var/log/crowdsec-events.log`;
 const JAPAN_IP = "210.249.74.42";
 const FRANCE_IP = "78.119.253.85";
+const { AGENT_TLS_PATH } = process.env;
+const AGENT_CERT_PATH = `${AGENT_TLS_PATH}/agent.pem`;
+const AGENT_KEY_PATH = `${AGENT_TLS_PATH}/agent-key.pem`;
+const CA_CERT_PATH = `${AGENT_TLS_PATH}/ca-chain.pem`;
 
 module.exports = {
     ADMIN_URL,
@@ -33,6 +35,7 @@ module.exports = {
     LAPI_URL_FROM_PLAYWRIGHT,
     PROXY_IP,
     TIMEOUT,
-    WATCHER_LOGIN,
-    WATCHER_PASSWORD,
+    AGENT_CERT_PATH,
+    AGENT_KEY_PATH,
+    CA_CERT_PATH,
 };
