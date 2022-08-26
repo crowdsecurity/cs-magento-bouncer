@@ -3,7 +3,7 @@ const ADMIN_URL = `${M2_URL}/admin/`;
 
 const ADMIN_LOGIN = "admin";
 const ADMIN_PASSWORD = "admin123";
-const LAPI_URL_FROM_M2 = "http://crowdsec:8080";
+const LAPI_URL_FROM_M2 = "https://crowdsec:8080";
 const { LAPI_URL_FROM_PLAYWRIGHT } = process.env;
 const { BOUNCER_KEY } = process.env;
 const WATCHER_LOGIN = "watcherLogin";

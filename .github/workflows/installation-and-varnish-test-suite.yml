@@ -36,13 +36,14 @@ jobs:
       EXTENSION_PATH: "crowdsec-bouncer"
 
     steps:
-      - uses: julienloizelet/github-actions-magento2-ddev-installation@v1.0.0
+      - uses: julienloizelet/github-actions-magento2-ddev-installation@v1.1.0
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
           varnish_setup: "true"
+          ddev_repository_ref: master
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
         uses: actions/checkout@v2

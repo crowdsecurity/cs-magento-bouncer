@@ -52,11 +52,12 @@ FAIL_FAST=true
 
 case $TYPE in
   "host")
+    CROWDSEC_URL_FROM_HOST=$(ddev describe | grep -A 1 "crowdsec" | sed 's/Host: //g' |  sed -e 's|│||g' | sed s/'\s'//g | tail -1)
     cd "../"
     DEBUG_STRING="PWDEBUG=1"
     YARN_PATH="./"
     COMMAND="yarn --cwd ${YARN_PATH} cross-env"
-    LAPI_URL_FROM_PLAYWRIGHT=http://$HOSTNAME:8080
+    LAPI_URL_FROM_PLAYWRIGHT=https://${CROWDSEC_URL_FROM_HOST}
     CURRENT_IP=$(ddev find-ip host)
     TIMEOUT=31000
     HEADLESS=false
@@ -67,7 +68,7 @@ case $TYPE in
     DEBUG_STRING=""
     YARN_PATH="./var/www/html/my-own-modules/crowdsec-bouncer/Test/EndToEnd"
     COMMAND="ddev exec -s playwright yarn --cwd ${YARN_PATH} cross-env"
-    LAPI_URL_FROM_PLAYWRIGHT=http://crowdsec:8080
+    LAPI_URL_FROM_PLAYWRIGHT=https://crowdsec:8080
     CURRENT_IP=$(ddev find-ip playwright)
     TIMEOUT=31000
     HEADLESS=true
@@ -78,7 +79,7 @@ case $TYPE in
     DEBUG_STRING="DEBUG=pw:api"
     YARN_PATH="./var/www/html/my-own-modules/crowdsec-bouncer/Test/EndToEnd"
     COMMAND="ddev exec -s playwright xvfb-run --auto-servernum -- yarn --cwd ${YARN_PATH} cross-env"
-    LAPI_URL_FROM_PLAYWRIGHT=http://crowdsec:8080
+    LAPI_URL_FROM_PLAYWRIGHT=https://crowdsec:8080
     CURRENT_IP=$(ddev find-ip playwright)
     TIMEOUT=60000
     HEADLESS=true
