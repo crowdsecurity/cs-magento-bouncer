@@ -33,8 +33,8 @@ jobs:
 
     steps:
 
-      - name: Install Magento 2
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.1.0
+      - name: Install Magento 2 with DDEV
+        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.2.0
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
