@@ -113,9 +113,7 @@ jobs:
       - name: Prepare auto-prepend-file mode test suite
         run: |
           cd ${{ github.workspace }}/.ddev
-          ddev create-watcher
           ddev nginx-config custom_files/crowdsec-prepend-nginx-site.conf
-          ddev exec -s crowdsec cscli decisions delete --all
 
       - name: Verify auto_prepend_file directive
         run: |
