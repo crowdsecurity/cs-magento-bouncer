@@ -28,9 +28,10 @@
 namespace CrowdSec\Bouncer\Helper;
 
 use CrowdSec\Bouncer\Constants;
+use CrowdSecBouncer\BouncerException;
+use Exception;
 use InvalidArgumentException;
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Exception\FileSystemException;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -186,8 +187,7 @@ class Config extends AbstractHelper
         Context       $context,
         Json          $serializer,
         DirectoryList $directoryList
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->serializer = $serializer;
         $this->directoryList = $directoryList;
@@ -373,22 +373,26 @@ class Config extends AbstractHelper
     }
 
     /**
-     * Get the geolocation database absolute path
+     * Get the absolute path of a var file
      *
      * @param string $relativePath
      * @return string
-     * @throws FileSystemException
+     * @throws BouncerException
      */
     public function getVarFullPath(string $relativePath): string
     {
-        return $this->directoryList->getPath(DirectoryList::VAR_DIR) . '/' . ltrim($relativePath, '/');
+        try {
+            return $this->directoryList->getPath(DirectoryList::VAR_DIR) . '/' . ltrim($relativePath, '/');
+        } catch (Exception $e) {
+            throw new BouncerException($e->getMessage());
+        }
     }
 
     /**
      * Get geolocation config
      *
      * @return array
-     * @throws FileSystemException
+     * @throws BouncerException
      */
     public function getGeolocation(): array
     {
@@ -420,7 +424,7 @@ class Config extends AbstractHelper
      * Get TLS authentification config
      *
      * @return array
-     * @throws FileSystemException
+     * @throws BouncerException
      */
     public function getTLS(): array
     {

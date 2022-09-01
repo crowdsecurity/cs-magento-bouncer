@@ -48,7 +48,7 @@
                         <validate>required-entry</validate>
                     </field>
                     <field id="auth_type" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
-                        <label>Connexion type</label>
+                        <label>Authentification type</label>
                         <source_model>CrowdSec\Bouncer\Model\Config\Source\ConnexionType</source_model>
                         <comment><![CDATA[Choose between API key and TLS (pki) authentification]]></comment>
                     </field>

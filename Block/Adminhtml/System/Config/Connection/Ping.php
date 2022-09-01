@@ -82,8 +82,6 @@ class Ping extends Button
      */
     protected $_bouncerKeyField = 'crowdsec_bouncer_general_connection_api_key';
 
-
-
     /**
      * Use curl field name
      *

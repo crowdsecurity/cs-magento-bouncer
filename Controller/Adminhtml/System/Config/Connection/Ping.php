@@ -66,8 +66,7 @@ class Ping extends Action implements HttpPostActionInterface
         JsonFactory    $resultJsonFactory,
         RegistryBounce $registryBounce,
         Helper         $helper
-    )
-    {
+    ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->registryBounce = $registryBounce;
@@ -131,17 +130,19 @@ class Ping extends Action implements HttpPostActionInterface
         $resultJson = $this->resultJsonFactory->create();
 
         $suffixMessage = ($authType === Constants::AUTH_TLS) ? '<br><br>' . __(
-                'Auth type: TLS <br>Tested url: %1 <br> Tested cert: %2 <br> Tested key: %3 <br> Verify peer: %4 <br>Tested ca cert: %5 <br>Use cURL: %6',
-                $baseUri ?? "",
-                $tlsCert ?? "",
-                $tlsKey ?? "",
-                $tlsVerifyPeer,
-                $tlsCaCert ?? "",
-                $useCurl) : '<br><br>' . __(
-                'Auth type: Api key <br>Tested url: %1 <br> Tested key: %2 <br> Use cURL: %3',
-                $baseUri ?? "",
-                $apiKey ?? "",
-                $useCurl);
+            'Auth type: TLS <br>Url: %1<br>Cert: %2<br>Key: %3<br>Verify peer: %4<br>CA cert: %5<br>Use cURL: %6',
+            $baseUri ?? "",
+            $tlsCert ?? "",
+            $tlsKey ?? "",
+            $tlsVerifyPeer,
+            $tlsCaCert ?? "",
+            $useCurl
+        ) : '<br><br>' . __(
+            'Auth type: Api key <br>Url: %1 <br>Api key: %2<br>Use cURL: %3',
+            $baseUri ?? "",
+            $apiKey ?? "",
+            $useCurl
+        );
 
         return $resultJson->setData([
             'connection' => $result,
