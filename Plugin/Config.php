@@ -456,10 +456,10 @@ class Config
                 }
                 $configs = $this->helper->getBouncerConfigs();
                 $finalApiKey = $newConnection['api_key'];
-                $finalCert = $newConnection['tls']['tls_cert_path'];
-                $finalKey = $newConnection['tls']['tls_key_path'] ;
-                $finalVerify = $newConnection['tls']['tls_verify_peer'];
-                $finalCaCert = $newConnection['tls']['tls_ca_cert_path'];
+                $finalCert = $newConnection['tls']['tls_cert_path']??"";
+                $finalKey = $newConnection['tls']['tls_key_path']??"" ;
+                $finalVerify = $newConnection['tls']['tls_verify_peer']??false;
+                $finalCaCert = $newConnection['tls']['tls_ca_cert_path']??"";
                 $finalUseCurl = $newConnection['use_curl']??false;
                 $currentConfigs = [
                     'api_url' => $newConnection['api_url'],
