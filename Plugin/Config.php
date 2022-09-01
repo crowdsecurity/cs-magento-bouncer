@@ -186,7 +186,7 @@ class Config
     public function beforeSave(
         MagentoConfig $subject
     ) {
-        if ($subject->getSection() === Helper::SECTION) {
+        if (PHP_SAPI !== 'cli' && $subject->getSection() === Helper::SECTION) {
             // Retrieve saved values (old) and posted data (new)
             $oldStreamMode = $this->helper->isStreamModeEnabled();
             $newStreamMode = $subject->getData(Helper::STREAM_MODE_FULL_PATH) === null ? $oldStreamMode :
