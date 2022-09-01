@@ -91,6 +91,50 @@ class Config
     }
 
     /**
+     * Retrieve old and new TLS settings
+     *
+     * @param MagentoConfig $subject
+     * @param boolean $isTLS
+     * @return array[]
+     * @throws BouncerException
+     */
+    protected function _getTLS($subject, $isTLS)
+    {
+        $result = ['old'=>[], 'new' => []];
+        if ($isTLS) {
+            $oldTls = $this->helper->getTLS();
+            $oldTlsCert = $oldTls['tls_cert_path'];
+            $newTlsCert = ($subject->getData(Helper::API_TLS_CERT_FULL_PATH)) ?
+                $this->helper->getVarFullPath($subject->getData(Helper::API_TLS_CERT_FULL_PATH)) : $oldTlsCert;
+
+            $oldTlsKey = $oldTls['tls_key_path'];
+            $newTlsKey = ($subject->getData(Helper::API_TLS_KEY_FULL_PATH)) ?
+                $this->helper->getVarFullPath($subject->getData(Helper::API_TLS_KEY_FULL_PATH)) : $oldTlsKey;
+
+            $oldTlsVerify = $oldTls['tls_verify_peer'];
+            $newTlsVerify = ($subject->getData(Helper::API_TLS_VERIFY_FULL_PATH) === null)
+                ? $oldTlsVerify
+                : (bool)$subject->getData(Helper::API_TLS_VERIFY_FULL_PATH);
+
+            $oldTlsCaCert = $oldTls['tls_ca_cert_path'];
+            $newTlsCaCert = ($subject->getData(Helper::API_TLS_CA_CERT_FULL_PATH)) ?
+                $this->helper->getVarFullPath($subject->getData(Helper::API_TLS_CA_CERT_FULL_PATH)) : $oldTlsCaCert;
+
+            $result['new'] = [
+                'tls_cert_path' => $newTlsCert,
+                'tls_key_path' => $newTlsKey,
+                'tls_verify_peer' => $newTlsVerify,
+                'tls_ca_cert_path' => $newTlsCaCert
+            ];
+
+            $result['old'] = $oldTls;
+
+        }
+
+        return $result;
+    }
+
+    /**
      * Retrieve old and new connections settings
      *
      * @param MagentoConfig $subject
@@ -103,51 +147,30 @@ class Config
         $newUrl = $this->getCurrentValue($subject->getData(Helper::API_URL_FULL_PATH), $oldUrl);
         $oldAuthType = $this->helper->getApiAuthType();
         $newAuthType = $this->getCurrentValue($subject->getData(Helper::API_AUTH_TYPE_FULL_PATH), $oldAuthType);
-        $oldTls = $this->helper->getTLS();
-        $oldTlsCert = $oldTls['tls_cert_path'] ?? "";
-        $newTlsCert = ($subject->getData(Helper::API_TLS_CERT_FULL_PATH)) ?
-            $this->helper->getVarFullPath($subject->getData(Helper::API_TLS_CERT_FULL_PATH)) : $oldTlsCert;
+        $isTLS = $newAuthType === Constants::AUTH_TLS;
+        $tls = $this->_getTLS($subject, $isTLS);
 
-        $oldTlsKey = $oldTls['tls_key_path'] ?? "";
-        $newTlsKey = ($subject->getData(Helper::API_TLS_KEY_FULL_PATH)) ?
-            $this->helper->getVarFullPath($subject->getData(Helper::API_TLS_KEY_FULL_PATH)) : $oldTlsKey;
-
-        $oldTlsVerify = $oldTls['tls_verify_peer'] ?? false;
-        $newTlsVerify = ($subject->getData(Helper::API_TLS_VERIFY_FULL_PATH) === null)
-            ? $oldTlsVerify
-            : (bool)$subject->getData(Helper::API_TLS_VERIFY_FULL_PATH);
+        $oldKey = $this->helper->getApiKey();
+        $newKey = $this->getCurrentValue($subject->getData(Helper::API_KEY_FULL_PATH), $oldKey);
 
         $oldUseCurl = $this->helper->isUseCurl();
         $newUseCurl = ($subject->getData(Helper::API_USE_CURL_FULL_PATH) === null)
             ? $oldUseCurl
             : (bool)$subject->getData(Helper::API_USE_CURL_FULL_PATH);
 
-        $oldTlsCaCert = $oldTls['tls_ca_cert_path'] ?? "";
-        $newTlsCaCert = ($subject->getData(Helper::API_TLS_CA_CERT_FULL_PATH)) ?
-            $this->helper->getVarFullPath($subject->getData(Helper::API_TLS_CA_CERT_FULL_PATH)) : $oldTlsCaCert;
-
-        $newTls = [
-            'tls_cert_path' => $newAuthType === Constants::AUTH_TLS ? $newTlsCert : "",
-            'tls_key_path' => $newTlsKey,
-            'tls_verify_peer' => $newTlsVerify,
-            'tls_ca_cert_path' => $newTlsCaCert,
-        ];
-        $oldKey = $this->helper->getApiKey();
-        $newKey = $this->getCurrentValue($subject->getData(Helper::API_KEY_FULL_PATH), $oldKey);
-
         $oldConnexion = [
             'api_url' => $oldUrl,
             'auth_type' => $oldAuthType,
             'use_curl' => $oldUseCurl,
             'api_key' => $oldKey,
-            'tls' => $oldTls
+            'tls' => $tls['old']
         ];
         $newConnexion = [
             'api_url' => $newUrl,
             'auth_type' => $newAuthType,
             'use_curl' => $newUseCurl,
-            'api_key' => $newAuthType === Constants::AUTH_KEY ? $newKey : "",
-            'tls' => $newTls
+            'api_key' => $isTLS ? "" : $newKey,
+            'tls' => $tls['new']
         ];
 
         return ['old' => $oldConnexion, 'new' => $newConnexion];
