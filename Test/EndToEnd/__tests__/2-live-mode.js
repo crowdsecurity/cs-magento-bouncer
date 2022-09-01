@@ -1,5 +1,11 @@
 /* eslint-disable no-undef */
-const { CURRENT_IP, PROXY_IP } = require("../utils/constants");
+const {
+    CURRENT_IP,
+    PROXY_IP,
+    BOUNCER_CERT_PATH,
+    BOUNCER_KEY_PATH,
+    BOUNCER_CA_CERT_PATH,
+} = require("../utils/constants");
 
 const {
     publicHomepageShouldBeBanWall,
@@ -163,6 +169,57 @@ describe(`Test cURL in Live mode`, () => {
             "#lapi_ping_result",
             /Connection test result: success.*Use cURL: true/,
         );
+        await onAdminSaveSettings();
+    });
+
+    it("Should display the homepage with no remediation", async () => {
+        await removeAllDecisions();
+        await publicHomepageShouldBeAccessible();
+    });
+
+    it("Should display a ban wall", async () => {
+        await banIpForSeconds(15 * 60, CURRENT_IP);
+        await publicHomepageShouldBeBanWall();
+    });
+});
+
+describe(`Test TLS auth in Live mode`, () => {
+    it("Should configure TLS", async () => {
+        await goToSettingsPage();
+        await selectElement(
+            "crowdsec_bouncer_general_connection_auth_type",
+            "tls",
+        );
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_cert_path",
+            "bad-path",
+        );
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_key_path",
+            `${BOUNCER_KEY_PATH}`,
+        );
+        await selectElement(
+            "crowdsec_bouncer_general_connection_tls_verify_peer",
+            "1",
+        );
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_ca_cert_path",
+            `${BOUNCER_CA_CERT_PATH}`,
+        );
+
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await expect(page).toMatchText("#lapi_ping_result", /Technical error/);
+
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_cert_path",
+            `${BOUNCER_CERT_PATH}`,
+        );
+
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Connection test result: success.*Auth type: TLS/,
+        );
+
         await onAdminSaveSettings();
     });
 

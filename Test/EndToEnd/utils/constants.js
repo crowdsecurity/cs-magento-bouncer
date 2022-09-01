@@ -18,6 +18,9 @@ const { AGENT_TLS_PATH } = process.env;
 const AGENT_CERT_PATH = `${AGENT_TLS_PATH}/agent.pem`;
 const AGENT_KEY_PATH = `${AGENT_TLS_PATH}/agent-key.pem`;
 const CA_CERT_PATH = `${AGENT_TLS_PATH}/ca-chain.pem`;
+const BOUNCER_CERT_PATH = "crowdsec/tls/councer.pem";
+const BOUNCER_KEY_PATH = "crowdsec/tls/bouncer-key.pem";
+const BOUNCER_CA_CERT_PATH = "crowdsec/tls/ca-chain.pem";
 const WATCHER_LOGIN = "watcherLogin";
 const WATCHER_PASSWORD = "watcherPassword";
 
@@ -42,4 +45,7 @@ module.exports = {
     CA_CERT_PATH,
     WATCHER_LOGIN,
     WATCHER_PASSWORD,
+    BOUNCER_CERT_PATH,
+    BOUNCER_KEY_PATH,
+    BOUNCER_CA_CERT_PATH,
 };

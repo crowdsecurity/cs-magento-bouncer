@@ -93,7 +93,8 @@ jobs:
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
           ddev magento cache:flush
           cd ${{ github.workspace }}
-          mkdir var/crowdsec
+          mkdir -p var/crowdsec/tls
+          cp -r cfssl/* var/crowdsec/tls
           ddev maxmind-download DEFAULT GeoLite2-City /var/www/html/var/crowdsec
           ddev maxmind-download DEFAULT GeoLite2-Country /var/www/html/var/crowdsec
           cd var/crowdsec
