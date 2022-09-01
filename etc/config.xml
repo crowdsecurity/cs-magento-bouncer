@@ -30,6 +30,9 @@
     <default>
         <crowdsec_bouncer>
             <general>
+                <connection>
+                    <auth_type>api_key</auth_type>
+                </connection>
                 <bouncing>
                     <level>normal_bouncing</level>
                 </bouncing>
