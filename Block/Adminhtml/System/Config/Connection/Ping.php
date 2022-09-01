@@ -34,11 +34,46 @@ class Ping extends Button
 {
 
     /**
-     * LAPI Url field Name
+     * Local API Url field Name
      *
      * @var string
      */
     protected $_apiUrlField = 'crowdsec_bouncer_general_connection_api_url';
+
+    /**
+     * Local API Auth type field Name
+     *
+     * @var string
+     */
+    protected $_apiAuthTypeField = 'crowdsec_bouncer_general_connection_auth_type';
+
+    /**
+     * TLS Cert path field Name
+     *
+     * @var string
+     */
+    protected $_tlsCertPathField = 'crowdsec_bouncer_general_connection_tls_cert_path';
+
+    /**
+     * TLS Cert key field Name
+     *
+     * @var string
+     */
+    protected $_tlsKeyPathField = 'crowdsec_bouncer_general_connection_tls_key_path';
+
+    /**
+     * TLS verify peer field Name
+     *
+     * @var string
+     */
+    protected $_tlsVerifyPeerField = 'crowdsec_bouncer_general_connection_tls_verify_peer';
+
+    /**
+     * TLS ca cert path field Name
+     *
+     * @var string
+     */
+    protected $_tlsCaCertPathField = 'crowdsec_bouncer_general_connection_tls_ca_cert_path';
 
     /**
      * Bouncer key field name
@@ -46,6 +81,9 @@ class Ping extends Button
      * @var string
      */
     protected $_bouncerKeyField = 'crowdsec_bouncer_general_connection_api_key';
+
+
+
     /**
      * Use curl field name
      *
@@ -59,13 +97,63 @@ class Ping extends Button
     protected $oldTemplate = 'CrowdSec_Bouncer::system/config/connection/old/ping.phtml';
 
     /**
-     * Get LAPI Url field Name
+     * Get Local API Url field Name
      *
      * @return string
      */
     public function getUrlField(): string
     {
         return $this->_apiUrlField;
+    }
+
+    /**
+     * Get auth type field Name
+     *
+     * @return string
+     */
+    public function getAuthTypeField(): string
+    {
+        return $this->_apiAuthTypeField;
+    }
+
+    /**
+     * Get tls cert path field Name
+     *
+     * @return string
+     */
+    public function getTlsCertPathField(): string
+    {
+        return $this->_tlsCertPathField;
+    }
+
+    /**
+     * Get tls key path field Name
+     *
+     * @return string
+     */
+    public function getTlsKeyPathField(): string
+    {
+        return $this->_tlsKeyPathField;
+    }
+
+    /**
+     * Get tls verify peer field Name
+     *
+     * @return string
+     */
+    public function getTlsVerifyPeerField(): string
+    {
+        return $this->_tlsVerifyPeerField;
+    }
+
+    /**
+     * Get tls ca cert path field Name
+     *
+     * @return string
+     */
+    public function getTlsCaCertPathField(): string
+    {
+        return $this->_tlsCaCertPathField;
     }
 
     /**
@@ -96,7 +184,7 @@ class Ping extends Button
      */
     protected function _getElementHtml(AbstractElement $element): string
     {
-        $buttonLabel =  __('Test CrowdSec LAPI connection');
+        $buttonLabel =  __('Test CrowdSec Local API connection');
         $this->addData(
             [
                 'button_label' => $buttonLabel,

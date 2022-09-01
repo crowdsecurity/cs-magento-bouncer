@@ -81,9 +81,10 @@ class Config
     public function __construct(
         ManagerInterface $messageManager,
         Helper           $helper,
-        RegistryBounce  $registryBounce,
+        RegistryBounce   $registryBounce,
         WriterInterface  $configWriter
-    ) {
+    )
+    {
         $this->messageManager = $messageManager;
         $this->helper = $helper;
         $this->registryBounce = $registryBounce;
@@ -99,7 +100,8 @@ class Config
      */
     public function beforeSave(
         MagentoConfig $subject
-    ) {
+    )
+    {
         if ($subject->getSection() === Helper::SECTION) {
             // Retrieve saved values (old) and posted data (new)
             $oldStreamMode = $this->helper->isStreamModeEnabled();
@@ -129,8 +131,55 @@ class Config
             );
             $oldUrl = $this->helper->getApiUrl();
             $newUrl = $this->getCurrentValue($subject->getData(Helper::API_URL_FULL_PATH), $oldUrl);
+            $oldAuthType = $this->helper->getApiAuthType();
+            $newAuthType = $this->getCurrentValue($subject->getData(Helper::API_AUTH_TYPE_FULL_PATH), $oldAuthType);
+            $oldTls = $this->helper->getTLS();
+            $oldTlsCert = $oldTls['tls_cert_path'] ?? "";
+            $newTlsCert = ($subject->getData(Helper::API_TLS_CERT_FULL_PATH)) ? $this->helper->getVarFullPath
+            ($subject->getData(Helper::API_TLS_CERT_FULL_PATH)) : $oldTlsCert;
+
+            $oldTlsKey = $oldTls['tls_key_path'] ?? "";
+            $newTlsKey = ($subject->getData(Helper::API_TLS_KEY_FULL_PATH)) ? $this->helper->getVarFullPath
+            ($subject->getData(Helper::API_TLS_KEY_FULL_PATH)) : $oldTlsKey;
+
+            $oldTlsVerify = $oldTls['tls_verify_peer'] ?? false;
+            $newTlsVerify = ($subject->getData(Helper::API_TLS_VERIFY_FULL_PATH) === null)
+                ? $oldTlsVerify
+                : (bool)$subject->getData(Helper::API_TLS_VERIFY_FULL_PATH);
+
+            $oldUseCurl = $this->helper->isUseCurl();
+            $newUseCurl = ($subject->getData(Helper::API_USE_CURL_FULL_PATH) === null)
+                ? $oldUseCurl
+                : (bool)$subject->getData(Helper::API_USE_CURL_FULL_PATH);
+
+            $oldTlsCaCert = $oldTls['tls_ca_cert_path'] ?? "";
+            $newTlsCaCert = ($subject->getData(Helper::API_TLS_CA_CERT_FULL_PATH)) ? $this->helper->getVarFullPath
+            ($subject->getData(Helper::API_TLS_CA_CERT_FULL_PATH)) : $oldTlsCaCert;
+
+            $newTls = [
+                'tls_cert_path' => $newTlsCert,
+                'tls_key_path' => $newTlsKey,
+                'tls_verify_peer' => $newTlsVerify,
+                'tls_ca_cert_path' => $newTlsCaCert
+            ];
             $oldKey = $this->helper->getApiKey();
             $newKey = $this->getCurrentValue($subject->getData(Helper::API_KEY_FULL_PATH), $oldKey);
+
+            $oldConnexion = [
+                'api_url' => $oldUrl,
+                'auth_type' => $oldAuthType,
+                'use_curl' => $oldUseCurl,
+                'api_key' => $oldKey,
+                'tls' => $oldTls
+            ];
+            $newConnexion = [
+                'api_url' => $newUrl,
+                'auth_type' => $newAuthType,
+                'use_curl' => $newUseCurl,
+                'api_key' => $newKey,
+                'tls' => $newTls
+            ];
+
             $cacheOptions = $this->helper->getCacheSystemOptions();
             $oldCacheLabel = $cacheOptions[$oldCacheSystem] ?? __('Unknown');
             $newCacheLabel = $cacheOptions[$newCacheSystem] ?? __('Unknown');
@@ -146,7 +195,7 @@ class Config
             $refreshCronExprChanged = $oldRefreshCronExpr !== $newRefreshCronExpr;
             $pruneCronExprChanged = $oldPruneCronExpr !== $newPruneCronExpr;
             // We should have to test connection
-            $this->_handleConnectionChanges($oldUrl, $newUrl, $oldKey, $newKey);
+            $this->_handleConnectionChanges($oldConnexion, $newConnexion);
             // We should have to deactivate or test cron
             $this->_handleRefreshCronExpr($oldStreamMode, $newStreamMode, $refreshCronExprChanged, $newRefreshCronExpr);
             // We should have to test cron
@@ -205,7 +254,8 @@ class Config
         string $newRedisDsn,
         string $newMemcachedDsn,
         Phrase $newCacheLabel
-    ) {
+    )
+    {
         // We should have to warm up the cache in Stream Mode
         $this->_handleWarmUp(
             $oldStreamMode,
@@ -252,7 +302,8 @@ class Config
         string $newRedisDsn,
         string $newMemcachedDsn,
         Phrase $newCacheLabel
-    ) {
+    )
+    {
         $shouldWarmUp = false;
         if ($newStreamMode === true) {
             if ($oldStreamMode !== true) {
@@ -286,7 +337,8 @@ class Config
         bool   $newStreamMode,
         bool   $cronExprChanged,
         string $newCronExpr
-    ) {
+    )
+    {
         if ($oldStreamMode !== $newStreamMode && $newStreamMode === false && $newCronExpr !== self::CRON_DISABLE) {
             // Disable cache refresh cron if Stream Mode deactivated
             try {
@@ -297,7 +349,7 @@ class Config
                 $cronMessage = __('Cache refresh cron has been disabled.');
                 $this->messageManager->addNoticeMessage($cronMessage);
             } catch (Exception $e) {
-                throw new BouncerException('Disabled refresh cron expression can\'t be saved: '. $e->getMessage());
+                throw new BouncerException('Disabled refresh cron expression can\'t be saved: ' . $e->getMessage());
             }
         } elseif ($cronExprChanged) {
             // Check expression
@@ -325,10 +377,11 @@ class Config
         string $newCacheSystem,
         bool   $cronExprChanged,
         string $newCronExpr
-    ) {
+    )
+    {
         if ($oldCacheSystem !== $newCacheSystem &&
-                  $newCacheSystem !== Constants::CACHE_SYSTEM_PHPFS
-                  && $newCronExpr !== self::CRON_DISABLE) {
+            $newCacheSystem !== Constants::CACHE_SYSTEM_PHPFS
+            && $newCronExpr !== self::CRON_DISABLE) {
             // Disable cache pruning cron if cache technology is not file system
             try {
                 $this->configWriter->save(
@@ -338,7 +391,7 @@ class Config
                 $cronMessage = __('File system cache pruning cron has been disabled.');
                 $this->messageManager->addNoticeMessage($cronMessage);
             } catch (Exception $e) {
-                throw new BouncerException('Disabled pruning cron expression can\'t be saved: '. $e->getMessage());
+                throw new BouncerException('Disabled pruning cron expression can\'t be saved: ' . $e->getMessage());
             }
         } elseif ($cronExprChanged) {
             // Check expression
@@ -354,38 +407,58 @@ class Config
     /**
      * Handle connection changes
      *
-     * @param string $oldUrl
-     * @param string $newUrl
-     * @param string $oldKey
-     * @param string $newKey
+     * @param array $oldConnection
+     * @param array $newConnection
      * @return void
      * @throws BouncerException
      */
     protected function _handleConnectionChanges(
-        string $oldUrl,
-        string $newUrl,
-        string $oldKey,
-        string $newKey
-    ) {
+        array $oldConnection,
+        array $newConnection,
+    )
+    {
         // Test connection if params changed
-        if (($newUrl && $newKey) && ($oldUrl !== $newUrl || $oldKey !== $newKey)) {
+        if ($oldConnection != $newConnection) {
             try {
-                // Try the adapter connection (Redis or Memcached will crash if the connection is incorrect)
                 if (!($bounce = $this->registryBounce->get())) {
                     $bounce = $this->registryBounce->create();
                 }
                 $configs = $this->helper->getBouncerConfigs();
+                $finalApiKey = $newConnection['auth_type'] === Constants::AUTH_KEY ? $newConnection['api_key'] : "";
+                $finalCert = $newConnection['auth_type'] === Constants::AUTH_TLS ?
+                    $newConnection['tls']['tls_cert_path'] : "";
+                $finalKey = $newConnection['auth_type'] === Constants::AUTH_TLS ?
+                    $newConnection['tls']['tls_key_path'] : "";
+                $finalVerify = $newConnection['auth_type'] === Constants::AUTH_TLS ?
+                    $newConnection['tls']['tls_verify_peer'] : false;
+                $finalCaCert =$newConnection['auth_type'] === Constants::AUTH_TLS ?
+                    $newConnection['tls']['tls_ca_cert_path'] : "";
+                $finalUseCurl = $newConnection['use_curl']??false;
                 $currentConfigs = [
-                    'api_url' => $newUrl,
-                    'api_key' => $newKey,
+                    'api_url' => $newConnection['api_url'],
+                    'api_key' => $finalApiKey,
+                    'use_curl' => $newConnection['use_curl'],
+                    'auth_type' => $newConnection['auth_type'],
+                    'tls_cert_path' => $finalCert,
+                    'tls_key_path' => $finalKey,
+                    'tls_ca_cert_path' => $finalCaCert,
+                    'tls_verify_peer' => $finalVerify,
                 ];
                 $bouncer = $bounce->init(array_merge($configs, $currentConfigs));
                 $restClient = $bouncer->getRestClient();
 
                 $this->helper->ping($restClient);
             } catch (Exception $e) {
-                throw new BouncerException("Connection test failed with url \'$newUrl\' and key \'$newKey\': "
-                                            .$e->getMessage());
+                $message = 'Connection test failed with <br>auth_type=' . $newConnection['auth_type']
+                           . '<br>url=' . $newConnection['api_url']
+                           . '<br>use curl=' . ($finalUseCurl ? 'true' : 'false')
+                           . '<br>api key=' . $finalApiKey
+                           . '<br>tls cert path=' . $finalCert
+                           . '<br>tls key path=' . $finalKey
+                           . '<br>tls ca cert path=' . $finalCaCert
+                           . '<br>tls verify peer=' . ($finalVerify ? 'true' : 'false')
+                           . '<br>: ';
+                throw new BouncerException($message . $e->getMessage());
             }
         }
     }
@@ -409,7 +482,8 @@ class Config
         string $newRedisDsn,
         string $newMemcachedDsn,
         Phrase $newCacheLabel
-    ) {
+    )
+    {
         $shouldClearCache = false;
         if ($newStreamMode === false) {
             if ($oldStreamMode !== false) {
@@ -440,7 +514,8 @@ class Config
         string $oldMemcachedDsn,
         string $oldRedisDsn,
         Phrase $oldCacheLabel
-    ) {
+    )
+    {
         if ($cacheChanged) {
             $this->_clearCache($oldCacheSystem, $oldMemcachedDsn, $oldRedisDsn, $oldCacheLabel);
         }
@@ -462,7 +537,8 @@ class Config
         string $memcachedDsn,
         string $redisDsn,
         Phrase $cacheLabel
-    ): void {
+    ): void
+    {
         if ($cacheChanged) {
             try {
                 // Try the adapter connection (Redis or Memcached will crash if the connection is incorrect)
@@ -505,12 +581,13 @@ class Config
      * @throws LogicException
      */
     protected function _clearCache(
-        string  $cacheSystem,
-        string  $memcachedDsn,
-        string  $redisDsn,
-        Phrase  $cacheLabel,
+        string $cacheSystem,
+        string $memcachedDsn,
+        string $redisDsn,
+        Phrase $cacheLabel,
         Phrase $preMessage = null
-    ): void {
+    ): void
+    {
         try {
             if (!($bounce = $this->registryBounce->get())) {
                 $bounce = $this->registryBounce->create();
@@ -556,7 +633,8 @@ class Config
         string $memcachedDsn,
         string $redisDsn,
         Phrase $cacheLabel
-    ): void {
+    ): void
+    {
         try {
             if (!($bounce = $this->registryBounce->get())) {
                 $bounce = $this->registryBounce->create();
@@ -600,7 +678,8 @@ class Config
         string $newRedisDsn,
         string $oldMemcachedDsn,
         string $newMemcachedDsn
-    ): bool {
+    ): bool
+    {
         switch ($newCacheSystem) {
             case Constants::CACHE_SYSTEM_REDIS:
                 return $oldRedisDsn !== $newRedisDsn;
@@ -620,10 +699,11 @@ class Config
      * @return void
      */
     private function displayCacheClearMessage(
-        bool $clearCacheResult,
+        bool   $clearCacheResult,
         Phrase $cacheLabel,
         Phrase $preMessage = null
-    ): void {
+    ): void
+    {
         $clearCacheMessage =
             $clearCacheResult ? __('%1 cache has been cleared.', $cacheLabel) :
                 __('%1 cache has not been cleared.', $cacheLabel);

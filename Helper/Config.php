@@ -40,6 +40,12 @@ class Config extends AbstractHelper
 {
     public const SECTION = 'crowdsec_bouncer';
     public const API_URL_FULL_PATH = 'groups/general/groups/connection/fields/api_url/value';
+    public const API_AUTH_TYPE_FULL_PATH = 'groups/general/groups/connection/fields/auth_type/value';
+    public const API_TLS_CERT_FULL_PATH = 'groups/general/groups/connection/fields/tls_cert_path/value';
+    public const API_TLS_KEY_FULL_PATH = 'groups/general/groups/connection/fields/tls_key_path/value';
+    public const API_TLS_VERIFY_FULL_PATH = 'groups/general/groups/connection/fields/tls_verify_peer/value';
+    public const API_TLS_CA_CERT_FULL_PATH = 'groups/general/groups/connection/fields/tls_ca_cert_path/value';
+    public const API_USE_CURL_FULL_PATH = 'groups/general/groups/connection/fields/use_curl/value';
     public const API_KEY_FULL_PATH = 'groups/general/groups/connection/fields/api_key/value';
     public const MEMCACHED_DSN_FULL_PATH = 'groups/advanced/groups/cache/fields/memcached_dsn/value';
     public const REDIS_DSN_FULL_PATH = 'groups/advanced/groups/cache/fields/redis_dsn/value';
@@ -50,6 +56,11 @@ class Config extends AbstractHelper
 
     // General configs
     public const XML_PATH_API_URL = self::SECTION . '/general/connection/api_url';
+    public const XML_PATH_API_AUTH_TYPE = self::SECTION . '/general/connection/auth_type';
+    public const XML_PATH_API_TLS_CERT = self::SECTION . '/general/connection/tls_cert_path';
+    public const XML_PATH_API_TLS_KEY = self::SECTION . '/general/connection/tls_key_path';
+    public const XML_PATH_API_TLS_VERIFY_PEER = self::SECTION . '/general/connection/tls_verify_peer';
+    public const XML_PATH_API_TLS_CA_CERT = self::SECTION . '/general/connection/tls_ca_cert_path';
     public const XML_PATH_API_KEY = self::SECTION . '/general/connection/api_key';
     public const XML_PATH_USE_CURL = self::SECTION . '/general/connection/use_curl';
     public const XML_PATH_FRONT_ENABLED = self::SECTION . '/general/bouncing/front_enabled';
@@ -130,6 +141,7 @@ class Config extends AbstractHelper
      */
     protected $_globals = [
         'api_url' => null,
+        'api_auth_type' => null,
         'api_key' => null,
         'use_curl' => null,
         'is_admin_enabled' => null,
@@ -152,6 +164,7 @@ class Config extends AbstractHelper
         'geolocation_duration' => null,
         'trusted_forwarded_ip' => null,
         'geolocation' => null,
+        'tls' => null,
     ];
     /**
      * @var null[]
@@ -170,10 +183,11 @@ class Config extends AbstractHelper
      * @param DirectoryList $directoryList
      */
     public function __construct(
-        Context $context,
-        Json $serializer,
+        Context       $context,
+        Json          $serializer,
         DirectoryList $directoryList
-    ) {
+    )
+    {
         parent::__construct($context);
         $this->serializer = $serializer;
         $this->directoryList = $directoryList;
@@ -190,7 +204,21 @@ class Config extends AbstractHelper
             $this->_globals['api_url'] = trim((string)$this->scopeConfig->getValue(self::XML_PATH_API_URL));
         }
 
-        return (string) $this->_globals['api_url'];
+        return (string)$this->_globals['api_url'];
+    }
+
+    /**
+     * Get api auth type config
+     *
+     * @return string
+     */
+    public function getApiAuthType(): string
+    {
+        if (!isset($this->_globals['api_auth_type'])) {
+            $this->_globals['api_auth_type'] = trim((string)$this->scopeConfig->getValue(self::XML_PATH_API_AUTH_TYPE));
+        }
+
+        return (string)$this->_globals['api_auth_type'];
     }
 
     /**
@@ -204,7 +232,7 @@ class Config extends AbstractHelper
             $this->_globals['api_key'] = trim((string)$this->scopeConfig->getValue(self::XML_PATH_API_KEY));
         }
 
-        return (string) $this->_globals['api_key'];
+        return (string)$this->_globals['api_key'];
     }
 
     /**
@@ -218,7 +246,7 @@ class Config extends AbstractHelper
             $this->_globals['use_curl'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_USE_CURL);
         }
 
-        return (bool) $this->_globals['use_curl'];
+        return (bool)$this->_globals['use_curl'];
     }
 
     /**
@@ -235,7 +263,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (bool) $this->_storeviews['is_front_enabled'];
+        return (bool)$this->_storeviews['is_front_enabled'];
     }
 
     /**
@@ -249,7 +277,7 @@ class Config extends AbstractHelper
             $this->_globals['is_admin_enabled'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_ADMIN_ENABLED);
         }
 
-        return (bool) $this->_globals['is_admin_enabled'];
+        return (bool)$this->_globals['is_admin_enabled'];
     }
 
     /**
@@ -263,7 +291,7 @@ class Config extends AbstractHelper
             $this->_globals['is_api_enabled'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_API_ENABLED);
         }
 
-        return (bool) $this->_globals['is_api_enabled'];
+        return (bool)$this->_globals['is_api_enabled'];
     }
 
     /**
@@ -277,7 +305,7 @@ class Config extends AbstractHelper
             $this->_globals['is_debug_log'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_DEBUG_LOG);
         }
 
-        return (bool) $this->_globals['is_debug_log'];
+        return (bool)$this->_globals['is_debug_log'];
     }
 
     /**
@@ -292,7 +320,7 @@ class Config extends AbstractHelper
                 (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_DISABLE_PROD_LOG);
         }
 
-        return (bool) $this->_globals['is_prod_log_disabled'];
+        return (bool)$this->_globals['is_prod_log_disabled'];
     }
 
     /**
@@ -309,7 +337,7 @@ class Config extends AbstractHelper
                 $enabled && $this->scopeConfig->getValue(self::XML_PATH_EVENTS_LOG_ROOT . $process);
         }
 
-        return (bool) $this->_globals['is_events_log_enabled'][$process];
+        return (bool)$this->_globals['is_events_log_enabled'][$process];
     }
 
     /**
@@ -324,7 +352,7 @@ class Config extends AbstractHelper
                 (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_DISPLAY_ERRORS);
         }
 
-        return (bool) $this->_globals['can_display_errors'];
+        return (bool)$this->_globals['can_display_errors'];
     }
 
     /**
@@ -341,7 +369,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (string) $this->_storeviews['bouncing_level'];
+        return (string)$this->_storeviews['bouncing_level'];
     }
 
     /**
@@ -351,7 +379,7 @@ class Config extends AbstractHelper
      * @return string
      * @throws FileSystemException
      */
-    public function getGeolocationDatabaseFullPath(string $relativePath): string
+    public function getVarFullPath(string $relativePath): string
     {
         return $this->directoryList->getPath(DirectoryList::VAR_DIR) . '/' . ltrim($relativePath, '/');
     }
@@ -376,7 +404,7 @@ class Config extends AbstractHelper
                     $result[$type]['database_type'] =
                         (string)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_TYPE);
                     $result[$type]['database_path'] =
-                        $this->getGeolocationDatabaseFullPath(
+                        $this->getVarFullPath(
                             $this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_PATH)
                         );
                 }
@@ -386,6 +414,35 @@ class Config extends AbstractHelper
         }
 
         return (array)$this->_globals['geolocation'];
+    }
+
+    /**
+     * Get TLS authentification config
+     *
+     * @return array
+     * @throws FileSystemException
+     */
+    public function getTLS(): array
+    {
+        if (!isset($this->_globals['tls'])) {
+
+            $result = [
+                'tls_cert_path' => $this->getVarFullPath(
+                    (string)$this->scopeConfig->getValue(self::XML_PATH_API_TLS_CERT)
+                ),
+                'tls_key_path' => $this->getVarFullPath(
+                    (string)$this->scopeConfig->getValue(self::XML_PATH_API_TLS_KEY)
+                ),
+                'tls_verify_peer' => (bool)$this->scopeConfig->getValue(self::XML_PATH_API_TLS_VERIFY_PEER),
+                'tls_ca_cert_path' => $this->getVarFullPath(
+                    (string)$this->scopeConfig->getValue(self::XML_PATH_API_TLS_CA_CERT)
+                )
+            ];
+
+            $this->_globals['tls'] = $result;
+        }
+
+        return (array)$this->_globals['tls'];
     }
 
     /**
@@ -401,7 +458,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (string) $this->_globals['forced_test_ip'];
+        return (string)$this->_globals['forced_test_ip'];
     }
 
     /**
@@ -417,7 +474,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (string) $this->_globals['forced_test_forwarded_ip'];
+        return (string)$this->_globals['forced_test_forwarded_ip'];
     }
 
     /**
@@ -431,7 +488,7 @@ class Config extends AbstractHelper
             $this->_globals['is_stream_mode'] = (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_MODE_STREAM);
         }
 
-        return (bool) $this->_globals['is_stream_mode'];
+        return (bool)$this->_globals['is_stream_mode'];
     }
 
     /**
@@ -447,7 +504,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (string) $this->_globals['refresh_cron_expr'];
+        return (string)$this->_globals['refresh_cron_expr'];
     }
 
     /**
@@ -463,7 +520,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (string) $this->_globals['prune_cron_expr'];
+        return (string)$this->_globals['prune_cron_expr'];
     }
 
     /**
@@ -479,7 +536,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (string) $this->_globals['cache_technology'];
+        return (string)$this->_globals['cache_technology'];
     }
 
     /**
@@ -495,7 +552,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (string) $this->_globals['redis_dsn'];
+        return (string)$this->_globals['redis_dsn'];
     }
 
     /**
@@ -511,7 +568,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (string) $this->_globals['memcached_dsn'];
+        return (string)$this->_globals['memcached_dsn'];
     }
 
     /**
@@ -527,7 +584,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (int) $this->_globals['clean_ip_duration'];
+        return (int)$this->_globals['clean_ip_duration'];
     }
 
     /**
@@ -543,7 +600,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (int) $this->_globals['bad_ip_duration'];
+        return (int)$this->_globals['bad_ip_duration'];
     }
 
     /**
@@ -559,7 +616,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (int) $this->_globals['captcha_duration'];
+        return (int)$this->_globals['captcha_duration'];
     }
 
     /**
@@ -575,7 +632,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (int) $this->_globals['geolocation_duration'];
+        return (int)$this->_globals['geolocation_duration'];
     }
 
     /**
@@ -592,7 +649,7 @@ class Config extends AbstractHelper
             );
         }
 
-        return (string) $this->_storeviews['remediation_fallback'];
+        return (string)$this->_storeviews['remediation_fallback'];
     }
 
     /**
@@ -610,6 +667,6 @@ class Config extends AbstractHelper
                 !empty($trustedForwardedIps) ? $this->serializer->unserialize($trustedForwardedIps) : [];
         }
 
-        return (array) $this->_globals['trusted_forwarded_ip'];
+        return (array)$this->_globals['trusted_forwarded_ip'];
     }
 }

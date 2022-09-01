@@ -35,6 +35,11 @@
 $ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
 $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Connection ping.')));
 $urlField = $escaper->escapeJs($block->getUrlField());
+$authField = $escaper->escapeJs($block->getAuthTypeField());
+$tlsCertField = $escaper->escapeJs($block->getTlsCertPathField());
+$tlsKeyField = $escaper->escapeJs($block->getTlsKeyPathField());
+$tlsVerifyPeerField = $escaper->escapeJs($block->getTlsVerifyPeerField());
+$tlsCaCertField = $escaper->escapeJs($block->getTlsCaCertPathField());
 $keyField = $escaper->escapeJs($block->getKeyField());
 $useCurlField = $escaper->escapeJs($block->getUseCurlField());
 
@@ -47,6 +52,11 @@ require(['prototype'], function(){
 
         params = {
             api_url: $('{$urlField}').value,
+            auth_type: $('{$authField}').value,
+            tls_cert_path: $('{$tlsCertField}').value,
+            tls_key_path: $('{$tlsKeyField}').value,
+            tls_verify_peer: $('{$tlsVerifyPeerField}').value,
+            tls_ca_cert_path: $('{$tlsCaCertField}').value,
             bouncer_key: $('{$keyField}').value,
             use_curl: $('{$useCurlField}').value
         };

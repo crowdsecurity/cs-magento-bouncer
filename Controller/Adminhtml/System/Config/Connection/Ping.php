@@ -62,11 +62,12 @@ class Ping extends Action implements HttpPostActionInterface
      * @param Helper $helper
      */
     public function __construct(
-        Context $context,
-        JsonFactory $resultJsonFactory,
+        Context        $context,
+        JsonFactory    $resultJsonFactory,
         RegistryBounce $registryBounce,
-        Helper $helper
-    ) {
+        Helper         $helper
+    )
+    {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->registryBounce = $registryBounce;
@@ -84,17 +85,30 @@ class Ping extends Action implements HttpPostActionInterface
         $useCurl = "";
         try {
             $baseUri = $this->getRequest()->getParam('api_url');
+            $authType = $this->getRequest()->getParam('auth_type');
+            $tlsCert = ($authType === Constants::AUTH_TLS) ? $this->getRequest()->getParam('tls_cert_path', "") : "";
+            $tlsKey = ($authType === Constants::AUTH_TLS) ? $this->getRequest()->getParam('tls_key_path', "") : "";
+            $tlsVerifyPeer = (bool)$this->getRequest()->getParam('tls_verify_peer', false);
+            $tlsCaCert =
+                ($authType === Constants::AUTH_TLS) ? $this->getRequest()->getParam('tls_ca_cert_path', "") : "";
             $userAgent = Constants::BASE_USER_AGENT;
-            $apiKey = $this->getRequest()->getParam('bouncer_key');
-            $useCurl = (bool) $this->getRequest()->getParam('use_curl', false);
+            $apiKey = ($authType === Constants::AUTH_KEY) ? $this->getRequest()->getParam('bouncer_key') : "";
+            $useCurl = (bool)$this->getRequest()->getParam('use_curl', false);
             $configs = $this->helper->getBouncerConfigs();
             $currentConfigs = [
                 'api_url' => $baseUri,
+                'auth_type' => $authType,
+                'tls_cert_path' => $this->helper->getVarFullPath($tlsCert),
+                'tls_key_path' => $this->helper->getVarFullPath($tlsKey),
+                'tls_verify_peer' => $tlsVerifyPeer,
+                'tls_ca_cert_path' => $this->helper->getVarFullPath($tlsCaCert),
                 'api_user_agent' => $userAgent,
                 'api_key' => $apiKey,
                 'use_curl' => $useCurl
             ];
+
             $useCurl = $useCurl ? __('true') : __('false');
+            $tlsVerifyPeer = $tlsVerifyPeer ? __('true') : __('false');
             $finalConfigs = array_merge($configs, $currentConfigs);
             $bounce = $this->registryBounce->create();
             $bouncer = $bounce->init($finalConfigs);
@@ -116,14 +130,22 @@ class Ping extends Action implements HttpPostActionInterface
 
         $resultJson = $this->resultJsonFactory->create();
 
+        $suffixMessage = ($authType === Constants::AUTH_TLS) ? '<br><br>' . __(
+                'Auth type: TLS <br>Tested url: %1 <br> Tested cert: %2 <br> Tested key: %3 <br> Verify peer: %4 <br>Tested ca cert: %5 <br>Use cURL: %6',
+                $baseUri ?? "",
+                $tlsCert ?? "",
+                $tlsKey ?? "",
+                $tlsVerifyPeer,
+                $tlsCaCert ?? "",
+                $useCurl) : '<br><br>' . __(
+                'Auth type: Api key <br>Tested url: %1 <br> Tested key: %2 <br> Use cURL: %3',
+                $baseUri ?? "",
+                $apiKey ?? "",
+                $useCurl);
+
         return $resultJson->setData([
             'connection' => $result,
-            'message' => $message .'<br><br>'. __(
-                'Tested url: %1 <br> Tested key: %2 <br> Use cURL: %3',
-                $baseUri??"",
-                $apiKey??"",
-                $useCurl
-            ),
+            'message' => $message . $suffixMessage,
         ]);
     }
 }

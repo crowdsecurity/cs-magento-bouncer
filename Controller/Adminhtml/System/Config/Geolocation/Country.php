@@ -118,7 +118,7 @@ class Country extends Action implements HttpPostActionInterface
             if ($type === Constants::GEOLOCATION_TYPE_MAXMIND) {
                 $geolocConfig['maxmind'] = [
                     'database_type' => $maxmindType,
-                    'database_path' => $this->helper->getGeolocationDatabaseFullPath($maxmindPath)
+                    'database_path' => $this->helper->getVarFullPath($maxmindPath)
                 ];
             }
 

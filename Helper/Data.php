@@ -376,6 +376,19 @@ class Data extends Config
     }
 
     /**
+     * Get connexion options
+     *
+     * @return array
+     */
+    public function getConnexionOptions(): array
+    {
+        return [
+            Constants::AUTH_KEY => __('API key'),
+            Constants::AUTH_TLS => __('TLS'),
+        ];
+    }
+
+    /**
      * Generate a config array in order to instantiate a bouncer
      *
      * @return array
@@ -400,9 +413,16 @@ class Data extends Config
                     throw new BouncerException("Unknown $bouncingLevel");
             }
 
+            $tlsConfigs = $this->getTLS();
+
             $this->_bouncerConfigs = [
                 // API connection
                 'api_url' => $this->getApiUrl(),
+                'auth_type' => $this->getApiAuthType(),
+                'tls_cert_path' => $tlsConfigs['tls_cert_path'] ?? "",
+                'tls_key_path' => $tlsConfigs['tls_key_path'] ?? "",
+                'tls_verify_peer' => $tlsConfigs['tls_verify_peer'] ?? false,
+                'tls_ca_cert_path' => $tlsConfigs['tls_ca_cert_path'] ?? "",
                 'api_key' => $this->getApiKey(),
                 'api_user_agent' => Constants::BASE_USER_AGENT,
                 'api_timeout' => Constants::API_TIMEOUT,
