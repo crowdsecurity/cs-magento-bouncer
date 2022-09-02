@@ -2,9 +2,11 @@
 const {
     CURRENT_IP,
     PROXY_IP,
-    BOUNCER_CERT_PATH,
-    BOUNCER_KEY_PATH,
-    BOUNCER_CA_CERT_PATH,
+    BOUNCER_CERT_FILE,
+    AGENT_CERT_FILE,
+    BOUNCER_KEY_FILE,
+    CA_CERT_FILE,
+    TLS_PATH,
 } = require("../utils/constants");
 
 const {
@@ -185,16 +187,17 @@ describe(`Test TLS auth in Live mode`, () => {
     it("Should configure TLS", async () => {
         await goToSettingsPage();
         await selectElement(
+            "crowdsec_bouncer_general_connection_use_curl",
+            "1",
+        );
+        await selectElement(
             "crowdsec_bouncer_general_connection_auth_type",
             "tls",
         );
-        await fillInput(
-            "crowdsec_bouncer_general_connection_tls_cert_path",
-            "bad-path",
-        );
+
         await fillInput(
             "crowdsec_bouncer_general_connection_tls_key_path",
-            `${BOUNCER_KEY_PATH}`,
+            `${TLS_PATH}/${BOUNCER_KEY_FILE}`,
         );
         await selectElement(
             "crowdsec_bouncer_general_connection_tls_verify_peer",
@@ -202,19 +205,76 @@ describe(`Test TLS auth in Live mode`, () => {
         );
         await fillInput(
             "crowdsec_bouncer_general_connection_tls_ca_cert_path",
-            `${BOUNCER_CA_CERT_PATH}`,
+            `${TLS_PATH}/${CA_CERT_FILE}`,
+        );
+        // Bad path
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_cert_path",
+            "bad-path",
         );
 
         await page.click("#crowdsec_bouncer_general_connection_test");
-        await expect(page).toMatchText("#lapi_ping_result", /Technical error/);
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Technical error.*could not load PEM client certificate/,
+        );
 
+        // Bad cert
         await fillInput(
             "crowdsec_bouncer_general_connection_tls_cert_path",
-            `${BOUNCER_CERT_PATH}`,
+            `${TLS_PATH}/${AGENT_CERT_FILE}`,
         );
+
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Technical error.*unable to set private key file/,
+        );
+
+        // Bad CA with verify peer
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_cert_path",
+            `${TLS_PATH}/${BOUNCER_CERT_FILE}`,
+        );
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_ca_cert_path",
+            `${TLS_PATH}/${AGENT_CERT_FILE}`,
+        );
+
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Technical error.*unable to get local issuer certificate/,
+        );
+
+        // Bad CA without verify peer
         await selectElement(
-            "crowdsec_bouncer_general_connection_use_curl",
+            "crowdsec_bouncer_general_connection_tls_verify_peer",
+            "0",
+        );
+
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Connection test result: success.*Auth type: TLS.*Use cURL: true/,
+        );
+
+        // Good settings with curl
+        await selectElement(
+            "crowdsec_bouncer_general_connection_tls_verify_peer",
             "1",
+        );
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_ca_cert_path",
+            `${TLS_PATH}/${CA_CERT_FILE}`,
+        );
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_cert_path",
+            `${TLS_PATH}/${BOUNCER_CERT_FILE}`,
         );
 
         await page.click("#crowdsec_bouncer_general_connection_test");
@@ -225,6 +285,7 @@ describe(`Test TLS auth in Live mode`, () => {
             /Connection test result: success.*Auth type: TLS.*Use cURL: true/,
         );
 
+        // Good settings without curl
         await selectElement(
             "crowdsec_bouncer_general_connection_use_curl",
             "0",

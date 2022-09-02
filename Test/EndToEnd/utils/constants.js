@@ -14,13 +14,12 @@ const DEBUG_LOG_PATH = `${__dirname}/../../../../../var/log/crowdsec-bouncer-deb
 const EVENT_LOG_PATH = `${__dirname}/../../../../../var/log/crowdsec-events.log`;
 const JAPAN_IP = "210.249.74.42";
 const FRANCE_IP = "78.119.253.85";
-const { AGENT_TLS_PATH } = process.env;
-const AGENT_CERT_PATH = `${AGENT_TLS_PATH}/agent.pem`;
-const AGENT_KEY_PATH = `${AGENT_TLS_PATH}/agent-key.pem`;
-const CA_CERT_PATH = `${AGENT_TLS_PATH}/ca-chain.pem`;
-const BOUNCER_CERT_PATH = "crowdsec/tls/bouncer.pem";
-const BOUNCER_KEY_PATH = "crowdsec/tls/bouncer-key.pem";
-const BOUNCER_CA_CERT_PATH = "crowdsec/tls/ca-chain.pem";
+const { VAR_PATH, TLS_PATH } = process.env;
+const AGENT_CERT_FILE = `agent.pem`;
+const AGENT_KEY_FILE = `agent-key.pem`;
+const CA_CERT_FILE = `ca-chain.pem`;
+const BOUNCER_CERT_FILE = `bouncer.pem`;
+const BOUNCER_KEY_FILE = `bouncer-key.pem`;
 const WATCHER_LOGIN = "watcherLogin";
 const WATCHER_PASSWORD = "watcherPassword";
 
@@ -40,12 +39,13 @@ module.exports = {
     LAPI_URL_FROM_PLAYWRIGHT,
     PROXY_IP,
     TIMEOUT,
-    AGENT_CERT_PATH,
-    AGENT_KEY_PATH,
-    CA_CERT_PATH,
+    AGENT_CERT_FILE,
+    AGENT_KEY_FILE,
+    CA_CERT_FILE,
     WATCHER_LOGIN,
     WATCHER_PASSWORD,
-    BOUNCER_CERT_PATH,
-    BOUNCER_KEY_PATH,
-    BOUNCER_CA_CERT_PATH,
+    BOUNCER_CERT_FILE,
+    BOUNCER_KEY_FILE,
+    VAR_PATH,
+    TLS_PATH,
 };

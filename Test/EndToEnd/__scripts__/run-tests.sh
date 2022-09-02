@@ -45,6 +45,7 @@ M2_URL=https://$HOSTNAME
 PROXY_IP=$(ddev find-ip ddev-router)
 BOUNCER_KEY=$(ddev exec bin/magento config:show crowdsec_bouncer/general/connection/api_key | sed 's/\r//g')
 JEST_PARAMS="--bail=true  --runInBand --verbose"
+TLS_PATH="crowdsec/tls" # Relative to var path
 # If FAIL_FAST, will exit on first individual test fail
 # @see CustomEnvironment.js
 FAIL_FAST=true
@@ -62,7 +63,7 @@ case $TYPE in
     TIMEOUT=31000
     HEADLESS=false
     SLOWMO=150
-    AGENT_TLS_PATH="../../../../var/crowdsec/tls"
+    VAR_PATH="../../../../var"
     ;;
 
   "docker")
@@ -74,7 +75,7 @@ case $TYPE in
     TIMEOUT=31000
     HEADLESS=true
     SLOWMO=0
-    AGENT_TLS_PATH="/var/www/html/var/crowdsec/tls"
+    VAR_PATH="/var/www/html/var"
     ;;
 
   "ci")
@@ -86,7 +87,7 @@ case $TYPE in
     TIMEOUT=60000
     HEADLESS=true
     SLOWMO=0
-    AGENT_TLS_PATH="/var/www/html/var/crowdsec/tls"
+    VAR_PATH="/var/www/html/var"
     ;;
 
   *)
@@ -111,7 +112,8 @@ TIMEOUT=$TIMEOUT \
 HEADLESS=$HEADLESS \
 FAIL_FAST=$FAIL_FAST \
 SLOWMO=$SLOWMO \
-AGENT_TLS_PATH=$AGENT_TLS_PATH \
+VAR_PATH=$VAR_PATH \
+TLS_PATH=$TLS_PATH \
 yarn --cwd $YARN_PATH test \
     $JEST_PARAMS \
     --json \

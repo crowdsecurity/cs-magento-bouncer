@@ -4,18 +4,20 @@ const fs = require("fs");
 
 const {
     LAPI_URL_FROM_PLAYWRIGHT,
-    AGENT_CERT_PATH,
-    AGENT_KEY_PATH,
-    CA_CERT_PATH,
+    AGENT_CERT_FILE,
+    AGENT_KEY_FILE,
+    CA_CERT_FILE,
+    TLS_PATH,
+    VAR_PATH,
     WATCHER_LOGIN,
     WATCHER_PASSWORD,
 } = require("./constants");
 
 const httpsAgent = new https.Agent({
     rejectUnauthorized: true,
-    cert: fs.readFileSync(AGENT_CERT_PATH),
-    key: fs.readFileSync(AGENT_KEY_PATH),
-    ca: fs.readFileSync(CA_CERT_PATH),
+    cert: fs.readFileSync(`${VAR_PATH}/${TLS_PATH}/${AGENT_CERT_FILE}`),
+    key: fs.readFileSync(`${VAR_PATH}/${TLS_PATH}/${AGENT_KEY_FILE}`),
+    ca: fs.readFileSync(`${VAR_PATH}/${TLS_PATH}/${CA_CERT_FILE}`),
 });
 
 const httpClient = axios.create({
