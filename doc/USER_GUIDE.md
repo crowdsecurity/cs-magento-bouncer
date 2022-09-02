@@ -85,7 +85,7 @@ Url to join your CrowdSec Local API.
 Choose between API key and TLS (pki) authentification.
 
 TLS authentication is only available if you use CrowdSec agent with a version superior to 1.4.0.
-Please see [CrowdSec documentation](https://docs.crowdsec.net/docs/local_api/tls_auth).
+Please see [CrowdSec documentation](https://docs.crowdsec.net/docs/local_api/tls_auth/).
 
  
 ***
