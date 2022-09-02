@@ -186,7 +186,7 @@ class Config
     public function beforeSave(
         MagentoConfig $subject
     ) {
-        if (PHP_SAPI !== 'cli' && $subject->getSection() === Helper::SECTION) {
+        if ($subject->getSection() === Helper::SECTION) {
             // Retrieve saved values (old) and posted data (new)
             $oldStreamMode = $this->helper->isStreamModeEnabled();
             $newStreamMode = $subject->getData(Helper::STREAM_MODE_FULL_PATH) === null ? $oldStreamMode :
@@ -449,7 +449,7 @@ class Config
         array $newConnection
     ) {
         // Test connection if params changed
-        if ($oldConnection != $newConnection) {
+        if ($oldConnection != $newConnection && !empty($newConnection['api_url'])) {
             try {
                 if (!($bounce = $this->registryBounce->get())) {
                     $bounce = $this->registryBounce->create();
