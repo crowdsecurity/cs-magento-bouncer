@@ -62,7 +62,6 @@ jobs:
       - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
         run: ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
-
       - name: Installation tests
         run: |
           sudo chmod -R 777 ${{ github.workspace }}
@@ -99,7 +98,7 @@ jobs:
           else
             echo "Test 1 OK"
           fi
-          sleep 3
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -109,6 +108,7 @@ jobs:
           else
             echo "Test 2 OK"
           fi
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
@@ -118,7 +118,7 @@ jobs:
           else
             echo "Test 3 OK"
           fi
-
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -128,6 +128,7 @@ jobs:
           else
             echo "Test 4 OK"
           fi
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
@@ -137,7 +138,7 @@ jobs:
           else
             echo "Test 5 OK"
           fi
-          sleep 3
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -147,6 +148,7 @@ jobs:
           else
             echo "Test 6 OK"
           fi
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/category-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
@@ -156,7 +158,7 @@ jobs:
           else
             echo "Test 7 OK"
           fi
-          sleep 3
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/category-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -166,6 +168,7 @@ jobs:
           else
             echo "Test 8 OK"
           fi
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/category-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
@@ -175,7 +178,7 @@ jobs:
           else
             echo "Test 9 OK"
           fi
-          sleep 3
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/category-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -185,6 +188,7 @@ jobs:
           else
             echo "Test 10 OK"
           fi
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }} | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
@@ -194,7 +198,7 @@ jobs:
           else
             echo "Test 11 OK"
           fi
-          sleep 3
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }} | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -221,7 +225,7 @@ jobs:
           else
             echo "Test 1 OK"
           fi
-          sleep 3
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -231,6 +235,7 @@ jobs:
           else
             echo "Test 2 OK"
           fi
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
@@ -240,7 +245,7 @@ jobs:
           else
             echo "Test 3 OK"
           fi
-          sleep 3
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -250,6 +255,7 @@ jobs:
           else
             echo "Test 4 OK"
           fi
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
@@ -259,7 +265,7 @@ jobs:
           else
             echo "Test 5 OK"
           fi
-          sleep 3
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
@@ -282,7 +288,7 @@ jobs:
           else
             echo "Test 1 OK"
           fi
-          sleep 3
+          sleep 2
           VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }} | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then

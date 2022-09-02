@@ -47,8 +47,6 @@ jobs:
           cp .ddev/additional_docker_compose/docker-compose.playwright-alone.yaml .ddev/docker-compose.playwright.yaml
           cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
           cp .ddev/custom_files/varnish-profile.xml varnish-profile.xml
-          mkdir ${{ github.workspace }}/cfssl
-          cp -r .ddev/custom_files/crowdsec/cfssl/* ${{ github.workspace }}/cfssl
           ddev restart
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
@@ -94,9 +92,8 @@ jobs:
         run: |
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
           ddev magento cache:flush
-          cd ${{ github.workspace }}
           mkdir -p var/crowdsec/tls
-          cp -r cfssl/* var/crowdsec/tls
+          cp -r .ddev/custom_files/crowdsec/cfssl/* var/crowdsec/tls
           ddev maxmind-download DEFAULT GeoLite2-City /var/www/html/var/crowdsec
           ddev maxmind-download DEFAULT GeoLite2-Country /var/www/html/var/crowdsec
           cd var/crowdsec

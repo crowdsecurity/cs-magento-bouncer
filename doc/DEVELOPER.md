@@ -193,6 +193,14 @@ We are using a Jest/Playwright Node.js stack to launch a suite of end-to-end tes
 Tests code is in the `Test/EndToEnd` folder. You should have to `chmod +x` the scripts you will find in  
 `Test/EndToEnd/__scripts__`.
 
+As we use a TLS ready CrowdSec container, you have first to copy some certificates and key:
+
+```bash
+cd m2-sources
+mkdir -p var/crowdsec/tls
+cp -r ../.ddev/custom_files/crowdsec/cfssl/* var/crowdsec/tls
+```
+
 To run a specific cron job from browser, we created a `launchCron.php` script that you have to copy before testing 
 cron dependent feature (stream mode for example):
 

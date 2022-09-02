@@ -62,7 +62,7 @@ case $TYPE in
     TIMEOUT=31000
     HEADLESS=false
     SLOWMO=150
-    AGENT_TLS_PATH="../../../../cfssl"
+    AGENT_TLS_PATH="../../../../var/crowdsec/tls"
     ;;
 
   "docker")
@@ -74,7 +74,7 @@ case $TYPE in
     TIMEOUT=31000
     HEADLESS=true
     SLOWMO=0
-    AGENT_TLS_PATH="/var/www/html/cfssl"
+    AGENT_TLS_PATH="/var/www/html/var/crowdsec/tls"
     ;;
 
   "ci")
@@ -86,7 +86,7 @@ case $TYPE in
     TIMEOUT=60000
     HEADLESS=true
     SLOWMO=0
-    AGENT_TLS_PATH="/var/www/html/cfssl"
+    AGENT_TLS_PATH="/var/www/html/var/crowdsec/tls"
     ;;
 
   *)

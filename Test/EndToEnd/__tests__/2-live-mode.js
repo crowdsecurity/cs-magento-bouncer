@@ -171,12 +171,10 @@ describe(`Test cURL in Live mode`, () => {
         );
         await onAdminSaveSettings();
     });
-
     it("Should display the homepage with no remediation", async () => {
         await removeAllDecisions();
         await publicHomepageShouldBeAccessible();
     });
-
     it("Should display a ban wall", async () => {
         await banIpForSeconds(15 * 60, CURRENT_IP);
         await publicHomepageShouldBeBanWall();
@@ -214,10 +212,29 @@ describe(`Test TLS auth in Live mode`, () => {
             "crowdsec_bouncer_general_connection_tls_cert_path",
             `${BOUNCER_CERT_PATH}`,
         );
+        await selectElement(
+            "crowdsec_bouncer_general_connection_use_curl",
+            "1",
+        );
+
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
 
         await expect(page).toMatchText(
             "#lapi_ping_result",
-            /Connection test result: success.*Auth type: TLS/,
+            /Connection test result: success.*Auth type: TLS.*Use cURL: true/,
+        );
+
+        await selectElement(
+            "crowdsec_bouncer_general_connection_use_curl",
+            "0",
+        );
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
+
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Connection test result: success.*Auth type: TLS.*Use cURL: false/,
         );
 
         await onAdminSaveSettings();
@@ -247,7 +264,6 @@ describe(`Test cache in Live mode`, () => {
         );
         await onAdminSaveSettings();
     });
-
     it("Should clear the cache on demand", async () => {
         await banIpForSeconds(15 * 60, CURRENT_IP);
         await publicHomepageShouldBeBanWall();
@@ -264,7 +280,6 @@ describe(`Test cache in Live mode`, () => {
         );
         await publicHomepageShouldBeAccessible();
     });
-
     it("Should log miss then hit", async () => {
         await goToSettingsPage();
         await page.click("#crowdsec_bouncer_advanced_cache_clear_cache");
@@ -275,20 +290,16 @@ describe(`Test cache in Live mode`, () => {
         await deleteFileContent(DEBUG_LOG_PATH);
         let logContent = await getFileContent(DEBUG_LOG_PATH);
         await expect(logContent).toBe("");
-
         await goToPublicPage();
-
         logContent = await getFileContent(DEBUG_LOG_PATH);
         await expect(logContent).toMatch(
             new RegExp(
                 `{"type":"CLEAN_VALUE","scope":"Ip","value":"${CURRENT_IP}","cache":"miss"}`,
             ),
         );
-
         await deleteFileContent(DEBUG_LOG_PATH);
         await wait(1000);
         await goToPublicPage();
-
         logContent = await getFileContent(DEBUG_LOG_PATH);
         await expect(logContent).toMatch(
             new RegExp(
