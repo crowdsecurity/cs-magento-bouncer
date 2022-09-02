@@ -82,6 +82,8 @@ class Ping extends Action implements HttpPostActionInterface
     public function execute(): Json
     {
         $useCurl = "";
+        $tlsVerifyPeer = "";
+        $authType ="";
         try {
             $baseUri = $this->getRequest()->getParam('api_url');
             $authType = $this->getRequest()->getParam('auth_type');
