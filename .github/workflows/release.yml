@@ -119,7 +119,7 @@ jobs:
 
             -   name: Prepare release notes
                 run: |
-                    VERSION_RELEASE_NOTES=$(awk -v ver="[${{ env.VERSION_NUMBER }}]" '/^## / { if (p) { exit }; if ($2 == ver) { p=1; next} } p && NF' ${{ env.VERSION_SOURCES }}/CHANGELOG.md)
+                    VERSION_RELEASE_NOTES=$(awk -v ver="[${{ env.VERSION_NUMBER }}]" '/^## / { if (p) { exit }; if ($2 == ver) { p=1; next} } p && NF' ${{ env.VERSION_SOURCES }}/CHANGELOG.md | sed ':a;N;$!ba;s/\n---/ /g')
                     echo "$VERSION_RELEASE_NOTES" >> CHANGELOG.txt
 
             -   name: Create release ${{ env.VERSION_NUMBER }}
