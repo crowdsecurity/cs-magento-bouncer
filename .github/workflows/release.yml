@@ -45,6 +45,7 @@ jobs:
                 uses: actions/checkout@v2
                 with:
                     path: ${{ env.VERSION_SOURCES }}
+                    fetch-depth: 0
 
             -   name: Check version ${{ env.VERSION_NUMBER }} consistency in files
                 # Check composer.json, Constants.php and CHANGELOG.md
