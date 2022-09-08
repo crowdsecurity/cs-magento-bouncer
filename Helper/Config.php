@@ -421,7 +421,7 @@ class Config extends AbstractHelper
     }
 
     /**
-     * Get TLS authentification config
+     * Get TLS authentication config
      *
      * @return array
      * @throws BouncerException

@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.5.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v1.5.0) - 2022-09-08
 [Compare with previous release](https://github.com/crowdsecurity/cs-magento-bouncer/compare/v1.4.0...v1.5.0)
 ### Added
-- Add TLS authentification feature
+- Add TLS authentication feature
 ---
 
 ## [1.4.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v1.4.0) - 2022-08-11

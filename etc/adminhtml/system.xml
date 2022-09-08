@@ -48,9 +48,9 @@
                         <validate>required-entry</validate>
                     </field>
                     <field id="auth_type" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
-                        <label>Authentification type</label>
+                        <label>Authentication type</label>
                         <source_model>CrowdSec\Bouncer\Model\Config\Source\ConnexionType</source_model>
-                        <comment><![CDATA[Choose between API key and TLS (pki) authentification]]></comment>
+                        <comment><![CDATA[Choose between API key and TLS (pki) authentication]]></comment>
                     </field>
                     <field id="api_key" translate="label,comment,tooltip tooltip" type="text" sortOrder="300" showInDefault="1">
                         <label>Your bouncer key</label>
