@@ -1,5 +1,13 @@
 /* eslint-disable no-undef */
-const { CURRENT_IP, PROXY_IP } = require("../utils/constants");
+const {
+    CURRENT_IP,
+    PROXY_IP,
+    BOUNCER_CERT_FILE,
+    AGENT_CERT_FILE,
+    BOUNCER_KEY_FILE,
+    CA_CERT_FILE,
+    TLS_PATH,
+} = require("../utils/constants");
 
 const {
     publicHomepageShouldBeBanWall,
@@ -165,6 +173,133 @@ describe(`Test cURL in Live mode`, () => {
         );
         await onAdminSaveSettings();
     });
+    it("Should display the homepage with no remediation", async () => {
+        await removeAllDecisions();
+        await publicHomepageShouldBeAccessible();
+    });
+    it("Should display a ban wall", async () => {
+        await banIpForSeconds(15 * 60, CURRENT_IP);
+        await publicHomepageShouldBeBanWall();
+    });
+});
+
+describe(`Test TLS auth in Live mode`, () => {
+    it("Should configure TLS", async () => {
+        await goToSettingsPage();
+        await selectElement(
+            "crowdsec_bouncer_general_connection_use_curl",
+            "1",
+        );
+        await selectElement(
+            "crowdsec_bouncer_general_connection_auth_type",
+            "tls",
+        );
+
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_key_path",
+            `${TLS_PATH}/${BOUNCER_KEY_FILE}`,
+        );
+        await selectElement(
+            "crowdsec_bouncer_general_connection_tls_verify_peer",
+            "1",
+        );
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_ca_cert_path",
+            `${TLS_PATH}/${CA_CERT_FILE}`,
+        );
+        // Bad path
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_cert_path",
+            "bad-path",
+        );
+
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Technical error.*could not load PEM client certificate/,
+        );
+
+        // Bad cert
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_cert_path",
+            `${TLS_PATH}/${AGENT_CERT_FILE}`,
+        );
+
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Technical error.*unable to set private key file/,
+        );
+
+        // Bad CA with verify peer
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_cert_path",
+            `${TLS_PATH}/${BOUNCER_CERT_FILE}`,
+        );
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_ca_cert_path",
+            `${TLS_PATH}/${AGENT_CERT_FILE}`,
+        );
+
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Technical error.*unable to get local issuer certificate/,
+        );
+
+        // Bad CA without verify peer
+        await selectElement(
+            "crowdsec_bouncer_general_connection_tls_verify_peer",
+            "0",
+        );
+
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Connection test result: success.*Auth type: TLS.*Use cURL: true/,
+        );
+
+        // Good settings with curl
+        await selectElement(
+            "crowdsec_bouncer_general_connection_tls_verify_peer",
+            "1",
+        );
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_ca_cert_path",
+            `${TLS_PATH}/${CA_CERT_FILE}`,
+        );
+        await fillInput(
+            "crowdsec_bouncer_general_connection_tls_cert_path",
+            `${TLS_PATH}/${BOUNCER_CERT_FILE}`,
+        );
+
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
+
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Connection test result: success.*Auth type: TLS.*Use cURL: true/,
+        );
+
+        // Good settings without curl
+        await selectElement(
+            "crowdsec_bouncer_general_connection_use_curl",
+            "0",
+        );
+        await page.click("#crowdsec_bouncer_general_connection_test");
+        await wait(2000);
+
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Connection test result: success.*Auth type: TLS.*Use cURL: false/,
+        );
+
+        await onAdminSaveSettings();
+    });
 
     it("Should display the homepage with no remediation", async () => {
         await removeAllDecisions();
@@ -190,7 +325,6 @@ describe(`Test cache in Live mode`, () => {
         );
         await onAdminSaveSettings();
     });
-
     it("Should clear the cache on demand", async () => {
         await banIpForSeconds(15 * 60, CURRENT_IP);
         await publicHomepageShouldBeBanWall();
@@ -207,7 +341,6 @@ describe(`Test cache in Live mode`, () => {
         );
         await publicHomepageShouldBeAccessible();
     });
-
     it("Should log miss then hit", async () => {
         await goToSettingsPage();
         await page.click("#crowdsec_bouncer_advanced_cache_clear_cache");
@@ -218,20 +351,16 @@ describe(`Test cache in Live mode`, () => {
         await deleteFileContent(DEBUG_LOG_PATH);
         let logContent = await getFileContent(DEBUG_LOG_PATH);
         await expect(logContent).toBe("");
-
         await goToPublicPage();
-
         logContent = await getFileContent(DEBUG_LOG_PATH);
         await expect(logContent).toMatch(
             new RegExp(
                 `{"type":"CLEAN_VALUE","scope":"Ip","value":"${CURRENT_IP}","cache":"miss"}`,
             ),
         );
-
         await deleteFileContent(DEBUG_LOG_PATH);
         await wait(1000);
         await goToPublicPage();
-
         logContent = await getFileContent(DEBUG_LOG_PATH);
         await expect(logContent).toMatch(
             new RegExp(

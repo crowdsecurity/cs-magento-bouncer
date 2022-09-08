@@ -123,42 +123,10 @@ class Bounce extends AbstractBounce
             $this->logger = $this->helper->getFinalLogger();
 
             try {
-                $configs = [
-                    // LAPI connection
-                    'api_key' => $settings['api_key'],
-                    'api_url' => $settings['api_url'],
-                    'api_user_agent' => $settings['api_user_agent'],
-                    'api_timeout' => $settings['api_timeout'],
-                    'use_curl' => $settings['use_curl'],
-                    // Debug
-                    'debug_mode' => $settings['debug_mode'],
-                    'disable_prod_log' => $settings['disable_prod_log'],
-                    'log_directory_path' => $settings['log_directory_path'],
-                    'forced_test_ip' => $settings['forced_test_ip'],
-                    'forced_test_forwarded_ip' => $settings['forced_test_forwarded_ip'],
-                    'display_errors' => $settings['display_errors'],
-                    // Bouncer
-                    'bouncing_level' => $settings['bouncing_level'],
-                    'trust_ip_forward_array' => $settings['trust_ip_forward_array'],
-                    'fallback_remediation' => $settings['fallback_remediation'],
-                    'max_remediation_level' => $settings['max_remediation_level'],
-                    // Cache settings
-                    'stream_mode' => $settings['stream_mode'],
-                    'cache_system' => $settings['cache_system'],
-                    'fs_cache_path' => $settings['fs_cache_path'],
-                    'redis_dsn' => $settings['redis_dsn'],
-                    'memcached_dsn' => $settings['memcached_dsn'],
-                    'clean_ip_cache_duration' => $settings['clean_ip_cache_duration'],
-                    'bad_ip_cache_duration' => $settings['bad_ip_cache_duration'],
-                    'captcha_cache_duration' => $settings['captcha_cache_duration'],
-                    'geolocation_cache_duration' => $settings['geolocation_cache_duration'],
-                    // Geolocation
-                    'geolocation' => $settings['geolocation']
-                ];
                 /** @var BouncerInstance $bouncerInstance */
                 $bouncerInstance =
                     $this->bouncerInstanceFactory->create(
-                        ['configs' => $configs, 'logger' => $this->logger ]
+                        ['configs' => $settings, 'logger' => $this->logger ]
                     );
 
             } catch (Exception $e) {

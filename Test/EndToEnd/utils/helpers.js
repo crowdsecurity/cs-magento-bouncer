@@ -120,6 +120,10 @@ const setDefaultConfig = async (save = true, direct = true) => {
         "crowdsec_bouncer_general_connection_api_url",
         LAPI_URL_FROM_M2,
     );
+    await selectElement(
+        "crowdsec_bouncer_general_connection_auth_type",
+        "api_key",
+    );
     await fillInput("crowdsec_bouncer_general_connection_api_key", BOUNCER_KEY);
     await selectElement("crowdsec_bouncer_general_connection_use_curl", "0");
     await page.click("#crowdsec_bouncer_general_connection_test");

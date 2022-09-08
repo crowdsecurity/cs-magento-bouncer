@@ -36,13 +36,14 @@ jobs:
       EXTENSION_PATH: "crowdsec-bouncer"
 
     steps:
-      - name: Install Magento 2
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.0.0
+      - name: Install Magento 2 with DDEV
+        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.2.0
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
+          ddev_repository_ref: master
 
       - name: Clone M2 Crowdsec Bouncer files
         uses: actions/checkout@v2
@@ -54,7 +55,6 @@ jobs:
           ddev composer config --unset repositories.0
           ddev composer config repositories.0 '{"type": "path", "url":"my-own-modules/${{ env.EXTENSION_PATH }}/",  "canonical": true, "options": {"symlink": false}}'
           ddev composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}"]}'
-          cat composer.json
 
       - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
         run: |

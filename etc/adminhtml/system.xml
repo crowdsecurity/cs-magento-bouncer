@@ -41,23 +41,66 @@
                 <group id="connection" translate="label,comment,tooltip" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Connection details</label>
                     <attribute type="expanded">1</attribute>
-                    <comment><![CDATA[Connect Magento 2 to your CrowdSec LAPI.]]></comment>
+                    <comment><![CDATA[Connect Magento 2 to your CrowdSec Local API.]]></comment>
                     <field id="api_url" translate="label,comment,tooltip tooltip" type="text" sortOrder="100" showInDefault="1">
-                        <label>Your LAPI url</label>
+                        <label>Your Local API url</label>
                         <comment><![CDATA[If the CrowdSec Agent is installed on this server, you will set this field to http://localhost:8080.]]></comment>
                         <validate>required-entry</validate>
                     </field>
-                    <field id="api_key" translate="label,comment,tooltip tooltip" type="text" sortOrder="200" showInDefault="1">
+                    <field id="auth_type" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
+                        <label>Authentification type</label>
+                        <source_model>CrowdSec\Bouncer\Model\Config\Source\ConnexionType</source_model>
+                        <comment><![CDATA[Choose between API key and TLS (pki) authentification]]></comment>
+                    </field>
+                    <field id="api_key" translate="label,comment,tooltip tooltip" type="text" sortOrder="300" showInDefault="1">
                         <label>Your bouncer key</label>
                         <comment><![CDATA[Generated with the cscli command, ex: <em>cscli bouncers add magento2-bouncer</em>]]></comment>
                         <validate>required-entry</validate>
+                        <depends>
+                            <field id="crowdsec_bouncer/general/connection/auth_type">api_key</field>
+                        </depends>
                     </field>
-                    <field id="use_curl" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
+                    <field id="tls_cert_path" translate="label,comment,tooltip" type="text" sortOrder="400" showInDefault="1">
+                        <label>Path to the bouncer certificate</label>
+                        <validate>required-entry</validate>
+                        <depends>
+                            <field id="crowdsec_bouncer/general/connection/auth_type">tls</field>
+                        </depends>
+                        <comment><![CDATA[Relative path to the "var" folder of your Magento 2 instance]]></comment>
+                        <tooltip><![CDATA[For example: crowdsec/tls/bouncer.pem]]></tooltip>
+                    </field>
+                    <field id="tls_key_path" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
+                        <label>Path to the bouncer key</label>
+                        <validate>required-entry</validate>
+                        <depends>
+                            <field id="crowdsec_bouncer/general/connection/auth_type">tls</field>
+                        </depends>
+                        <comment><![CDATA[Relative path to the "var" folder of your Magento 2 instance]]></comment>
+                        <tooltip><![CDATA[For example: crowdsec/tls/bouncer-key.pem]]></tooltip>
+                    </field>
+                    <field id="tls_verify_peer" translate="label,comment,tooltip" type="select" sortOrder="600" showInDefault="1">
+                        <label>Enable TLS peer verification</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                            <field id="crowdsec_bouncer/general/connection/auth_type">tls</field>
+                        </depends>
+                    </field>
+                    <field id="tls_ca_cert_path" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
+                        <label>Path to the CA certificate for peer verification</label>
+                        <validate>required-entry</validate>
+                        <depends>
+                            <field id="crowdsec_bouncer/general/connection/auth_type">tls</field>
+                            <field id="crowdsec_bouncer/general/connection/tls_verify_peer">1</field>
+                        </depends>
+                        <comment><![CDATA[Relative path to the "var" folder of your Magento 2 instance]]></comment>
+                        <tooltip><![CDATA[For example: crowdsec/tls/ca-chain.pem]]></tooltip>
+                    </field>
+                    <field id="use_curl" translate="label,comment,tooltip" type="select" sortOrder="800" showInDefault="1">
                         <label>Use cURL</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment><![CDATA[Enable if you want to call LAPI with <i>cURL</i> instead of <i>file_get_contents</i>.]]></comment>
+                        <comment><![CDATA[Enable if you want to call Local API with <i>cURL</i> instead of <i>file_get_contents</i>.]]></comment>
                     </field>
-                    <field id="test"  translate="button_label" sortOrder="400" showInDefault="1">
+                    <field id="test"  translate="button_label" sortOrder="900" showInDefault="1">
                         <button_label>Test connection</button_label>
                         <frontend_model>CrowdSec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping</frontend_model>
                     </field>
@@ -264,7 +307,7 @@
                     <field id="technology" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
                         <label>Technology</label>
                         <source_model>CrowdSec\Bouncer\Model\Config\Source\Cache</source_model>
-                        <comment><![CDATA[The File system cache is faster than calling LAPI. Redis or Memcached is faster than the File System cache.]]></comment>
+                        <comment><![CDATA[The File system cache is faster than calling Local API. Redis or Memcached is faster than the File System cache.]]></comment>
                     </field>
                     <field id="clear_cache"  translate="button_label" sortOrder="200" showInDefault="1">
                         <button_label>Clear cache</button_label>
@@ -316,7 +359,7 @@
                     <field id="clean_ip_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="700" showInDefault="1">
                         <label><![CDATA[Clean IPs cache duration  (in seconds)]]></label>
                         <tooltip><![CDATA[Live mode only]]></tooltip>
-                        <comment><![CDATA[The duration between re-asking LAPI about an already checked clean IP.<br>Minimum 1 second.]]></comment>
+                        <comment><![CDATA[The duration between re-asking Local API about an already checked clean IP.<br>Minimum 1 second.]]></comment>
                         <depends>
                             <field id="crowdsec_bouncer/advanced/mode/stream">0</field>
                         </depends>
@@ -325,7 +368,7 @@
                     <field id="bad_ip_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="800" showInDefault="1">
                         <label><![CDATA[Bad IPs cache duration  (in seconds)]]></label>
                         <tooltip><![CDATA[Live mode only]]></tooltip>
-                        <comment><![CDATA[The duration between re-asking LAPI about an already checked bad IP.<br>Minimum 1 second.]]></comment>
+                        <comment><![CDATA[The duration between re-asking Local API about an already checked bad IP.<br>Minimum 1 second.]]></comment>
                         <depends>
                             <field id="crowdsec_bouncer/advanced/mode/stream">0</field>
                         </depends>

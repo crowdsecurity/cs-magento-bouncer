@@ -7,6 +7,7 @@ const {
     onAdminSaveSettings,
     flushCache,
     setDefaultConfig,
+    wait,
 } = require("../utils/helpers");
 
 const { BOUNCER_KEY } = require("../utils/constants");
@@ -88,6 +89,7 @@ describe(`Extension configuration modification`, () => {
         );
         await fillInput("crowdsec_bouncer_advanced_cache_redis_dsn", "bad-dsn");
         await onAdminSaveSettings(false);
+        await wait(3000);
         await expect(page).toMatchText(
             "#messages",
             /Technical error while testing the Redis cache/,
@@ -124,6 +126,7 @@ describe(`Extension configuration modification`, () => {
             "memcached://memcached:18579",
         );
         await onAdminSaveSettings(false);
+        await wait(3000);
         await expect(page).toMatchText(
             "#messages",
             /Technical error while testing the Memcached cache/,
