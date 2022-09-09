@@ -75,7 +75,7 @@ At last, you have to deploy the static content:
 ### Higher matching error
 
 If a new version `y.y.y` has been published in Packagist and the Marketplace review process of this version is still in progress,
-you could encounter the following error:
+you could encounter the following error during installation on update:
 
 > Higher matching version y.y.y of crowdsec/magento2-module-bouncer was found in public repository packagist.org
 > than x.x.x in private https://repo.magento.com. Public package might've been taken over by a malicious entity,
