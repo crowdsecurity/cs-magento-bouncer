@@ -198,7 +198,7 @@ As we use a TLS ready CrowdSec container, you have first to copy some certificat
 ```bash
 cd m2-sources
 mkdir -p var/crowdsec/tls
-cp -r ../.ddev/custom_files/crowdsec/cfssl/* var/crowdsec/tls
+cp -r .ddev/custom_files/crowdsec/cfssl/* var/crowdsec/tls
 ```
 
 To run a specific cron job from browser, we created a `launchCron.php` script that you have to copy before testing 
@@ -210,7 +210,7 @@ cron dependent feature (stream mode for example):
 Then you can use the `run-test.sh` script to run the tests:
 
 - the first parameter specifies if you want to run the test on your machine (`host`) or in the 
-docker containers (`docker`). You can also use `ci` if you want to have the same behavior as in Github action.
+docker containers (`docker`). You can also use `ci` if you want to have the same behavior as in GitHub action.
 - the second parameter list the test files you want to execute. If empty, all the test suite will be launched.
 
 For example: 
@@ -397,14 +397,14 @@ Before publishing a new release, there are some manual steps to take:
 - Update the `CHANGELOG.md` file
 
 
-Then, using the [Github CLI](https://github.com/cli/cli), you can: 
+Then, using the [GitHub CLI](https://github.com/cli/cli), you can: 
 - create a draft release: `gh workflow run release.yml -f tag_name=vx.y.z -f draft=true`
 - publish a prerelease:  `gh workflow run release.yml -f tag_name=vx.y.z -f prerelease=true`
 - publish a release: `gh workflow run release.yml -f tag_name=vx.y.z`
 
-Note that the Github action will fail if the tag `tag_name` already exits.
+Note that the GitHub action will fail if the tag `tag_name` already exits.
 
-At the end of the Github action process, you will find a `crowdsec-magento2-module-bouncer-x.y.z.zip` file in the 
+At the end of the GitHub action process, you will find a `crowdsec-magento2-module-bouncer-x.y.z.zip` file in the 
 Github release assets.
 
  

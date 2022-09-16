@@ -44,8 +44,9 @@
                     <comment><![CDATA[Connect Magento 2 to your CrowdSec Local API.]]></comment>
                     <field id="api_url" translate="label,comment,tooltip tooltip" type="text" sortOrder="100" showInDefault="1">
                         <label>Your Local API url</label>
-                        <comment><![CDATA[If the CrowdSec Agent is installed on this server, you will set this field to http://localhost:8080.]]></comment>
+                        <comment><![CDATA[]]></comment>
                         <validate>required-entry</validate>
+                        <tooltip><![CDATA[If the CrowdSec Agent is installed on this server, you could set this field to http://localhost:8080.]]></tooltip>
                     </field>
                     <field id="auth_type" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
                         <label>Authentication type</label>
