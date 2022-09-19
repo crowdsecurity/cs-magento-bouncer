@@ -93,8 +93,7 @@ composer require crowdsec/magento2-module-bouncer --no-plugins
 
 #### Install the latest Packagist release
 
-To avoid this error and install the latest known Packagist release `y.y.y`, you could modify the root `composer.
-json` of your Magento project by setting the `repo.magento.com` repository as non-canonical:
+To avoid this error and install the latest known Packagist release `y.y.y`, you could modify the root `composer.json` of your Magento project by setting the `repo.magento.com` repository as non-canonical:
 
 ```
 "repositories": {

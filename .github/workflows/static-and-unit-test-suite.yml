@@ -16,17 +16,15 @@ jobs:
       fail-fast: false
       matrix:
         # First and last patch for the current and previous minor, greatest php version
-        m2-version: [ "2.3.0", "2.3.7", "2.4.0", "2.4.5" ]
-        php-version: [ "7.2", "7.4", "8.1" ]
-        exclude:
-          - { php-version: "7.4", m2-version: "2.3.0" }
-          - { php-version: "8.1", m2-version: "2.3.0" }
-          - { php-version: "7.2", m2-version: "2.3.7" }
-          - { php-version: "8.1", m2-version: "2.3.7" }
-          - { php-version: "7.2", m2-version: "2.4.0" }
-          - { php-version: "8.1", m2-version: "2.4.0" }
-          - { php-version: "7.2", m2-version: "2.4.5" }
-          - { php-version: "7.4", m2-version: "2.4.5" }
+        include:
+          - m2-version: '2.3.0'
+            php-version: '7.2'
+          - m2-version: '2.3.7'
+            php-version: '7.4'
+          - m2-version: '2.4.0'
+            php-version: '7.4'
+          - m2-version: '2.4.5'
+            php-version: '8.1'
 
     name: Static and unit test suite
     runs-on: ubuntu-latest
@@ -37,13 +35,12 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.2.0
+        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.3.0
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
-          ddev_repository_ref: master
 
       - name: Clone M2 Crowdsec Bouncer files
         uses: actions/checkout@v2

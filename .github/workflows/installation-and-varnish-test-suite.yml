@@ -15,16 +15,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Last one for the current and previous minor, greatest php version
-        m2-version: [ "2.3.0", "2.3.7", "2.4.5" ]
-        php-version: [ "7.2", "7.4", "8.1" ]
-        exclude:
-          - { php-version: "7.4", m2-version: "2.3.0" }
-          - { php-version: "8.1", m2-version: "2.3.0" }
-          - { php-version: "7.2", m2-version: "2.3.7" }
-          - { php-version: "8.1", m2-version: "2.3.7" }
-          - { php-version: "7.2", m2-version: "2.4.5" }
-          - { php-version: "7.4", m2-version: "2.4.5" }
+        # Last patch for the current and previous minor, greatest php version
+        include:
+          - m2-version: '2.3.7'
+            php-version: '7.4'
+          - m2-version: '2.4.5'
+            php-version: '8.1'
 
     name: Installation and Varnish test suite
     # @see https://devdocs.magento.com/marketplace/sellers/installation-and-varnish-tests.html
@@ -37,7 +33,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.2.0
+        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.3.0
         id: magento2-install
         with:
           php_version: ${{ matrix.php-version }}
@@ -45,7 +41,6 @@ jobs:
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
           varnish_setup: "true"
-          ddev_repository_ref: master
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
         uses: actions/checkout@v2
