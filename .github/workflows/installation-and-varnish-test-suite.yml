@@ -39,7 +39,6 @@ jobs:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
-          magento_repository: "https://repo.magento.com/"
           varnish_setup: "true"
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
@@ -57,34 +56,56 @@ jobs:
         run: ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
       - name: Installation tests
+        # @see https://developer.adobe.com/commerce/marketplace/guides/sellers/installation-and-varnish-tests/#what-is-being-checked
         run: |
-          ddev magento maintenance:enable
           ddev magento module:enable ${{ env.EXTENSION_NAME }}
-          ddev magento maintenance:disable
           ddev magento setup:upgrade
+          # ddev magento setup:di:compile (done while setting production mode later)
+          ddev magento setup:static-content:deploy -f
           ddev magento deploy:mode:set production
           ddev magento indexer:reindex
-          ddev magento cache:clean
-          ddev magento cache:flush
-          ddev magento setup:static-content:deploy -f
-
-      - name: Disable some extensions for 2.4
-        if: startsWith(matrix.m2-version, '2.4')
-        run: |
-          ddev magento maintenance:enable
-          ddev magento module:disable --clear-static-content  Magento_TwoFactorAuth
-          ddev magento setup:static-content:deploy -f
-          ddev magento maintenance:disable
 
       - name: Prepare for Varnish tests
         run: |
           ddev magento config:set system/full_page_cache/caching_application 2
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
 
+      - name: Disable some extensions for 2.4
+        if: startsWith(matrix.m2-version, '2.4')
+        run: |
+          ddev magento maintenance:enable
+          ddev magento module:disable --clear-static-content  Magento_TwoFactorAuth
+          ddev magento cache:clean
+          ddev magento cache:flush
+          ddev magento setup:static-content:deploy -f
+          ddev magento maintenance:disable
+
       - name: Varnish MISS and HIT test
+        # @see https://developer.adobe.com/commerce/marketplace/guides/sellers/installation-and-varnish-tests/#varnish-test-execution
         run: |
           # TEST 1
           curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html > curl_response.txt
+          # Some debug for the first call (503, report)
+          HTTP_CODE=$(grep -oP "^HTTP\K(.*)$" curl_response.txt)
+          if [[ "$HTTP_CODE" != *"200"* ]]
+          then
+            echo "Bad HTTP code : ${HTTP_CODE}"
+            cat curl_response.txt
+          fi
+          LOG_NUM=$(grep -oP "Error log record number: \K(.*)$" curl_response.txt | sed 's,</p>,,')
+          if [[ -n "$LOG_NUM" ]]
+          then
+            cat var/report/${LOG_NUM}
+          fi
+          if [[ "$HTTP_CODE" != *"200"* ]]
+          then
+            # try to restart
+            ddev restart
+            ddev replace-acl $(ddev find-ip ddev-router)
+            ddev reload-vcl
+            sleep 2
+            curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html > curl_response.txt
+          fi
           VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
