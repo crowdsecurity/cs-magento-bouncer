@@ -13,6 +13,7 @@
 - [Full Page Cache](#full-page-cache)
 - [Varnish](#varnish)
 - [Magento 2.2](#magento-22)
+- [Why `crowdsec/magento-symfony-cache` ?](#why-crowdsecmagento-symfony-cache-)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
