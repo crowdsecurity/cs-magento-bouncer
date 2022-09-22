@@ -15,16 +15,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Last one for the current and previous minor, greatest php version
-        m2-version: [ "2.3.0", "2.3.7", "2.4.5" ]
-        php-version: [ "7.2", "7.4", "8.1" ]
-        exclude:
-          - { php-version: "7.4", m2-version: "2.3.0" }
-          - { php-version: "8.1", m2-version: "2.3.0" }
-          - { php-version: "7.2", m2-version: "2.3.7" }
-          - { php-version: "8.1", m2-version: "2.3.7" }
-          - { php-version: "7.2", m2-version: "2.4.5" }
-          - { php-version: "7.4", m2-version: "2.4.5" }
+        # Last patch for the current and previous minor, greatest php version
+        include:
+          - m2-version: '2.3.7'
+            php-version: '7.4'
+          - m2-version: '2.4.5'
+            php-version: '8.1'
 
     name: Installation and Varnish test suite
     # @see https://devdocs.magento.com/marketplace/sellers/installation-and-varnish-tests.html
@@ -37,7 +33,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.2.0
+        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.3.0
         id: magento2-install
         with:
           php_version: ${{ matrix.php-version }}
@@ -45,7 +41,6 @@ jobs:
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
           varnish_setup: "true"
-          ddev_repository_ref: master
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
         uses: actions/checkout@v2
@@ -57,39 +52,62 @@ jobs:
           ddev composer config --unset repositories.0
           ddev composer config repositories.0 '{"type": "path", "url":"my-own-modules/${{ env.EXTENSION_PATH }}/",  "canonical": true}'
           ddev composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}"]}'
-          cat composer.json
 
       - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
         run: ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
       - name: Installation tests
+        # @see https://developer.adobe.com/commerce/marketplace/guides/sellers/installation-and-varnish-tests/#what-is-being-checked
         run: |
-          sudo chmod -R 777 ${{ github.workspace }}
-          rm -Rf ${{ github.workspace }}/generated
-          ddev magento maintenance:enable
           ddev magento module:enable ${{ env.EXTENSION_NAME }}
-          ddev magento maintenance:disable
           ddev magento setup:upgrade
+          # ddev magento setup:di:compile (done while setting production mode later)
+          ddev magento setup:static-content:deploy -f
           ddev magento deploy:mode:set production
           ddev magento indexer:reindex
-
-      - name: Disable some extensions for 2.4
-        if: startsWith(matrix.m2-version, '2.4')
-        run: |
-          sudo chmod -R 777 ${{ github.workspace }}
-          rm -Rf ${{ github.workspace }}/generated
-          ddev magento maintenance:enable
-          ddev magento module:disable Magento_TwoFactorAuth
-          ddev magento maintenance:disable
 
       - name: Prepare for Varnish tests
         run: |
           ddev magento config:set system/full_page_cache/caching_application 2
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
 
-      - name: Varnish MISS and HIT test
+      - name: Disable some extensions for 2.4
+        if: startsWith(matrix.m2-version, '2.4')
         run: |
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          ddev magento maintenance:enable
+          ddev magento module:disable --clear-static-content  Magento_TwoFactorAuth
+          ddev magento cache:clean
+          ddev magento cache:flush
+          ddev magento setup:static-content:deploy -f
+          ddev magento maintenance:disable
+
+      - name: Varnish MISS and HIT test
+        # @see https://developer.adobe.com/commerce/marketplace/guides/sellers/installation-and-varnish-tests/#varnish-test-execution
+        run: |
+          # TEST 1
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html > curl_response.txt
+          # Some debug for the first call (503, report)
+          HTTP_CODE=$(grep -oP "^HTTP\K(.*)$" curl_response.txt)
+          if [[ "$HTTP_CODE" != *"200"* ]]
+          then
+            echo "Bad HTTP code : ${HTTP_CODE}"
+            cat curl_response.txt
+          fi
+          LOG_NUM=$(grep -oP "Error log record number: \K(.*)$" curl_response.txt | sed 's,</p>,,')
+          if [[ -n "$LOG_NUM" ]]
+          then
+            cat var/report/${LOG_NUM}
+          fi
+          if [[ "$HTTP_CODE" != *"200"* ]]
+          then
+            # try to restart
+            ddev restart
+            ddev replace-acl $(ddev find-ip ddev-router)
+            ddev reload-vcl
+            sleep 2
+            curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html > curl_response.txt
+          fi
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
             echo "Test 1 failed"
@@ -98,8 +116,11 @@ jobs:
           else
             echo "Test 1 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 2
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
             echo "Test 2 failed"
@@ -108,8 +129,11 @@ jobs:
           else
             echo "Test 2 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 3
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
             echo "Test 3 failed"
@@ -118,8 +142,11 @@ jobs:
           else
             echo "Test 3 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 4
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
             echo "Test 4 failed"
@@ -128,8 +155,11 @@ jobs:
           else
             echo "Test 4 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 5
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
             echo "Test 5 failed"
@@ -138,8 +168,11 @@ jobs:
           else
             echo "Test 5 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          #TEST 6
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
             echo "Test 6 failed"
@@ -148,8 +181,11 @@ jobs:
           else
             echo "Test 6 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/category-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 7
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/category-1.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
             echo "Test 7 failed"
@@ -158,8 +194,11 @@ jobs:
           else
             echo "Test 7 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/category-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 8
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/category-1.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
             echo "Test 8 failed"
@@ -168,8 +207,11 @@ jobs:
           else
             echo "Test 8 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/category-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 9
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/category-2.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
             echo "Test 9 failed"
@@ -178,8 +220,11 @@ jobs:
           else
             echo "Test 9 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/category-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 10
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/category-2.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
             echo "Test 10 failed"
@@ -188,8 +233,11 @@ jobs:
           else
             echo "Test 10 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }} | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 11
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }} > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
             echo "Test 11 failed"
@@ -198,8 +246,11 @@ jobs:
           else
             echo "Test 11 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }} | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 12
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }} > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
             echo "Test 12 failed"
@@ -216,7 +267,9 @@ jobs:
           ddev exec ./update-product-price.sh ${{ steps.magento2-install.outputs.m2_url }} product_dynamic_1
           ddev exec ./update-product-price.sh ${{ steps.magento2-install.outputs.m2_url }} product_dynamic_2
           ddev exec ./update-product-price.sh ${{ steps.magento2-install.outputs.m2_url }} product_dynamic_3
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+
+          # TEST 1
+          VERIF=$(curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
             echo "Test 1 failed"
@@ -225,8 +278,11 @@ jobs:
           else
             echo "Test 1 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 2
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-1.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
             echo "Test 2 failed"
@@ -235,8 +291,11 @@ jobs:
           else
             echo "Test 2 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 3
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
             echo "Test 3 failed"
@@ -245,8 +304,11 @@ jobs:
           else
             echo "Test 3 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 4
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-2.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
             echo "Test 4 failed"
@@ -255,8 +317,11 @@ jobs:
           else
             echo "Test 4 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 5
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
             echo "Test 5 failed"
@@ -265,8 +330,11 @@ jobs:
           else
             echo "Test 5 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 6
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}/simple-product-3.html > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
             echo "Test 6 failed"
@@ -279,7 +347,10 @@ jobs:
       - name: Varnish FPC clean test
         run: |
           ddev magento cache:clean full_page
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }} | grep -E "^x-eqp-cache:" | sed 's/ //g')
+
+          # TEST 1
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }} > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:MISS"* ]]
           then
             echo "Test 1 failed"
@@ -288,8 +359,11 @@ jobs:
           else
             echo "Test 1 OK"
           fi
-          sleep 2
-          VERIF=$(curl -sSL -D - ${{ steps.magento2-install.outputs.m2_url }} | grep -E "^x-eqp-cache:" | sed 's/ //g')
+          sleep 1
+
+          # TEST 2
+          curl -sSLD - ${{ steps.magento2-install.outputs.m2_url }}  > curl_response.txt
+          VERIF=$(grep -E "^x-eqp-cache:" curl_response.txt | sed 's/ //g')
           if [[ $VERIF != *"x-eqp-cache:HIT"* ]]
           then
             echo "Test 2 failed"
@@ -298,4 +372,3 @@ jobs:
           else
             echo "Test 2 OK"
           fi
-

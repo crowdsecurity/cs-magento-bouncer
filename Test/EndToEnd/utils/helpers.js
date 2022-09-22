@@ -220,7 +220,7 @@ const onLoginPageLoginAsAdmin = async () => {
     await page.click(".action-login");
     await page.waitForLoadState("networkidle");
     // On first login only, there is a modal to allow admin usage statistics
-    adminUsage = await page.isVisible(".admin-usage-notification");
+    const adminUsage = await page.isVisible(".admin-usage-notification");
     if (adminUsage) {
         await page.click(".admin-usage-notification .action-secondary");
         await page.waitForLoadState("networkidle");
