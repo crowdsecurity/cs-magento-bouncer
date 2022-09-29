@@ -74,7 +74,7 @@ case $TYPE in
     CURRENT_IP=$(ddev find-ip playwright)
     TIMEOUT=31000
     HEADLESS=true
-    SLOWMO=0
+    SLOWMO=150
     VAR_PATH="/var/www/html/var"
     ;;
 
@@ -86,7 +86,7 @@ case $TYPE in
     CURRENT_IP=$(ddev find-ip playwright)
     TIMEOUT=60000
     HEADLESS=true
-    SLOWMO=0
+    SLOWMO=150
     VAR_PATH="/var/www/html/var"
     ;;
 

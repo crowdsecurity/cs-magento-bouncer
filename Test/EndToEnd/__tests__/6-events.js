@@ -51,7 +51,7 @@ describe(`Log events in front`, () => {
         await fillInput("password", PASSWORD);
         await fillInput("password-confirmation", PASSWORD);
         await page.click(".action.submit.primary");
-        await page.waitForLoadState("networkidle");
+
         await expect(page).toMatchText(
             ".message-success",
             /Thank you for registering/,
@@ -75,16 +75,16 @@ describe(`Log events in front`, () => {
     it("Should Log out and failed registering with same email", async () => {
         await page.click(".action.switch");
         await page.click('li.authorization-link:has-text("Sign Out")');
-        await page.waitForLoadState("networkidle");
+
         await goToPublicPage("/customer/account/create");
-        await page.waitForLoadState("networkidle");
+
         await fillInput("firstname", FIRSTNAME);
         await fillInput("lastname", LASTNAME);
         await fillInput("email_address", EMAIL);
         await fillInput("password", PASSWORD);
         await fillInput("password-confirmation", PASSWORD);
         await page.click(".action.submit.primary");
-        await page.waitForLoadState("networkidle");
+
         await expect(page).toMatchText(
             ".message-error",
             /There is already an account with this email address./,
@@ -106,14 +106,14 @@ describe(`Log events in front`, () => {
         );
         await onAdminSaveSettings();
         await goToPublicPage("/customer/account/create");
-        await page.waitForLoadState("networkidle");
+
         await fillInput("firstname", FIRSTNAME);
         await fillInput("lastname", LASTNAME);
         await fillInput("email_address", EMAIL);
         await fillInput("password", PASSWORD);
         await fillInput("password-confirmation", PASSWORD);
         await page.click(".action.submit.primary");
-        await page.waitForLoadState("networkidle");
+
         await expect(page).toMatchText(
             ".message-error",
             /There is already an account with this email address./,
@@ -126,11 +126,12 @@ describe(`Log events in front`, () => {
 
     it("Should login ", async () => {
         await page.click('li.authorization-link:has-text("Sign In")');
-        await page.waitForLoadState("networkidle");
+
         await fillInput("email", EMAIL);
         await fillInput("pass", PASSWORD);
         await page.click(".action.login.primary");
-        await page.waitForLoadState("networkidle");
+        await wait(2000);
+
         await expect(page).toMatchText(".welcome > span", /Welcome/);
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
@@ -144,7 +145,6 @@ describe(`Log events in front`, () => {
     it("Should not log login if configuration disabled", async () => {
         await page.click(".action.switch");
         await page.click('li.authorization-link:has-text("Sign Out")');
-        await page.waitForLoadState("networkidle");
 
         await goToSettingsPage();
         await selectElement("crowdsec_bouncer_events_log_customer_login", "0");
@@ -153,11 +153,11 @@ describe(`Log events in front`, () => {
         await goToPublicPage("/customer/account/create");
 
         await page.click('li.authorization-link:has-text("Sign In")');
-        await page.waitForLoadState("networkidle");
+
         await fillInput("email", EMAIL);
         await fillInput("pass", PASSWORD);
         await page.click(".action.login.primary");
-        await page.waitForLoadState("networkidle");
+        await wait(2000);
         await expect(page).toMatchText(".welcome > span", /Welcome/);
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).not.toMatch(
@@ -171,7 +171,7 @@ describe(`Log events in front`, () => {
     it("Should add to cart", async () => {
         await goToPublicPage("/simple-product-10.html");
         await page.click("#product-addtocart-button");
-        await page.waitForLoadState("networkidle");
+
         await expect(page).toMatchText(
             ".message-success",
             /You added Simple Product 10/,
@@ -192,7 +192,7 @@ describe(`Log events in front`, () => {
 
         await goToPublicPage("/simple-product-10.html");
         await page.click("#product-addtocart-button");
-        await page.waitForLoadState("networkidle");
+
         await expect(page).toMatchText(
             ".message-success",
             /You added Simple Product 10/,
@@ -208,7 +208,7 @@ describe(`Log events in front`, () => {
 
     it("Should place order", async () => {
         await goToPublicPage("/checkout");
-        await page.waitForLoadState("networkidle");
+
         await wait(2000);
         await fillByName("city", CITY);
         await fillByName("postcode", POSTCODE);
@@ -216,9 +216,9 @@ describe(`Log events in front`, () => {
         await selectByName("country_id", "FR");
         await fillByName("street\\[0\\]", STREET);
         await page.click(".action.continue.primary");
-        await page.waitForLoadState("networkidle");
+
         await page.click(".action.primary.checkout");
-        await page.waitForLoadState("networkidle");
+
         await wait(2000);
         await expect(page).toMatchTitle("Success Page");
         const logContent = await getFileContent(EVENT_LOG_PATH);
@@ -257,19 +257,19 @@ describe(`Log events in front`, () => {
 
         await goToPublicPage("/simple-product-10.html");
         await page.click("#product-addtocart-button");
-        await page.waitForLoadState("networkidle");
+
         await expect(page).toMatchText(
             ".message-success",
             /You added Simple Product 10/,
         );
 
         await goToPublicPage("/checkout");
-        await page.waitForLoadState("networkidle");
+
         await wait(2000);
         await page.click(".action.continue.primary");
-        await page.waitForLoadState("networkidle");
+
         await page.click(".action.primary.checkout");
-        await page.waitForLoadState("networkidle");
+
         await wait(2000);
         await expect(page).toMatchTitle("Success Page");
         const logContent = await getFileContent(EVENT_LOG_PATH);
@@ -318,7 +318,7 @@ describe(`Log events in admin`, () => {
         await page.fill("#username", "BAD_USER");
         await page.fill("#login", "BAD_PASSWORD");
         await page.click(".action-login");
-        await page.waitForLoadState("networkidle");
+
         await expect(page).toHaveSelector(".message-error");
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).toMatch(
@@ -341,7 +341,7 @@ describe(`Log events in admin`, () => {
         await page.fill("#username", "BAD_USER");
         await page.fill("#login", "BAD_PASSWORD");
         await page.click(".action-login");
-        await page.waitForLoadState("networkidle");
+
         await expect(page).toHaveSelector(".message-error");
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).not.toMatch(
@@ -365,7 +365,7 @@ describe(`Log events in admin`, () => {
         await page.fill("#username", "BAD_USER");
         await page.fill("#login", "BAD_PASSWORD");
         await page.click(".action-login");
-        await page.waitForLoadState("networkidle");
+
         await expect(page).toHaveSelector(".message-error");
         const logContent = await getFileContent(EVENT_LOG_PATH);
         await expect(logContent).not.toMatch(
