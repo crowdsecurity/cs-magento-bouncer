@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.3.0
+        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.4.0
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
@@ -43,7 +43,7 @@ jobs:
           magento_repository: "https://repo.magento.com/"
 
       - name: Clone M2 Crowdsec Bouncer files
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 

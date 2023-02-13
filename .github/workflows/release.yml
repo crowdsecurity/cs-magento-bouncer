@@ -43,7 +43,7 @@ jobs:
                     echo "VERSION_SOURCES=$(echo ${{ env.EXTENSION_ZIP_NAME }}-${{ env.VERSION_NUMBER }} )" >> $GITHUB_ENV
 
             -   name: Clone sources
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
                 with:
                     path: ${{ env.VERSION_SOURCES }}
 
@@ -95,7 +95,7 @@ jobs:
                     zip -r ${{ env.VERSION_SOURCES }}.zip ${{ env.VERSION_SOURCES }}/ -x '${{ env.VERSION_SOURCES }}/.git*'
 
             -   name: Clone zip validator
-                uses: actions/checkout@v2
+                uses: actions/checkout@v3
                 with:
                     repository: julienloizelet/m2-extension-zip-validator
                     path: zip-validator
@@ -106,11 +106,11 @@ jobs:
                     php zip-validator/validate_m2_package.php  ${{ env.VERSION_SOURCES }}.zip
 
             -   name: Create Tag ${{ github.event.inputs.tag_name }}
-                uses: actions/github-script@v3
+                uses: actions/github-script@v6
                 with:
                     github-token: ${{ github.token }}
                     script: |
-                        github.git.createRef({
+                        github.rest.git.createRef({
                           owner: context.repo.owner,
                           repo: context.repo.repo,
                           ref: "refs/tags/${{ github.event.inputs.tag_name }}",

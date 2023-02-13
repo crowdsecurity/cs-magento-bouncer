@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.3.0
+        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.4.0
         id: magento2-install
         with:
           php_version: ${{ matrix.php-version }}
@@ -43,7 +43,7 @@ jobs:
           varnish_setup: "true"
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 
