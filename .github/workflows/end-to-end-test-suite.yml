@@ -6,6 +6,11 @@ on:
     paths-ignore:
       - '**.md'
   workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: Debug with tmate
+        default: false
 
 permissions:
   contents: read
@@ -151,3 +156,12 @@ jobs:
         with:
           test_path: ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd
           file_path: 7-geolocation.js
+
+      - name: Debug with tmate
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          timeout-minutes: 60
+        if: always() && github.event.inputs.debug_enabled == 'true'
+
