@@ -1,5 +1,6 @@
 {
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "test": "jest"
   },
