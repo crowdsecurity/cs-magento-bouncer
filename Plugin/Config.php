@@ -28,7 +28,7 @@
 namespace CrowdSec\Bouncer\Plugin;
 
 use CrowdSec\Bouncer\Helper\Data as Helper;
-use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use CrowdSecBouncer\BouncerException;
 use Exception;
 use LogicException;
@@ -66,27 +66,27 @@ class Config
     protected $helper;
 
     /**
-     * @var RegistryBounce
+     * @var RegistryBouncer
      */
-    protected $registryBounce;
+    protected $registryBouncer;
 
     /**
      * Constructor
      *
      * @param ManagerInterface $messageManager
      * @param Helper $helper
-     * @param RegistryBounce $registryBounce
+     * @param RegistryBouncer $registryBouncer
      * @param WriterInterface $configWriter
      */
     public function __construct(
         ManagerInterface $messageManager,
         Helper           $helper,
-        RegistryBounce   $registryBounce,
+        RegistryBouncer   $registryBouncer,
         WriterInterface  $configWriter
     ) {
         $this->messageManager = $messageManager;
         $this->helper = $helper;
-        $this->registryBounce = $registryBounce;
+        $this->registryBouncer = $registryBouncer;
         $this->configWriter = $configWriter;
     }
 
@@ -292,7 +292,7 @@ class Config
         Phrase $newCacheLabel
     ) {
         // We should have to warm up the cache in Stream Mode
-        $this->_handleWarmUp(
+        $this->_handleRefresh(
             $oldStreamMode,
             $newStreamMode,
             $refreshCronExprChanged,
@@ -328,7 +328,7 @@ class Config
      * @throws LogicException
      * @throws CacheException
      */
-    protected function _handleWarmUp(
+    protected function _handleRefresh(
         bool   $oldStreamMode,
         bool   $newStreamMode,
         bool   $refreshCronExprChanged,
@@ -338,21 +338,21 @@ class Config
         string $newMemcachedDsn,
         Phrase $newCacheLabel
     ) {
-        $shouldWarmUp = false;
+        $shouldRefresh = false;
         if ($newStreamMode === true) {
             if ($oldStreamMode !== true) {
-                $shouldWarmUp = true;
+                $shouldRefresh = true;
             }
             if ($refreshCronExprChanged) {
-                $shouldWarmUp = true;
+                $shouldRefresh = true;
             }
             if ($cacheChanged) {
-                $shouldWarmUp = true;
+                $shouldRefresh = true;
             }
         }
 
-        if ($shouldWarmUp) {
-            $this->_warmUpCache($newCacheSystem, $newMemcachedDsn, $newRedisDsn, $newCacheLabel);
+        if ($shouldRefresh) {
+            $this->_refreshCache($newCacheSystem, $newMemcachedDsn, $newRedisDsn, $newCacheLabel);
         }
     }
 
@@ -450,17 +450,14 @@ class Config
     ) {
         // Test connection if params changed
         if ($oldConnection != $newConnection && !empty($newConnection['api_url'])) {
+            $finalApiKey = $newConnection['api_key']??"";
+            $finalCert = $newConnection['tls']['tls_cert_path']??"";
+            $finalKey = $newConnection['tls']['tls_key_path']??"" ;
+            $finalVerify = $newConnection['tls']['tls_verify_peer']??false;
+            $finalCaCert = $newConnection['tls']['tls_ca_cert_path']??"";
+            $finalUseCurl = $newConnection['use_curl']??false;
             try {
-                if (!($bounce = $this->registryBounce->get())) {
-                    $bounce = $this->registryBounce->create();
-                }
                 $configs = $this->helper->getBouncerConfigs();
-                $finalApiKey = $newConnection['api_key'];
-                $finalCert = $newConnection['tls']['tls_cert_path']??"";
-                $finalKey = $newConnection['tls']['tls_key_path']??"" ;
-                $finalVerify = $newConnection['tls']['tls_verify_peer']??false;
-                $finalCaCert = $newConnection['tls']['tls_ca_cert_path']??"";
-                $finalUseCurl = $newConnection['use_curl']??false;
                 $currentConfigs = [
                     'api_url' => $newConnection['api_url'],
                     'api_key' => $finalApiKey,
@@ -471,8 +468,12 @@ class Config
                     'tls_ca_cert_path' => $finalCaCert,
                     'tls_verify_peer' => $finalVerify,
                 ];
-                $bouncer = $bounce->init(array_merge($configs, $currentConfigs));
-                $restClient = $bouncer->getRestClient();
+                $bouncer = $this->registryBouncer->create([
+                    'helper' => $this->helper,
+                    'configs' => array_merge($configs, $currentConfigs)
+                ]);
+
+                $restClient = $bouncer->getRemediationEngine()->getClient();
 
                 $this->helper->ping($restClient);
             } catch (Exception $e) {
@@ -566,16 +567,18 @@ class Config
         if ($cacheChanged) {
             try {
                 // Try the adapter connection (Redis or Memcached will crash if the connection is incorrect)
-                if (!($bounce = $this->registryBounce->get())) {
-                    $bounce = $this->registryBounce->create();
-                }
                 $configs = $this->helper->getBouncerConfigs();
                 $currentConfigs = [
                     'cache_system' => $cacheSystem,
                     'memcached_dsn' => $memcachedDsn,
                     'redis_dsn' => $redisDsn
                 ];
-                $bounce->init(array_merge($configs, $currentConfigs))->testConnection();
+                $bouncer = $this->registryBouncer->create([
+                    'helper' => $this->helper,
+                    'configs' => array_merge($configs, $currentConfigs)
+                ]);
+
+                $bouncer->testCacheConnection();
                 $cacheMessage = __('CrowdSec new cache (%1) has been successfully tested.', $cacheLabel);
                 $this->messageManager->addNoticeMessage($cacheMessage);
             } catch (Exception $e) {
@@ -612,17 +615,18 @@ class Config
         Phrase $preMessage = null
     ): void {
         try {
-            if (!($bounce = $this->registryBounce->get())) {
-                $bounce = $this->registryBounce->create();
-            }
             $configs = $this->helper->getBouncerConfigs();
             $currentConfigs = [
                 'cache_system' => $cacheSystem,
                 'memcached_dsn' => $memcachedDsn,
                 'redis_dsn' => $redisDsn
             ];
-            $clearCacheResult =
-                $bounce->init(array_merge($configs, $currentConfigs))->clearCache();
+            $bouncer = $this->registryBouncer->create([
+                'helper' => $this->helper,
+                'configs' => array_merge($configs, $currentConfigs)
+            ]);
+
+            $clearCacheResult = $bouncer->clearCache();
             $this->displayCacheClearMessage($clearCacheResult, $cacheLabel, $preMessage);
         } catch (Exception $e) {
             $this->helper->error('', [
@@ -651,24 +655,26 @@ class Config
      * @throws LogicException
      * @throws CacheException
      */
-    protected function _warmUpCache(
+    protected function _refreshCache(
         string $cacheSystem,
         string $memcachedDsn,
         string $redisDsn,
         Phrase $cacheLabel
     ): void {
         try {
-            if (!($bounce = $this->registryBounce->get())) {
-                $bounce = $this->registryBounce->create();
-            }
             $configs = $this->helper->getBouncerConfigs();
             $currentConfigs = [
                 'cache_system' => $cacheSystem,
                 'memcached_dsn' => $memcachedDsn,
                 'redis_dsn' => $redisDsn
             ];
-            $warmUpCacheResult = $bounce->init(array_merge($configs, $currentConfigs))->warmBlocklistCacheUp();
-            $this->displayCacheWarmUpMessage($warmUpCacheResult, $cacheLabel);
+            $bouncer = $this->registryBouncer->create([
+                'helper' => $this->helper,
+                'configs' => array_merge($configs, $currentConfigs)
+            ]);
+
+            $refreshResult = $bouncer->refreshBlocklistCache();
+            $this->displayCacheRefreshMessage($refreshResult, $cacheLabel);
         } catch (Exception $e) {
             $this->helper->error('', [
                 'type' => 'M2_EXCEPTION_WHILE_WARMING_UP_CACHE',
@@ -731,19 +737,19 @@ class Config
     }
 
     /**
-     * Manage cache warm up message display
+     * Manage cache refresh message display
      *
-     * @param array $warmUpCacheResult
+     * @param array $refreshCacheResult
      * @param Phrase $cacheLabel
      * @return void
      */
-    private function displayCacheWarmUpMessage(array $warmUpCacheResult, Phrase $cacheLabel): void
+    private function displayCacheRefreshMessage(array $refreshCacheResult, Phrase $cacheLabel): void
     {
-        $decisionsCount = $warmUpCacheResult['count'] ?? 0;
-        $decisionsMessage =
-            $decisionsCount > 1 ? 'There are now %1 decisions in cache.' : 'There is now %1 decision in cache.';
-        $message = __('As the stream mode is enabled, the cache (%1) has been warmed up.', $cacheLabel);
-        $message .= ' ' . __("$decisionsMessage", $decisionsCount);
+        $newDecisionsCount = $refreshCacheResult['new'] ?? 0;
+        $deletedDecisionsCount = $refreshCacheResult['deleted'] ?? 0;
+        $decisionsMessage = 'New decision(s): %1. Deleted decision(s): %2. ';
+        $message = __('As the stream mode is enabled, the cache (%1) has been refreshed.', $cacheLabel);
+        $message .= ' ' . __("$decisionsMessage", $newDecisionsCount, $deletedDecisionsCount);
 
         $this->messageManager->addNoticeMessage($message);
     }

@@ -34,7 +34,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Constants;
 
@@ -46,9 +46,9 @@ class Ping extends Action implements HttpPostActionInterface
     protected $resultJsonFactory;
 
     /**
-     * @var RegistryBounce
+     * @var RegistryBouncer
      */
-    protected $registryBounce;
+    protected $registryBouncer;
 
     /**
      * @var Helper
@@ -58,18 +58,18 @@ class Ping extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
-     * @param RegistryBounce $registryBounce
+     * @param RegistryBouncer $registryBouncer
      * @param Helper $helper
      */
     public function __construct(
         Context        $context,
         JsonFactory    $resultJsonFactory,
-        RegistryBounce $registryBounce,
+        RegistryBouncer $registryBouncer,
         Helper         $helper
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->registryBounce = $registryBounce;
+        $this->registryBouncer = $registryBouncer;
         $this->helper = $helper;
     }
 
@@ -111,9 +111,11 @@ class Ping extends Action implements HttpPostActionInterface
             $useCurl = $useCurl ? __('true') : __('false');
             $tlsVerifyPeer = $tlsVerifyPeer ? __('true') : __('false');
             $finalConfigs = array_merge($configs, $currentConfigs);
-            $bounce = $this->registryBounce->create();
-            $bouncer = $bounce->init($finalConfigs);
-            $restClient = $bouncer->getRestClient();
+            $bouncer = $this->registryBouncer->create([
+                'helper' => $this->helper,
+                'configs' => $finalConfigs
+            ]);
+            $restClient = $bouncer->getRemediationEngine()->getClient();
             $this->helper->ping($restClient);
             $result = 1;
             $message = __('Connection test result: success.');

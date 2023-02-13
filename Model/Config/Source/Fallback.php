@@ -27,6 +27,7 @@
 namespace CrowdSec\Bouncer\Model\Config\Source;
 
 use CrowdSec\Bouncer\Constants;
+use CrowdSec\RemediationEngine\LapiRemediation;
 use Magento\Framework\Data\OptionSourceInterface;
 
 class Fallback implements OptionSourceInterface
@@ -39,7 +40,8 @@ class Fallback implements OptionSourceInterface
     public function toOptionArray(): array
     {
         $result = [];
-        foreach (Constants::ORDERED_REMEDIATIONS as $remediation) {
+        $orderedRemediations = array_merge(LapiRemediation::ORDERED_REMEDIATIONS, [Constants::REMEDIATION_BYPASS]);
+        foreach ($orderedRemediations as $remediation) {
             $result[] = ['value' => $remediation, 'label' => __("$remediation")];
         }
 

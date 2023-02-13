@@ -400,8 +400,8 @@ class Config extends AbstractHelper
             $result = ['enabled' => false];
             if ($this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_ENABLED)) {
                 $result['enabled'] = true;
-                $result['save_result'] =
-                    (bool)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_SAVE_RESULT);
+                $result['cache_duration'] =
+                    $this->getGeolocationCacheDuration();
                 $type = (string)$this->scopeConfig->getValue(self::XML_PATH_ADVANCED_GEOLOCATION_TYPE);
                 $result['type'] = $type;
                 if ($type === Constants::GEOLOCATION_TYPE_MAXMIND) {

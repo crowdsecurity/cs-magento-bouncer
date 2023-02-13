@@ -34,7 +34,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
@@ -47,9 +47,9 @@ class Refresh extends Action implements HttpPostActionInterface
     protected $resultJsonFactory;
 
     /**
-     * @var RegistryBounce
+     * @var RegistryBouncer
      */
-    protected $registryBounce;
+    protected $registryBouncer;
 
     /**
      * @var Helper
@@ -59,18 +59,18 @@ class Refresh extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
-     * @param RegistryBounce $registryBounce
+     * @param RegistryBouncer $registryBouncer
      * @param Helper $helper
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        RegistryBounce $registryBounce,
+        RegistryBouncer $registryBouncer,
         Helper $helper
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->registryBounce = $registryBounce;
+        $this->registryBouncer = $registryBouncer;
         $this->helper = $helper;
     }
 
@@ -85,11 +85,13 @@ class Refresh extends Action implements HttpPostActionInterface
     public function execute(): Json
     {
         try {
-            if (!($bounce = $this->registryBounce->get())) {
-                $bounce = $this->registryBounce->create();
-            }
             $configs = $this->helper->getBouncerConfigs();
-            $refresh = $bounce->init($configs)->refreshBlocklistCache();
+            $bouncer = $this->registryBouncer->create([
+                'helper' => $this->helper,
+                'configs' => $configs
+            ]);
+
+            $refresh = $bouncer->refreshBlocklistCache();
             $new = $refresh['new']??0;
             $deleted = $refresh['deleted']??0;
             $cacheSystem = $this->helper->getCacheTechnology();

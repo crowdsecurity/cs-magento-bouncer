@@ -33,7 +33,7 @@ describe(`Configure Stream mode`, () => {
         await onAdminSaveSettings();
         await expect(page).toMatchText(
             "#messages",
-            /As the stream mode is enabled, the cache \(.*\) has been warmed up. There is now 0 decision in cache./,
+            /As the stream mode is enabled, the cache \(.*\) has been refreshed. New decision\(s\): 0. Deleted decision\(s\): 0./,
         );
     });
 });

@@ -43,26 +43,12 @@ You may use your own local stack, but we provide here some useful tools that dep
 
 ### DDEV-Local setup
 
-For a quick start, follow the below steps.
-
-_We will suppose that you want to test on a Magento 2.4.3 instance. Change the version number if you prefer another 
-release._
+For a quick start, follow the below steps._We will suppose that you want to test on a Magento 2.4.3 instance. Change the version number if you prefer another release._
 
 #### DDEV installation
 
-This project is fully compatible with DDEV 1.20.0, and it is recommended to use this specific version.
-For the DDEV installation, please follow the [official instructions](https://ddev.readthedocs.io/en/stable/#installation).
-On a Linux distribution, you can run:
-```
-sudo apt-get -qq update
-sudo apt-get -qq -y install libnss3-tools
-curl -LO https://raw.githubusercontent.com/drud/ddev/master/scripts/install_ddev.sh
-bash install_ddev.sh v1.20.0
-rm install_ddev.sh
-```
+This project is fully compatible with DDEV 1.21.4, and it is recommended to use this specific version. For the DDEV installation, please follow the [official instructions](https://ddev.readthedocs.io/en/stable/#installation).
 
-
-#### DDEV Magento 2 environment
 
 The final structure of the project will look like below.
 
@@ -84,28 +70,28 @@ m2-sources
          
 ```
 
-**N.B:** you can use whatever name you like for the folder `m2-sources` but, in order to use our pre-configured ddev
+**N.B.:** you can use whatever name you like for the folder `m2-sources` but, in order to use our pre-configured ddev
 commands, you must respect the sub folders naming: `.ddev`, `my-own-modules` and `crowdsec-bouncer`.
 
 - Create an empty folder that will contain all necessary sources (Magento 2 and this extension):
-``` 
+``` bash
 mkdir m2-sources && cd m2-sources
 ```
 - Create an empty `.ddev` folder for DDEV and clone our pre-configured DDEV repo:
-```
+```bash
 mkdir .ddev && cd .ddev
 git clone git@github.com:julienloizelet/ddev-m2.git ./
 ```
 - Copy some configurations file:
 
-```      
+```      bash
 cp config_overrides/config.m243.yaml config.m243.yaml
 cp additional_docker_compose/docker-compose.crowdsec.yaml docker-compose.crowdsec.yaml
 cp additional_docker_compose/docker-compose.playwright.yaml docker-compose.playwright.yaml
 ```
 
 - Launch DDEV
-```
+```bash
 ddev start
 ```
  This should take some times on the first launch as this will download all necessary docker images.
@@ -114,48 +100,56 @@ ddev start
 #### Magento 2 installation
 You will need your Magento 2 credentials to install the source code.
 
-     ddev composer create --repository=https://repo.magento.com/ magento/project-community-edition:2.4.3
+```bash
+ ddev composer create --repository=https://repo.magento.com/ magento/project-community-edition:2.4.3
+```
 
 
 #### Set up Magento 2
 
-     ddev magento setup:install \
-                           --base-url=https://m243.ddev.site/ \
-                           --db-host=db \
-                           --db-name=db \
-                           --db-user=db \
-                           --db-password=db \
-                           --backend-frontname=admin \
-                           --admin-firstname=admin \
-                           --admin-lastname=admin \
-                           --admin-email=admin@admin.com \
-                           --admin-user=admin \
-                           --admin-password=admin123 \
-                           --language=en_US \
-                           --currency=USD \
-                           --timezone=America/Chicago \
-                           --use-rewrites=1 \
-                           --elasticsearch-host=elasticsearch
+```bash
+ ddev magento setup:install \
+                       --base-url=https://m243.ddev.site/ \
+                       --db-host=db \
+                       --db-name=db \
+                       --db-user=db \
+                       --db-password=db \
+                       --backend-frontname=admin \
+                       --admin-firstname=admin \
+                       --admin-lastname=admin \
+                       --admin-email=admin@admin.com \
+                       --admin-user=admin \
+                       --admin-password=admin123 \
+                       --language=en_US \
+                       --currency=USD \
+                       --timezone=America/Chicago \
+                       --use-rewrites=1 \
+                       --elasticsearch-host=elasticsearch
+```
 
 
 #### Configure Magento 2 for local development
 
-    ddev magento config:set admin/security/password_is_forced 0
-    ddev magento config:set admin/security/password_lifetime 0
-    ddev magento module:disable Magento_TwoFactorAuth
-    ddev magento setup:performance:generate-fixtures setup/performance-toolkit/profiles/ce/small.xml
-    ddev magento c:c
+```bash
+ddev magento config:set admin/security/password_is_forced 0
+ddev magento config:set admin/security/password_lifetime 0
+ddev magento module:disable Magento_TwoFactorAuth
+ddev magento setup:performance:generate-fixtures setup/performance-toolkit/profiles/ce/small.xml
+ddev magento c:c
+```
 
 #### CrowdSec Bouncer extension installation
 
-     cd m2-sources
-     mkdir -p my-own-modules/crowdsec-bouncer && cd my-own-modules/crowdsec-bouncer
-     git clone git@github.com:crowdsecurity/cs-magento-bouncer.git ./
-     ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
-     ddev composer require crowdsec/magento2-module-bouncer:@dev
-     ddev magento module:enable CrowdSec_Bouncer
-     ddev magento setup:upgrade
-     ddev magento cache:flush
+```bash
+ cd m2-sources
+ mkdir -p my-own-modules/crowdsec-bouncer && cd my-own-modules/crowdsec-bouncer
+ git clone git@github.com:crowdsecurity/cs-magento-bouncer.git ./
+ ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
+ ddev composer require crowdsec/magento2-module-bouncer:@dev
+ ddev magento module:enable CrowdSec_Bouncer
+ ddev magento setup:upgrade
+ ddev magento cache:flush
+```
 
 #### CrowdSec configuration on start
 
@@ -166,13 +160,17 @@ We use a post-start DDEV hook to:
 
 Just copy the file and restart:
 
-     
-    cp .ddev/config_overrides/config.crowdsec.yaml .ddev/config.crowdsec.yaml
-    ddev restart
+
+```bash
+cp .ddev/config_overrides/config.crowdsec.yaml .ddev/config.crowdsec.yaml
+ddev restart
+```
 
 You can also add the ddev-router IP as trusted proxy IP:
 
-    ddev magento config:set crowdsec_bouncer/advanced/remediation/trust_ip_forward_list $(ddev find-ip ddev-router)
+```bash
+ddev magento config:set crowdsec_bouncer/advanced/remediation/trust_ip_forward_list $(ddev find-ip ddev-router)
+```
 
 ### Extension quality
 
@@ -190,8 +188,7 @@ We are using a Jest/Playwright Node.js stack to launch a suite of end-to-end tes
 
 **Please note** that those tests modify local configurations and log content on the fly.
 
-Tests code is in the `Test/EndToEnd` folder. You should have to `chmod +x` the scripts you will find in  
-`Test/EndToEnd/__scripts__`.
+Tests code is in the `Test/EndToEnd` folder. You should have to `chmod +x` the scripts you will find in `Test/EndToEnd/__scripts__`.
 
 As we use a TLS ready CrowdSec container, you have first to copy some certificates and key:
 
@@ -201,12 +198,13 @@ mkdir -p var/crowdsec/tls
 cp -r .ddev/custom_files/crowdsec/cfssl/* var/crowdsec/tls
 ```
 
-To run a specific cron job from browser, we created a `launchCron.php` script that you have to copy before testing 
-cron dependent feature (stream mode for example):
+To run a specific cron job from browser, we created a `launchCron.php` script that you have to copy before testing cron dependent feature (stream mode for example):
 
-    cp .ddev/custom_scripts/cronLaunch.php m2-sources/pub/cronLaunch.php
-    chmod +x m2-sources/pub/cronLaunch.php
-    
+```bash
+cp .ddev/custom_scripts/cronLaunch.php m2-sources/pub/cronLaunch.php
+chmod +x m2-sources/pub/cronLaunch.php
+```
+
 Then you can use the `run-test.sh` script to run the tests:
 
 - the first parameter specifies if you want to run the test on your machine (`host`) or in the 
@@ -215,30 +213,36 @@ docker containers (`docker`). You can also use `ci` if you want to have the same
 
 For example: 
 
-    ./run-tests.sh host "./__tests__/1-config.js"
-    ./run-tests.sh docker "./__tests__/1-config.js" 
-    ./run-tests.sh host
-    ./run-tests.sh host "./__tests__/1-config.js  ./__tests__/3-stream-mode.js"
+```bash
+./run-tests.sh host "./__tests__/1-config.js"
+./run-tests.sh docker "./__tests__/1-config.js" 
+./run-tests.sh host
+./run-tests.sh host "./__tests__/1-config.js  ./__tests__/3-stream-mode.js"
+```
 
 Before testing with the `docker` or `ci` parameter, you have to install all the required dependencies 
 in the playwright container with this command :
 
-    ./test-init.sh
+```bash
+./test-init.sh
+```
 
 If you want to test with the `host` parameter, you will have to install manually all the required dependencies: 
 
-```
+```bash
 yarn --cwd ./Test/EndToEnd --force
 yarn global add cross-env
 ```
- 
+
 
 ### Cron
 
 If you want to test the CrowdSec Bouncer stream mode, you can simulate Magento 2 cron with the following command in 
 a new terminal: 
 
-     ddev cron
+```bash
+ ddev cron
+```
 
 You should find a `var/log/magento.cron.log` for debug.
 
@@ -247,9 +251,11 @@ You should find a `var/log/magento.cron.log` for debug.
 You can run every CSCLI command by prefixing it with `ddev exec -s crowdsec`. For example:
 
 
-    ddev exec -s crowdsec cscli decisions add --ip 172.21.0.12 --duration 4h --type ban
+```bash
+ddev exec -s crowdsec cscli decisions add --ip 172.21.0.12 --duration 4h --type ban
 
-    ddev exec -s crowdsec cscli bouncers add magento2-bouncer
+ddev exec -s crowdsec cscli bouncers add magento2-bouncer
+```
 
 
 ### Varnish
@@ -258,17 +264,19 @@ If you want to test with Varnish, please follow these instructions:
 
 First, you should configure your Magento 2 instance to use Varnish as full page cache:
 
-```
+```bash
 ddev magento config:set system/full_page_cache/caching_application 2
 ```
 
 You can also add the varnish IP as trusted proxy IP:
 
-    ddev magento config:set crowdsec_bouncer/advanced/remediation/trust_ip_forward_list $(ddev find-ip varnish)
+```bash
+ddev magento config:set crowdsec_bouncer/advanced/remediation/trust_ip_forward_list $(ddev find-ip varnish)
+```
 
 Then, you can add specific files for Varnish and restart:
 
-```
+```bash
 cp .ddev/additional_docker_compose/docker-compose.varnish.yml .ddev/docker-compose.varnish.yml
 cp .ddev/custom_files/default.vcl .ddev/varnish/default.vcl
 ddev restart
@@ -276,7 +284,7 @@ ddev restart
 
 Finally, we need to change the ACL part for purge process:
 
-```
+```bash
 ddev replace-acl $(ddev find-ip ddev-router)
 ddev reload-vcl
 ```
@@ -284,8 +292,7 @@ ddev reload-vcl
 
 For information, here are the differences between the back office generated `default.vcl` and the `default.vcl` we use:
 
-- We changed the probe url from `"/pub/health_check.php"` to `"/health_check.php"` as explained in the [official
-  documentation](https://devdocs.magento.com/guides/v2.4/config-guide/varnish/config-varnish-advanced.html):
+- We changed the probe url from `"/pub/health_check.php"` to `"/health_check.php"` as explained in the [official documentation](https://devdocs.magento.com/guides/v2.4/config-guide/varnish/config-varnish-advanced.html):
 
 ```
  .probe = {
@@ -313,13 +320,13 @@ if (resp.http.x-varnish ~ " ") {
 
 To see if purge works, you can do :
 
-```
+```bash
 ddev exec -s varnish varnishlog -g request -q \'ReqMethod eq "PURGE"\'
 ```
 
 And then, from another terminal, flush the cache :
 
-```
+```bash
 ddev magento cache:flush
 ```
 
@@ -340,16 +347,22 @@ RespReason     Purged
 
 First, you have to copy the `crowdsec-prepend.php` file to your `app/etc` folder:
 
-    cp m2-sources/my-own-modules/crowdsec-bouncer/crowdsec-prepend.php m2-sources/app/etc/crowdsec-prepend.php
+```bash
+cp m2-sources/my-own-modules/crowdsec-bouncer/crowdsec-prepend.php m2-sources/app/etc/crowdsec-prepend.php
+```
 
 Then, to enable the `auto prepend file` mode, you can run the following command that will modify and reload nginx
 configuration:
 
-    ddev crowdsec-prepend-nginx
+```bash
+ddev crowdsec-prepend-nginx
+```
 
 To disable the `auto prepend file` mode, please restart:
 
-    ddev restart
+```bash
+ddev restart
+```
 
 ## Commit message
 
@@ -369,7 +382,7 @@ Example:
 
 You can use the `commit-msg` git hook that you will find in the `.githooks` folder : 
 
-```
+```bash
 cp .githooks/commit-msg .git/hooks/commit-msg
 chmod +x .git/hooks/commit-msg
 ```
@@ -405,6 +418,6 @@ Then, using the [GitHub CLI](https://github.com/cli/cli), you can:
 Note that the GitHub action will fail if the tag `tag_name` already exits.
 
 At the end of the GitHub action process, you will find a `crowdsec-magento2-module-bouncer-x.y.z.zip` file in the 
-Github release assets.
+GitHub release assets.
 
  

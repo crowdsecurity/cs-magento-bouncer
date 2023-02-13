@@ -27,10 +27,12 @@ const {
     goToSettingsPage,
     wait,
     fillInput,
+    fillByName,
     setDefaultConfig,
     deleteFileContent,
     getFileContent,
     goToPublicPage,
+    runCacheAction,
 } = require("../utils/helpers");
 const { addDecision } = require("../utils/watcherClient");
 
@@ -60,6 +62,35 @@ describe(`Live mode run`, () => {
         );
         await onAdminSaveSettings();
         await publicHomepageShouldBeCaptchaWallWithoutMentions();
+    });
+
+    it("Should refresh image", async () => {
+        await runCacheAction("captcha-phrase", `&ip=${CURRENT_IP}`);
+        const phrase = await page.$eval("h1", (el) => el.innerText);
+        await publicHomepageShouldBeCaptchaWall();
+        await page.click("#refresh_link");
+        await runCacheAction("captcha-phrase", `&ip=${CURRENT_IP}`);
+        const newPhrase = await page.$eval("h1", (el) => el.innerText);
+        await expect(newPhrase).not.toEqual(phrase);
+    });
+
+    it("Should show error message", async () => {
+        await publicHomepageShouldBeCaptchaWall();
+        expect(await page.locator(".error").count()).toBeFalsy();
+        await fillByName("phrase", "bad-value");
+        await page.locator('button:text("CONTINUE")').click();
+        expect(await page.locator(".error").count()).toBeTruthy();
+    });
+
+    it("Should solve the captcha", async () => {
+        await runCacheAction("captcha-phrase", `&ip=${CURRENT_IP}`);
+        const phrase = await page.$eval("h1", (el) => el.innerText);
+        await publicHomepageShouldBeCaptchaWall();
+        await fillByName("phrase", phrase);
+        await page.locator('button:text("CONTINUE")').click();
+        await publicHomepageShouldBeAccessible();
+        // Clear cache for next tests
+        await runCacheAction("clear");
     });
 
     it("Should display a ban wall", async () => {
@@ -355,7 +386,7 @@ describe(`Test cache in Live mode`, () => {
         logContent = await getFileContent(DEBUG_LOG_PATH);
         await expect(logContent).toMatch(
             new RegExp(
-                `{"type":"CLEAN_VALUE","scope":"Ip","value":"${CURRENT_IP}","cache":"miss"}`,
+                `{"type":"LAPI_REM_CACHED_DECISIONS","ip":"${CURRENT_IP}","result":"miss"}`,
             ),
         );
         await deleteFileContent(DEBUG_LOG_PATH);
@@ -364,7 +395,7 @@ describe(`Test cache in Live mode`, () => {
         logContent = await getFileContent(DEBUG_LOG_PATH);
         await expect(logContent).toMatch(
             new RegExp(
-                `{"type":"CLEAN_VALUE","scope":"Ip","value":"${CURRENT_IP}","cache":"hit"}`,
+                `{"type":"LAPI_REM_CACHED_DECISIONS","ip":"${CURRENT_IP}","result":"hit"}`,
             ),
         );
     });
