@@ -162,6 +162,6 @@ jobs:
         with:
           limit-access-to-actor: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          timeout-minutes: 60
-        if: always() && github.event.inputs.debug_enabled == 'true'
+        timeout-minutes: 30
+        if: failure() && github.event.inputs.debug_enabled == 'true'
 

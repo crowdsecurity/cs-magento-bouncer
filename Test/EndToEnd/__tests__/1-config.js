@@ -48,7 +48,7 @@ describe(`Extension configuration`, () => {
         await goToPublicPage();
         await expect(page).toMatchText(
             "body",
-            /(There has been an error processing your request|Fatal error)/,
+            /(There has been an error processing your request|Fatal error|BouncerException)/,
         );
         await goToAdmin();
         await onAdminGoToSettingsPage(true);
@@ -60,7 +60,7 @@ describe(`Extension configuration`, () => {
         await goToPublicPage();
         await expect(page).not.toMatchText(
             "body",
-            /(There has been an error processing your request|Fatal error)/,
+            /(There has been an error processing your request|Fatal error|BouncerException)/,
         );
         await goToAdmin();
         await onAdminGoToSettingsPage(true);
