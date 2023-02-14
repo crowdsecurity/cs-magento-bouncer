@@ -5,6 +5,8 @@ on:
       - main
     paths-ignore:
       - '**.md'
+  schedule:
+    - cron: '25 08 * * *'
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -60,30 +62,32 @@ jobs:
           ddev restart
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
-        if: github.event_name == 'push' || github.event.inputs.check_head_zip == 'true'
         uses: actions/checkout@v3
         with:
-          path: temp-dir
+          path: module-sources
 
       - name: Use zip sources as for a release process
         if: github.event_name == 'push' || github.event.inputs.check_head_zip == 'true'
         run: |
-          zip -r crowdsec-head.zip temp-dir/ -x 'temp-dir/.git*'
-          mkdir temp-dir-2
-          unzip crowdsec-head.zip -d temp-dir-2
+          zip -r crowdsec-head.zip module-sources/ -x 'module-sources/.git*'
+          mkdir temp-dir
+          unzip crowdsec-head.zip -d temp-dir
           mkdir -p ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
-          cd temp-dir-2
+          cd temp-dir/module-sources
           cp -r . ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
+          ls -al ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
 
       - name: Retrieve last stable release zip
         if: github.event_name != 'push' && github.event.inputs.check_head_zip != 'true'
         run: |
           LAST_TAG=$(curl -Ls -o /dev/null -w %{url_effective} ${{ env.ORIGIN }}/releases/latest | grep -oP "\/tag\/v\K(.*)$")
           curl -fL ${{ env.ORIGIN }}/releases/download/v$LAST_TAG/crowdsec-magento2-module-bouncer-$LAST_TAG.zip -o crowdsec.$LAST_TAG.zip
-          mkdir temp-dir
-          unzip crowdsec.$LAST_TAG.zip -d temp-dir
-          cd temp-dir
+          mkdir release-sources
+          unzip crowdsec.$LAST_TAG.zip -d release-sources
+          mkdir -p ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
+          cd release-sources/crowdsec-magento2-module-bouncer-$LAST_TAG
           cp -r . ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
+          ls -al ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
 
       - name: Validate composer.json
         run: ddev composer validate --working-dir ./my-own-modules/${{ env.EXTENSION_PATH }}
@@ -140,6 +144,9 @@ jobs:
           chmod +x test-init.sh
           ./test-init.sh
           chmod +x run-tests.sh
+          cd ${{ github.workspace }}/module-sources
+          cp -r .github ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
+          ls -al ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
 
       - name: Run config test
         uses: ./my-own-modules/crowdsec-bouncer/.github/workflows/end-to-end/run-single-test
