@@ -71,6 +71,7 @@ jobs:
           zip -r crowdsec-head.zip temp-dir/ -x 'temp-dir/.git*'
           mkdir temp-dir-2
           unzip crowdsec-head.zip -d temp-dir-2
+          mkdir -p ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
           cd temp-dir-2
           cp -r . ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
 
