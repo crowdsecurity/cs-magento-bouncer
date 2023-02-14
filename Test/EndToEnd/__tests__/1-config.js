@@ -8,6 +8,8 @@ const {
     flushCache,
     setDefaultConfig,
     wait,
+    goToPublicPage,
+    onAdminGoToSettingsPage,
 } = require("../utils/helpers");
 
 const { BOUNCER_KEY } = require("../utils/constants");
@@ -35,6 +37,38 @@ describe(`Extension configuration`, () => {
         await fillInput(
             "crowdsec_bouncer_general_connection_api_key",
             BOUNCER_KEY,
+        );
+    });
+    it("Should display errors or not depending on config", async () => {
+        await fillInput(
+            "crowdsec_bouncer_advanced_debug_forced_test_ip",
+            "xyz",
+        );
+        await onAdminSaveSettings();
+        await goToPublicPage();
+        await expect(page).toMatchText(
+            "body",
+            /(There has been an error processing your request|Fatal error)/,
+        );
+        await goToAdmin();
+        await onAdminGoToSettingsPage(true);
+        await selectElement(
+            "crowdsec_bouncer_advanced_debug_display_errors",
+            "0",
+        );
+        await onAdminSaveSettings();
+        await goToPublicPage();
+        await expect(page).not.toMatchText(
+            "body",
+            /(There has been an error processing your request|Fatal error)/,
+        );
+        await goToAdmin();
+        await onAdminGoToSettingsPage(true);
+        // Reset default values
+        await fillInput("crowdsec_bouncer_advanced_debug_forced_test_ip", "");
+        await selectElement(
+            "crowdsec_bouncer_advanced_debug_display_errors",
+            "1",
         );
     });
 });
