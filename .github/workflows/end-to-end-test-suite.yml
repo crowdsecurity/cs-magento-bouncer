@@ -1,5 +1,10 @@
 name: End-to-end tests
 on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
   workflow_dispatch:
     inputs:
       debug_enabled:

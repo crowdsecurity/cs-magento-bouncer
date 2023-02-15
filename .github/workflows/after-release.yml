@@ -1,28 +1,19 @@
-name: End-to-end release tests
+name: After release tests
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - '**.md'
-  schedule:
-    - cron: '25 08 * * *'
+  release:
+    types: [ published ]
   workflow_dispatch:
     inputs:
       debug_enabled:
         type: boolean
         description: Debug with tmate
         default: false
-      check_head_zip:
-        type: boolean
-        description: Use expected ZIP on HEAD sources
-        default: false
 
 permissions:
   contents: read
 
 jobs:
-  end-to-end-test-suite:
+  after-release:
     strategy:
       fail-fast: false
       matrix:
@@ -35,14 +26,13 @@ jobs:
           - m2-version: '2.4.5'
             php-version: '8.1'
 
-    name: End-to-end test suite
+    name: After release test suite
     if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
     runs-on: ubuntu-latest
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"
       EXTENSION_NAME: "CrowdSec_Bouncer"
       EXTENSION_PATH: "crowdsec-bouncer"
-      ORIGIN: "https://github.com/crowdsecurity/cs-magento-bouncer"
 
     steps:
 
@@ -66,22 +56,10 @@ jobs:
         with:
           path: module-sources
 
-      - name: Use zip sources as for a release process
-        if: github.event_name == 'push' || github.event.inputs.check_head_zip == 'true'
-        run: |
-          zip -r crowdsec-head.zip module-sources/ -x 'module-sources/.git*'
-          mkdir temp-dir
-          unzip crowdsec-head.zip -d temp-dir
-          mkdir -p ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
-          cd temp-dir/module-sources
-          cp -r . ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
-          ls -al ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
-
       - name: Retrieve last stable release zip
-        if: github.event_name != 'push' && github.event.inputs.check_head_zip != 'true'
         run: |
-          LAST_TAG=$(curl -Ls -o /dev/null -w %{url_effective} ${{ env.ORIGIN }}/releases/latest | grep -oP "\/tag\/v\K(.*)$")
-          curl -fL ${{ env.ORIGIN }}/releases/download/v$LAST_TAG/crowdsec-magento2-module-bouncer-$LAST_TAG.zip -o crowdsec.$LAST_TAG.zip
+          LAST_TAG=$(curl -Ls -o /dev/null -w %{url_effective} $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/latest | grep -oP "\/tag\/v\K(.*)$")
+          curl -fL $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/v$LAST_TAG/crowdsec-magento2-module-bouncer-$LAST_TAG.zip -o crowdsec.$LAST_TAG.zip
           mkdir release-sources
           unzip crowdsec.$LAST_TAG.zip -d release-sources
           mkdir -p ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}
