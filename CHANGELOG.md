@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v2.0.0) - 2023-??-??
+[_Compare with previous release_](https://github.com/crowdsecurity/cs-magento-bouncer/compare/v1.5.0...v2.0.0)
+
+- All source code has been refactored using new CrowdSec PHP librairies:
+    - Logs messages have been changed
+    - User Agent sent to CrowdSec LAPI has been changed to `csphplapi_Magento2/vX.Y.Z`
+---
+
 
 ## [1.5.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v1.5.0) - 2022-09-08
 [_Compare with previous release_](https://github.com/crowdsecurity/cs-magento-bouncer/compare/v1.4.0...v1.5.0)

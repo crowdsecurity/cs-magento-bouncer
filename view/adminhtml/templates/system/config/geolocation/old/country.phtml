@@ -43,7 +43,7 @@
                 geolocation_maxmind_database_type: dataBaseType.value,
                 geolocation_maxmind_database_path: dataBasePath.value,
                 forced_test_ip: $('<?= $block->escapeJs($block->getForcedTestIpField()) ?>').value,
-                save_result: $('<?= $block->escapeJs($block->getSaveResultField()) ?>').value
+                cache_duration: $('<?= $block->escapeJs($block->getCacheDurationField()) ?>').value
             };
 
             new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {

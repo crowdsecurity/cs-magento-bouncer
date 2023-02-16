@@ -4,7 +4,7 @@ namespace CrowdSec\Bouncer\Cron;
 
 use CrowdSec\Bouncer\Constants;
 use CrowdSec\Bouncer\Helper\Data as Helper;
-use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use Exception;
 use LogicException;
 
@@ -15,20 +15,20 @@ class PruneCache
      */
     protected $helper;
     /**
-     * @var RegistryBounce
+     * @var RegistryBouncer
      */
-    protected $registryBounce;
+    protected $registryBouncer;
 
     /**
      * Constructor
      *
      * @param Helper $helper
-     * @param RegistryBounce $registryBounce
+     * @param RegistryBouncer $registryBouncer
      */
-    public function __construct(Helper $helper, RegistryBounce $registryBounce)
+    public function __construct(Helper $helper, RegistryBouncer $registryBouncer)
     {
         $this->helper = $helper;
-        $this->registryBounce = $registryBounce;
+        $this->registryBouncer = $registryBouncer;
     }
 
     /**
@@ -41,11 +41,17 @@ class PruneCache
     {
         if ($this->helper->getCacheTechnology() === Constants::CACHE_SYSTEM_PHPFS) {
             try {
-                $bounce = $this->registryBounce->create();
                 $configs = $this->helper->getBouncerConfigs();
-                $bounce->init($configs)->pruneCache();
+                $bouncer = $this->registryBouncer->create([
+                    'helper' => $this->helper,
+                    'configs' => $configs
+                ]);
+                $result = $bouncer->pruneCache();
+                if ($result) {
+                    $this->helper->info('Cache has been pruned by cron', []);
+                }
             } catch (Exception $e) {
-                $this->helper->error('', [
+                $this->helper->error('Error while pruning cache', [
                     'type' => 'M2_EXCEPTION_WHILE_PRUNING_CACHE',
                     'message' => $e->getMessage(),
                     'code' => $e->getCode(),

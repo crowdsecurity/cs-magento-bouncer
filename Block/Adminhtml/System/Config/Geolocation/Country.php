@@ -62,11 +62,11 @@ class Country extends Button
     protected $_forcedTestIpField = 'crowdsec_bouncer_advanced_debug_forced_test_ip';
 
     /**
-     * Save result field name
+     * Cache duration field name
      *
      * @var string
      */
-    protected $_saveResultField = 'crowdsec_bouncer_advanced_geolocation_save_result';
+    protected $_cacheDurationField = 'crowdsec_bouncer_advanced_geolocation_cache_duration';
 
     /** @var string  */
     protected $template = 'CrowdSec_Bouncer::system/config/geolocation/country.phtml';
@@ -114,13 +114,13 @@ class Country extends Button
     }
 
     /**
-     * Save result field name
+     * Cache duration field name
      *
      * @return string
      */
-    public function getSaveResultField(): string
+    public function getCacheDurationField(): string
     {
-        return $this->_saveResultField;
+        return $this->_cacheDurationField;
     }
 
     /**

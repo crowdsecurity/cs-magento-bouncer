@@ -81,7 +81,7 @@ describe(`Configure and run crons`, () => {
         await expect(logContent).toBe("");
         await runCron("CrowdSec\\Bouncer\\Cron\\PruneCache");
         logContent = await getFileContent(DEBUG_LOG_PATH);
-        await expect(logContent).toMatch("CACHE_PRUNED");
+        await expect(logContent).toMatch("Cache has been pruned by cron");
     });
 
     it("Should log that refresh cron is running", async () => {
@@ -90,6 +90,6 @@ describe(`Configure and run crons`, () => {
         await expect(logContent).toBe("");
         await runCron("CrowdSec\\Bouncer\\Cron\\RefreshCache");
         logContent = await getFileContent(DEBUG_LOG_PATH);
-        await expect(logContent).toMatch("CACHE_UPDATED");
+        await expect(logContent).toMatch("Cache has been refreshed by cron");
     });
 });

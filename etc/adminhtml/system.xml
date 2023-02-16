@@ -381,15 +381,6 @@
                         <comment><![CDATA[The lifetime of cached captcha flow for some IP.<br>Minimum 1 second.]]></comment>
                         <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
                     </field>
-                    <field id="geolocation_cache_duration" translate="label,comment,tooltip" type="text" sortOrder="1000" showInDefault="1">
-                        <label><![CDATA[Geolocation cache duration  (in seconds)]]></label>
-                        <comment><![CDATA[The lifetime of cached country geolocation result for some IP.<br>Minimum 1 second.]]></comment>
-                        <validate>required-entry validate-digits validate-digits-range digits-range-1-</validate>
-                        <tooltip><![CDATA[One day: 86400]]></tooltip>
-                        <depends>
-                            <field id="crowdsec_bouncer/advanced/geolocation/save_result">1</field>
-                        </depends>
-                    </field>
                 </group>
                 <!-- Geolocation -->
                 <group id="geolocation" translate="label,comment,tooltip" showInDefault="1" >
@@ -401,10 +392,11 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment><![CDATA[Enable if you want to handle country scoped decisions]]></comment>
                     </field>
-                    <field id="save_result" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
-                        <label>Save geolocation country result in cache</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment><![CDATA[Enabling this option will avoid multiple call to the geolocation system (e.g. MaxMind database)]]></comment>
+                    <field id="cache_duration" translate="label,comment,tooltip" type="text" sortOrder="200" showInDefault="1">
+                        <label><![CDATA[Geolocation cache duration  (in seconds)]]></label>
+                        <comment><![CDATA[The lifetime of cached country geolocation result for some IP.<br>Set 0 to disable.]]></comment>
+                        <validate>required-entry validate-digits validate-digits-range digits-range-0-</validate>
+                        <tooltip><![CDATA[One day: 86400]]></tooltip>
                         <depends>
                             <field id="crowdsec_bouncer/advanced/geolocation/enabled">1</field>
                         </depends>

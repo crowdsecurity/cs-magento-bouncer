@@ -34,7 +34,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
-use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
@@ -47,9 +47,9 @@ class Clear extends Action implements HttpPostActionInterface
     protected $resultJsonFactory;
 
     /**
-     * @var RegistryBounce
+     * @var RegistryBouncer
      */
-    protected $registryBounce;
+    protected $registryBouncer;
 
     /**
      * @var Helper
@@ -59,18 +59,18 @@ class Clear extends Action implements HttpPostActionInterface
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
-     * @param RegistryBounce $registryBounce
+     * @param RegistryBouncer $registryBouncer
      * @param Helper $helper
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        RegistryBounce $registryBounce,
+        RegistryBouncer $registryBouncer,
         Helper $helper
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->registryBounce = $registryBounce;
+        $this->registryBouncer = $registryBouncer;
         $this->helper = $helper;
     }
 
@@ -85,28 +85,27 @@ class Clear extends Action implements HttpPostActionInterface
     public function execute(): Json
     {
         try {
-            if (!($bounce = $this->registryBounce->get())) {
-                $bounce = $this->registryBounce->create();
-            }
-
             $configs = $this->helper->getBouncerConfigs();
-            $bouncer = $bounce->init($configs);
+            $bouncer = $this->registryBouncer->create([
+                'helper' => $this->helper,
+                'configs' => $configs
+            ]);
             $result = (int) $bouncer->clearCache();
             $cacheSystem = $this->helper->getCacheTechnology();
             $cacheOptions = $this->helper->getCacheSystemOptions();
             $cacheLabel = $cacheOptions[$cacheSystem] ?? __('Unknown');
             $message = __('CrowdSec cache (%1) has been cleared.', $cacheLabel);
             if ($this->helper->isStreamModeEnabled()) {
-                $warmUpCacheResult = $bouncer->warmBlocklistCacheUp();
-                $decisionsCount = $warmUpCacheResult['count']??0;
-                $decisionsMessage =
-                    $decisionsCount > 1 ? 'There are now %1 decisions in cache.' : 'There is now %1 decision in cache.';
-                $message .=' '. __('As the stream mode is enabled, cache has been warmed up too.', $cacheLabel);
-                $message .=  ' '.__("$decisionsMessage", $decisionsCount);
+                $refreshCacheResult = $bouncer->refreshBlocklistCache();
+                $newDecisionsCount = $refreshCacheResult['new'] ?? 0;
+                $deletedDecisionsCount = $refreshCacheResult['deleted'] ?? 0;
+                $decisionsMessage = 'New decision(s): %1. Deleted decision(s): %2';
+                $message .=' '. __('As the stream mode is enabled, cache has been refreshed too.', $cacheLabel);
+                $message .=  ' '.__("$decisionsMessage", $newDecisionsCount, $deletedDecisionsCount);
             }
 
         } catch (Exception $e) {
-            $this->helper->error('', [
+            $this->helper->error('Error while clearing cache', [
                 'type' => 'M2_EXCEPTION_WHILE_CLEARING_CACHE',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

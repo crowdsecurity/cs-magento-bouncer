@@ -45,8 +45,8 @@ describe(`Geolocation and country scoped decision`, () => {
             "crowdsec_bouncer_advanced_geolocation_enabled",
             "1",
         );
-        await selectElement(
-            "crowdsec_bouncer_advanced_geolocation_save_result",
+        await fillInput(
+            "crowdsec_bouncer_advanced_geolocation_cache_duration",
             "0",
         );
         await selectElement(
@@ -117,8 +117,8 @@ describe(`Geolocation and country scoped decision`, () => {
         await goToSettingsPage(true);
 
         // Do not save result
-        await selectElement(
-            "crowdsec_bouncer_advanced_geolocation_save_result",
+        await fillInput(
+            "crowdsec_bouncer_advanced_geolocation_cache_duration",
             "0",
         );
 
@@ -147,9 +147,9 @@ describe(`Geolocation and country scoped decision`, () => {
         );
 
         // Save result
-        await selectElement(
-            "crowdsec_bouncer_advanced_geolocation_save_result",
-            "1",
+        await fillInput(
+            "crowdsec_bouncer_advanced_geolocation_cache_duration",
+            "120",
         );
 
         // Set a good path to simulate bad database

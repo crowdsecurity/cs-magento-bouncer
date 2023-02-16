@@ -28,7 +28,8 @@
 namespace CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Geolocation;
 
 use CrowdSec\Bouncer\Controller\Adminhtml\System\Config\Action;
-use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
+use CrowdSec\RemediationEngine\GeolocationFactory as GeolocationFactory;
 use Exception;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
@@ -36,7 +37,6 @@ use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Constants;
-use CrowdSecBouncer\Geolocation;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
@@ -53,39 +53,39 @@ class Country extends Action implements HttpPostActionInterface
      */
     protected $helper;
 
-    /** @var  Geolocation */
+    /** @var  GeolocationFactory */
     protected $geolocation;
 
     /** @var  DirectoryList */
     protected $directoryList;
 
     /**
-     * @var RegistryBounce
+     * @var RegistryBouncer
      */
-    protected $registryBounce;
+    protected $registryBouncer;
 
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param Helper $helper
-     * @param Geolocation $geolocation
+     * @param GeolocationFactory $geolocationFactory
      * @param DirectoryList $directoryList
-     * @param RegistryBounce $registryBounce
+     * @param RegistryBouncer $registryBouncer
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         Helper $helper,
-        Geolocation $geolocation,
+        GeolocationFactory $geolocationFactory,
         DirectoryList $directoryList,
-        RegistryBounce $registryBounce
+        RegistryBouncer $registryBouncer
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->helper = $helper;
-        $this->geolocation = $geolocation;
+        $this->geolocation = $geolocationFactory;
         $this->directoryList = $directoryList;
-        $this->registryBounce = $registryBounce;
+        $this->registryBouncer = $registryBouncer;
     }
 
     /**
@@ -98,22 +98,23 @@ class Country extends Action implements HttpPostActionInterface
     public function execute(): Json
     {
         try {
-            if (!($bounce = $this->registryBounce->get())) {
-                $bounce = $this->registryBounce->create();
-            }
             $configs = $this->helper->getBouncerConfigs();
-            $bouncer = $bounce->init($configs);
-            $apiCache = $bouncer->getApiCache();
+            $bouncer = $this->registryBouncer->create([
+                'helper' => $this->helper,
+                'configs' => $configs
+            ]);
+
+            $cacheStorage = $bouncer->getRemediationEngine()->getCacheStorage();
 
             $type = $this->getRequest()->getParam('geolocation_type');
             $maxmindType = $this->getRequest()->getParam('geolocation_maxmind_database_type');
             $maxmindPath = $this->getRequest()->getParam('geolocation_maxmind_database_path');
             $forcedIP = $this->getRequest()->getParam('forced_test_ip');
-            $saveResult = (bool) $this->getRequest()->getParam('save_result');
+            $cacheDuration = (int) $this->getRequest()->getParam('cache_duration');
             $ip = !empty($forcedIP) ? $forcedIP : $this->helper->getRemoteIp();
             $geolocConfig = [
                 'type' => $type,
-                'save_result' => $saveResult,
+                'cache_duration' => $cacheDuration,
             ];
             if ($type === Constants::GEOLOCATION_TYPE_MAXMIND) {
                 $geolocConfig['maxmind'] = [
@@ -121,8 +122,13 @@ class Country extends Action implements HttpPostActionInterface
                     'database_path' => $this->helper->getVarFullPath($maxmindPath)
                 ];
             }
+            $logger = $bouncer->getLogger();
 
-            $countryResult = $this->geolocation->getCountryResult($geolocConfig, $ip, $apiCache);
+            $geolocation = $this->geolocation->create(
+                ['configs' => $geolocConfig, 'cacheStorage' => $cacheStorage, 'logger' => $logger]
+            );
+
+            $countryResult = $geolocation->handleCountryResultForIp($ip);
             $countryMessage = null;
             $result = false;
             $message = __('Geolocation test result: failed.');

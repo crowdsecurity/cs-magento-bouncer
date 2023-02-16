@@ -4,4 +4,5 @@ module.exports = {
     testEnvironment: "./CustomEnvironment.js",
     testSequencer: "./testSequencer.js",
     setupFilesAfterEnv: ["expect-playwright"],
+    transformIgnorePatterns: ["/node_modules/(?!(axios|axios-ntlm|soap))"],
 };

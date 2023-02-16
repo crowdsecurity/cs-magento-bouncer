@@ -116,7 +116,7 @@ class Event
             $schema->in((object)$eventData);
             $result = true;
         } catch (Exception $e) {
-            $this->helper->debug('', [
+            $this->helper->debug('Error while validating event', [
                 'type' => 'M2_EXCEPTION_WHILE_VALIDATING_EVENT',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

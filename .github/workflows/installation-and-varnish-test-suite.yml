@@ -6,6 +6,11 @@ on:
     paths-ignore:
       - '**.md'
   workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: Debug with tmate
+        default: false
 
 permissions:
   contents: read
@@ -33,7 +38,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.3.0
+        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.5.0
         id: magento2-install
         with:
           php_version: ${{ matrix.php-version }}
@@ -43,7 +48,7 @@ jobs:
           varnish_setup: "true"
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 
@@ -51,7 +56,7 @@ jobs:
         run: |
           ddev composer config --unset repositories.0
           ddev composer config repositories.0 '{"type": "path", "url":"my-own-modules/${{ env.EXTENSION_PATH }}/",  "canonical": true}'
-          ddev composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}"]}'
+          ddev composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}", "magento/composer-dependency-version-audit-plugin"]}'
 
       - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
         run: ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
@@ -372,3 +377,11 @@ jobs:
           else
             echo "Test 2 OK"
           fi
+
+      - name: Debug with tmate
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        timeout-minutes: 30
+        if: failure() && github.event.inputs.debug_enabled == 'true'

@@ -28,7 +28,7 @@
     ],
     "require": {
         "magento/framework": ">=102",
-        "crowdsec/bouncer": "0.32.0",
+        "crowdsec/bouncer": "^1.1.1",
         "swaggest/json-schema": "0.12.39",
         "crowdsec/magento-symfony-cache": "1.1.0 || 2.2.0"
     },

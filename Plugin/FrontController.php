@@ -25,12 +25,11 @@
  *
  */
 
-
 namespace CrowdSec\Bouncer\Plugin;
 
 use Closure;
 use CrowdSecBouncer\BouncerException;
-use Exception;
+use Throwable;
 use LogicException;
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\FrontControllerInterface;
@@ -39,7 +38,7 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\App\ActionFlag;
 use Magento\Framework\App\State;
 use CrowdSec\Bouncer\Helper\Data as HelperData;
-use CrowdSec\Bouncer\Registry\CurrentBounce as RegistryBounce;
+use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use Magento\Framework\Exception\FileSystemException;
 use Magento\Framework\Exception\LocalizedException;
 use Psr\Cache\CacheException;
@@ -68,9 +67,9 @@ class FrontController
     protected $helper;
 
     /**
-     * @var RegistryBounce
+     * @var RegistryBouncer
      */
-    protected $registryBounce;
+    protected $registryBouncer;
 
     /**
      * @var ResponseInterface
@@ -82,7 +81,7 @@ class FrontController
      * @param HelperData $helper
      * @param ActionFlag $actionFlag
      * @param State $state
-     * @param RegistryBounce $registryBounce
+     * @param RegistryBouncer $registryBouncer
      * @param ResponseInterface $response
      *
      */
@@ -90,13 +89,13 @@ class FrontController
         HelperData $helper,
         ActionFlag $actionFlag,
         State $state,
-        RegistryBounce $registryBounce,
+        RegistryBouncer $registryBouncer,
         ResponseInterface $response
     ) {
         $this->helper = $helper;
         $this->actionFlag = $actionFlag;
         $this->state = $state;
-        $this->registryBounce = $registryBounce;
+        $this->registryBouncer = $registryBouncer;
         $this->response = $response;
     }
 
@@ -126,14 +125,14 @@ class FrontController
             return $proceed($request);
         }
         /**
-        * If there is any technical problem while bouncing, don't block the user.
-        * Bypass bouncing and log the  error.
-        *
-        */
+         * If there is any technical problem while bouncing, don't block the user.
+         * Bypass bouncing and log the  error.
+         *
+         */
         try {
             return $this->bounce($subject, $proceed, $request);
-        } catch (Exception $e) {
-            $this->helper->critical('', [
+        } catch (Throwable $e) {
+            $this->helper->critical('Error while bouncing', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),
@@ -168,16 +167,22 @@ class FrontController
         RequestInterface $request
     ) {
         // Avoid multiple call
-        if ($this->registryBounce->get()) {
+        if ($this->registryBouncer->get()) {
             return $proceed($request);
         }
-        $registryBounce = $this->registryBounce->create();
         $configs = $this->helper->getBouncerConfigs();
-        $registryBounce->init($configs);
-        $registryBounce->run();
+        $registryBouncer = $this->registryBouncer->create(
+            [
+                'helper' => $this->helper,
+                'configs' => $configs,
+                'response' => $this->response
+            ]
+        );
+
+        $registryBouncer->run();
 
         // If ban or captcha remediation wall display is detected
-        if ($registryBounce->hasRemediationDisplay()) {
+        if ($registryBouncer->hasRemediationDisplay()) {
             // Stop further processing if your condition is met
             $this->actionFlag->set('', ActionInterface::FLAG_NO_DISPATCH, true);
 

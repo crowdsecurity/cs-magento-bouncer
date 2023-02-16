@@ -186,6 +186,15 @@ const setDefaultConfig = async (save = true, direct = true) => {
     }
 };
 
+const runCacheAction = async (actionType = "refresh", otherParams = "") => {
+    await goToPublicPage(
+        `/cacheActions.php?action=${actionType}${otherParams}`,
+    );
+    await page.waitForLoadState("networkidle");
+    await expect(page).not.toMatchTitle(/404/);
+    await expect(page).toMatchTitle(`Cache action: ${actionType}`);
+};
+
 const flushCache = async () => {
     await goToAdmin();
     await wait(1000);
@@ -360,4 +369,5 @@ module.exports = {
     getFileContent,
     deleteFileContent,
     setDefaultConfig,
+    runCacheAction,
 };
