@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.4.0
+        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.5.0
         id: magento2-install
         with:
           php_version: ${{ matrix.php-version }}
@@ -56,7 +56,7 @@ jobs:
         run: |
           ddev composer config --unset repositories.0
           ddev composer config repositories.0 '{"type": "path", "url":"my-own-modules/${{ env.EXTENSION_PATH }}/",  "canonical": true}'
-          ddev composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}"]}'
+          ddev composer config repositories.1 '{"type": "composer", "url":"https://repo.magento.com/",  "exclude": ["${{ env.EXTENSION_PACKAGE_NAME }}", "magento/composer-dependency-version-audit-plugin"]}'
 
       - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
         run: ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
