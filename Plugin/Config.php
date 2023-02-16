@@ -582,7 +582,7 @@ class Config
                 $cacheMessage = __('CrowdSec new cache (%1) has been successfully tested.', $cacheLabel);
                 $this->messageManager->addNoticeMessage($cacheMessage);
             } catch (Exception $e) {
-                $this->helper->error('', [
+                $this->helper->error('Error while testing cache', [
                     'type' => 'M2_EXCEPTION_WHILE_TESTING_CACHE',
                     'message' => $e->getMessage(),
                     'code' => $e->getCode(),
@@ -629,7 +629,7 @@ class Config
             $clearCacheResult = $bouncer->clearCache();
             $this->displayCacheClearMessage($clearCacheResult, $cacheLabel, $preMessage);
         } catch (Exception $e) {
-            $this->helper->error('', [
+            $this->helper->error('Error while clearing cache', [
                 'type' => 'M2_EXCEPTION_WHILE_CLEARING_CACHE',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),
@@ -676,8 +676,8 @@ class Config
             $refreshResult = $bouncer->refreshBlocklistCache();
             $this->displayCacheRefreshMessage($refreshResult, $cacheLabel);
         } catch (Exception $e) {
-            $this->helper->error('', [
-                'type' => 'M2_EXCEPTION_WHILE_WARMING_UP_CACHE',
+            $this->helper->error('Error while refreshing cache', [
+                'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),
                 'file' => $e->getFile(),

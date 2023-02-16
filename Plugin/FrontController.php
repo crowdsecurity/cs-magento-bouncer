@@ -132,7 +132,7 @@ class FrontController
         try {
             return $this->bounce($subject, $proceed, $request);
         } catch (Throwable $e) {
-            $this->helper->critical('', [
+            $this->helper->critical('Error while bouncing', [
                 'type' => 'M2_EXCEPTION_WHILE_BOUNCING',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

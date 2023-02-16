@@ -105,7 +105,7 @@ class Refresh extends Action implements HttpPostActionInterface
             );
             $result = 1;
         } catch (Exception $e) {
-            $this->helper->error('', [
+            $this->helper->error('Error while refreshing cache', [
                 'type' => 'M2_EXCEPTION_WHILE_REFRESHING_CACHE',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

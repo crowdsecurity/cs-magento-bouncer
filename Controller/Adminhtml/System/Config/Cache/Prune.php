@@ -94,7 +94,7 @@ class Prune extends Action implements HttpPostActionInterface
             $message = __('CrowdSec cache (%1) has been pruned.', $cacheLabel);
 
         } catch (Exception $e) {
-            $this->helper->error('', [
+            $this->helper->error('Error while pruning cache', [
                 'type' => 'M2_EXCEPTION_WHILE_PRUNING_CACHE',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

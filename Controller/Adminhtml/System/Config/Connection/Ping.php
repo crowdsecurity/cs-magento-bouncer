@@ -120,7 +120,7 @@ class Ping extends Action implements HttpPostActionInterface
             $result = 1;
             $message = __('Connection test result: success.');
         } catch (Exception $e) {
-            $this->helper->error('', [
+            $this->helper->error('Error while testing connection', [
                 'type' => 'M2_EXCEPTION_WHILE_TESTING_CONNECTION',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),

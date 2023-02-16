@@ -105,7 +105,7 @@ class Clear extends Action implements HttpPostActionInterface
             }
 
         } catch (Exception $e) {
-            $this->helper->error('', [
+            $this->helper->error('Error while clearing cache', [
                 'type' => 'M2_EXCEPTION_WHILE_CLEARING_CACHE',
                 'message' => $e->getMessage(),
                 'code' => $e->getCode(),
