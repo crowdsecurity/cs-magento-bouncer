@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.6.0
+        uses: julienloizelet/magento2-ddev-installation@v2.0.0
         id: magento2-install
         with:
           php_version: ${{ matrix.php-version }}
@@ -76,13 +76,19 @@ jobs:
           ddev magento config:set system/full_page_cache/caching_application 2
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
 
+      - name: Disable some extensions for 2.4.6
+        if: startsWith(matrix.m2-version, '2.4.6')
+        run: |
+          ddev magento maintenance:enable
+          ddev magento module:disable --clear-static-content Magento_AdminAdobeImsTwoFactorAuth
+          ddev magento setup:static-content:deploy -f
+          ddev magento maintenance:disable
+
       - name: Disable some extensions for 2.4
         if: startsWith(matrix.m2-version, '2.4')
         run: |
           ddev magento maintenance:enable
           ddev magento module:disable --clear-static-content  Magento_TwoFactorAuth
-          ddev magento cache:clean
-          ddev magento cache:flush
           ddev magento setup:static-content:deploy -f
           ddev magento maintenance:disable
 
@@ -267,7 +273,7 @@ jobs:
 
       - name: Varnish product update test
         run: |
-          cp .ddev/custom_scripts/update-product-price.sh update-product-price.sh
+          cp .ddev/okaeli-add-on/magento2/custom_scripts/update-product-price.sh update-product-price.sh
           chmod +x update-product-price.sh
           ddev exec ./update-product-price.sh ${{ steps.magento2-install.outputs.m2_url }} product_dynamic_1
           ddev exec ./update-product-price.sh ${{ steps.magento2-install.outputs.m2_url }} product_dynamic_2
