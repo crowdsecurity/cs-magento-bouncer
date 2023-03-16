@@ -96,4 +96,9 @@ For PHP >= `8.0.2`, we provide a compatible `v2` version of `crowdsec/magento-sy
 This `v2` version replaces the specified `5.x.y` version of `symfony/cache` : we use a copy of `5.x.y` files and allow `psr/cache` `3.0`. We also copy some `6.0.z` files to have compatible PHP 8 method signatures.
 
 
+_Update_: Since Magento `2.4.6`, it is possible to install `symfony/cache` because the required version of 
+`web-token/jwt-framework` is `3.1`. But, in order to keep compatibility with `2.4.4` and `2.4.5`, we have to 
+keep this `crowdsec/magento-symfony-cache` dependency.
+
+
 

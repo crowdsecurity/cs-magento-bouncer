@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Allow ddev get to use a GitHub token to prevent rate limiting by tests
+  DDEV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   end-to-end-auto-prepend-file-test-suite:
     strategy:
@@ -19,10 +23,10 @@ jobs:
         include:
           - m2-version: '2.3.7'
             php-version: '7.4'
-          - m2-version: '2.4.4'
-            php-version: '8.1'
           - m2-version: '2.4.5'
             php-version: '8.1'
+          - m2-version: '2.4.6'
+            php-version: '8.2'
 
     name: End-to-end auto-prepend-file mode test suite
     if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
@@ -35,18 +39,26 @@ jobs:
     steps:
 
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/github-actions-magento2-ddev-installation@v1.5.0
+        uses: julienloizelet/magento2-ddev-installation@v2.0.0
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
 
-      - name: Add CrowdSec and Playwright to DDEV
+      - name: Add Redis and Memcached
         run: |
-          cp .ddev/additional_docker_compose/docker-compose.playwright-alone.yaml .ddev/docker-compose.playwright.yaml
-          cp .ddev/additional_docker_compose/docker-compose.crowdsec.yaml .ddev/docker-compose.crowdsec.yaml
-          cp .ddev/custom_files/varnish-profile.xml varnish-profile.xml
+          ddev get ddev/ddev-redis
+          ddev get ddev/ddev-memcached
+          # override redis.conf
+          ddev get julienloizelet/ddev-tools
+
+      - name: Add Crowdsec and Playwright
+        run: |
+          ddev get julienloizelet/ddev-crowdsec-php
+          ddev get julienloizelet/ddev-playwright
+          cp .ddev/okaeli-add-on/magento2/custom_files/varnish-profile.xml varnish-profile.xml
+          cp .ddev/okaeli-add-on/magento2/commands/host/crowdsec-config .ddev/commands/host/
           ddev restart
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
@@ -64,6 +76,12 @@ jobs:
       - name: Add ${{ env.EXTENSION_NAME }} as composer dependency
         run: |
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
+
+      - name: Disable some extensions for 2.4.6
+        if: startsWith(matrix.m2-version, '2.4.6')
+        run: |
+          ddev magento module:disable Magento_AdminAdobeImsTwoFactorAuth
+
 
       - name: Disable some extensions for 2.4
         if: startsWith(matrix.m2-version, '2.4')
@@ -91,7 +109,7 @@ jobs:
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
           ddev magento cache:flush
           mkdir -p var/crowdsec/tls
-          cp -r .ddev/custom_files/crowdsec/cfssl/* var/crowdsec/tls
+          cp -r .ddev/okaeli-add-on/custom_files/crowdsec/cfssl/* var/crowdsec/tls
           ddev maxmind-download DEFAULT GeoLite2-City /var/www/html/var/crowdsec
           ddev maxmind-download DEFAULT GeoLite2-Country /var/www/html/var/crowdsec
           cd var/crowdsec
@@ -101,8 +119,8 @@ jobs:
           tar -xf GeoLite2-City.tar.gz
           rm GeoLite2-Country.tar.gz GeoLite2-Country.tar.gz.sha256.txt GeoLite2-City.tar.gz GeoLite2-City.tar.gz.sha256.txt
           cd ${{ github.workspace }}
-          cp .ddev/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
-          cp .ddev/custom_scripts/cacheActions.php ${{ github.workspace }}/pub/cacheActions.php
+          cp .ddev/okaeli-add-on/magento2/custom_scripts/cronLaunch.php ${{ github.workspace }}/pub/cronLaunch.php
+          cp .ddev/okaeli-add-on/magento2/custom_scripts/crowdsec/cacheActions.php ${{ github.workspace }}/pub/cacheActions.php
           cp ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/crowdsec-prepend.php.example ${{ github.workspace }}/app/etc/crowdsec-prepend.php
           cd ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd/__scripts__
           chmod +x test-init.sh
@@ -112,12 +130,12 @@ jobs:
       - name: Prepare auto-prepend-file mode test suite
         run: |
           cd ${{ github.workspace }}/.ddev
-          ddev nginx-config custom_files/crowdsec-prepend-nginx-site.conf
+          ddev nginx-config okaeli-add-on/magento2/custom_files/crowdsec/crowdsec-prepend-nginx-site.conf
 
       - name: Verify auto_prepend_file directive
         run: |
           cd ${{ github.workspace }}
-          cp .ddev/custom_files/phpinfo.php pub/phpinfo.php
+          cp .ddev/okaeli-add-on/common/custom_files/phpinfo.php pub/phpinfo.php
           curl -v https://${{ env.M2_VERSION_CODE }}.ddev.site/phpinfo.php
           PREPENDVERIF=$(curl https://${{ env.M2_VERSION_CODE }}.ddev.site/phpinfo.php | grep -o -E "auto_prepend_file=(.*)php(.*)" | sed 's/<\/tr>//g; s/<\/td>//g;' | tr '\n' '#')
           if [[ $PREPENDVERIF == "auto_prepend_file=/var/www/html/app/etc/crowdsec-prepend.php#auto_prepend_file=/var/www/html/app/etc/crowdsec-prepend.php#" ]]
