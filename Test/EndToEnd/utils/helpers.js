@@ -101,6 +101,8 @@ const onAdminSaveSettings = async (successExpected = true) => {
             "#messages",
             /You saved the configuration./,
         );
+    } else {
+        await wait(3000);
     }
 };
 
