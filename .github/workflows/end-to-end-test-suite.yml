@@ -15,6 +15,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Allow ddev get to use a GitHub token to prevent rate limiting by tests
+  DDEV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   end-to-end-test-suite:
     strategy:
@@ -27,7 +31,7 @@ jobs:
           - m2-version: '2.4.5'
             php-version: '8.1'
           - m2-version: '2.4.6'
-            php-version: '8.1'
+            php-version: '8.2'
 
     name: End-to-end test suite
     if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
