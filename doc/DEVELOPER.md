@@ -83,9 +83,7 @@ ddev get ddev/ddev-elasticsearch
 ddev get julienloizelet/ddev-tools
 ddev get julienloizelet/ddev-playwright
 ddev get julienloizelet/ddev-crowdsec-php
-cp -r .ddev/okaeli-add-on/magento2/commands/* .ddev/commands
 cp .ddev/okaeli-add-on/config_overrides/crowdsec/config.crowdsec.yaml .ddev/config.crowdsec.yaml 
-cp .ddev/okaeli-add-on/common/config_overrides/config.check-ddev-version.yaml .ddev/config.check-ddev-version.yaml
 cp .ddev/okaeli-add-on/magento2/commands/host/crowdsec-config .ddev/commands/host/
 ddev start
 ```
