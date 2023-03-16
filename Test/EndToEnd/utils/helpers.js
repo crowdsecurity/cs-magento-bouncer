@@ -95,14 +95,12 @@ const onAdminGoToSettingsPage = async (direct = true) => {
 
 const onAdminSaveSettings = async (successExpected = true) => {
     await page.click("#save");
-
+    await wait(3000)
     if (successExpected) {
         await expect(page).toMatchText(
             "#messages",
             /You saved the configuration./,
         );
-    } else {
-        await wait(3000);
     }
 };
 

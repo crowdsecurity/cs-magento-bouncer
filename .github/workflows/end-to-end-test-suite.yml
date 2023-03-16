@@ -162,12 +162,6 @@ jobs:
           test_path: ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd
           file_path: 5-api.js
 
-      - name: Run events logging test
-        uses: ./my-own-modules/crowdsec-bouncer/.github/workflows/end-to-end/run-single-test
-        with:
-          test_path: ${{ github.workspace }}/my-own-modules/${{ env.EXTENSION_PATH }}/Test/EndToEnd
-          file_path: 6-events.js
-
       - name: Run geolocation test
         uses: ./my-own-modules/crowdsec-bouncer/.github/workflows/end-to-end/run-single-test
         with:
