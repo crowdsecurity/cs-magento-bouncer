@@ -9,14 +9,13 @@
 **Table of Contents**
 
 - [Local development](#local-development)
-  - [DDEV-Local setup](#ddev-local-setup)
+  - [DDEV setup](#ddev-setup)
     - [DDEV installation](#ddev-installation)
-    - [DDEV Magento 2 environment](#ddev-magento-2-environment)
+    - [Create a Magento 2 DDEV project with some DDEV add-ons](#create-a-magento-2-ddev-project-with-some-ddev-add-ons)
     - [Magento 2 installation](#magento-2-installation)
-    - [Set up Magento 2](#set-up-magento-2)
+      - [Set up Magento 2](#set-up-magento-2)
     - [Configure Magento 2 for local development](#configure-magento-2-for-local-development)
-    - [CrowdSec Bouncer extension installation](#crowdsec-bouncer-extension-installation)
-    - [CrowdSec configuration on start](#crowdsec-configuration-on-start)
+    - [Crowdsec Bouncer extension installation](#crowdsec-bouncer-extension-installation)
   - [Extension quality](#extension-quality)
   - [End-to-end tests](#end-to-end-tests)
   - [Cron](#cron)
