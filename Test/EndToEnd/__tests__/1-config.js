@@ -52,10 +52,12 @@ describe(`Extension configuration`, () => {
         );
         await goToAdmin();
         await onAdminGoToSettingsPage(true);
+        await wait(1000);
         await selectElement(
             "crowdsec_bouncer_advanced_debug_display_errors",
             "0",
         );
+        await wait(1000);
         await onAdminSaveSettings();
         await goToPublicPage();
         await expect(page).not.toMatchText(
