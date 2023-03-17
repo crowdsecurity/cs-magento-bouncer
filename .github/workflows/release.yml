@@ -176,13 +176,8 @@ jobs:
             # override redis.conf
             ddev get julienloizelet/ddev-tools
 
-        - name: Add Crowdsec and Playwright
-          run: |
-            ddev get julienloizelet/ddev-crowdsec-php
-            ddev get julienloizelet/ddev-playwright
-            cp .ddev/okaeli-add-on/magento2/custom_files/varnish-profile.xml varnish-profile.xml
-            cp .ddev/okaeli-add-on/magento2/commands/host/crowdsec-config .ddev/commands/host/
-            ddev restart
+        - name: Playwright
+          run: ddev get julienloizelet/ddev-playwright
 
         - name: Clone M2 ${{ env.EXTENSION_NAME }} files
           uses: actions/checkout@v3
@@ -236,11 +231,13 @@ jobs:
             ddev magento module:enable ${{ env.EXTENSION_NAME }}
             ddev magento setup:upgrade
             ddev magento setup:static-content:deploy -f
-            ddev crowdsec-config
             ddev magento cache:flush
+            ddev get julienloizelet/ddev-crowdsec-php
+            ddev restart
 
         - name: Prepare for playwright test
           run: |
+            cp .ddev/okaeli-add-on/magento2/custom_files/varnish-profile.xml varnish-profile.xml
             ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
             ddev magento cache:flush
             mkdir -p var/crowdsec/tls

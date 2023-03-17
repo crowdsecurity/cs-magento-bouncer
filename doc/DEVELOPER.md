@@ -82,9 +82,6 @@ ddev get ddev/ddev-memcached
 ddev get ddev/ddev-elasticsearch
 ddev get julienloizelet/ddev-tools
 ddev get julienloizelet/ddev-playwright
-ddev get julienloizelet/ddev-crowdsec-php
-cp .ddev/okaeli-add-on/config_overrides/crowdsec/config.crowdsec.yaml .ddev/config.crowdsec.yaml 
-cp .ddev/okaeli-add-on/magento2/commands/host/crowdsec-config .ddev/commands/host/
 ddev start
 ```
 
@@ -143,6 +140,8 @@ ddev magento c:c
  ddev magento module:enable CrowdSec_Bouncer
  ddev magento setup:upgrade
  ddev magento cache:flush
+ ddev get julienloizelet/ddev-crowdsec-php
+ ddev restart
 ```
 
 ### Extension quality
