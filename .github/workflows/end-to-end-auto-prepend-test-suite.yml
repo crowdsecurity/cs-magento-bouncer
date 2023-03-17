@@ -39,7 +39,7 @@ jobs:
     steps:
 
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/magento2-ddev-installation@v2.0.0
+        uses: julienloizelet/magento2-ddev-installation@v2.1.0
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
@@ -74,9 +74,7 @@ jobs:
 
       - name: Disable some extensions for 2.4.6
         if: startsWith(matrix.m2-version, '2.4.6')
-        run: |
-          ddev magento module:disable Magento_AdminAdobeImsTwoFactorAuth
-
+        run: ddev magento module:disable Magento_AdminAdobeImsTwoFactorAuth
 
       - name: Disable some extensions for 2.4
         if: startsWith(matrix.m2-version, '2.4')
@@ -90,7 +88,7 @@ jobs:
           ddev magento  module:disable Dotdigitalgroup_Chat
           ddev magento  module:disable Dotdigitalgroup_Email
 
-      - name: Enable extension
+      - name: Enable extension and prepare Crowdsec
         run: |
           ddev magento deploy:mode:set developer
           ddev magento module:enable ${{ env.EXTENSION_NAME }}
