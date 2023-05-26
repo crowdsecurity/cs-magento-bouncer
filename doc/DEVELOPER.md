@@ -134,7 +134,7 @@ ddev magento c:c
  cd m2-sources
  mkdir -p my-own-modules/crowdsec-bouncer
  cd my-own-modules/crowdsec-bouncer
- git clone git@github.com:crowdsecurity/cs-magento2-bouncer.git ./
+ git clone git@github.com:crowdsecurity/cs-magento-bouncer.git ./
  ddev composer config repositories.crowdsec-bouncer-module path my-own-modules/crowdsec-bouncer/
  ddev composer require crowdsec/magento2-module-bouncer:@dev
  ddev magento module:enable CrowdSec_Bouncer
