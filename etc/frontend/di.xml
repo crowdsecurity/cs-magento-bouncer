@@ -27,7 +27,7 @@
  */
  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Framework\App\FrontControllerInterface">
         <!-- We have to put our plugin before this Full Page Cache plugin-->
         <plugin name="front-controller-builtin-cache" sortOrder="10" />

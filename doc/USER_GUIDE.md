@@ -147,6 +147,21 @@ By default, `file_get_contents` method is used to call Local API. This method re
 
 Here, you can choose to use `cURL` requests instead. Beware that in this case, you need to have php `cURL` extension installed and enabled on your system.
 
+***
+
+`Connection details → Global timeout` (`global` scope)
+
+In seconds. The global timeout when calling Local API. If set to 0, timeout will be unlimited.
+
+
+***
+
+
+`Connection details → Connect timeout` (`global` scope)
+
+In seconds. **Only for curl**. The timeout for the connection phase when calling Local API. If set to a 0, timeout will be unlimited.
+
+
 
 **N.B** : Even before saving configuration, you can check if your settings are correct by clicking on the test button.
 

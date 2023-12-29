@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+The [public API](https://semver.org/spec/v2.0.0.html#spec-item-1) for this project is defined by the set of
+functions provided by the module.
+
+
+## [2.1.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v2.1.0) - 2024-??-??
+[_Compare with previous release_](https://github.com/crowdsecurity/cs-magento-bouncer/compare/v2.0.0...v2.1.0)
+
+
+### Changed
+
+- Encrypt bouncer key in database
+
+
+### Added
+
+- Add `api_connect_timeout` configuration for `Curl` request handler
+- Add `api_timeout` configuration
+
+---
+
+
 ## [2.0.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v2.0.0) - 2023-03-23
 [_Compare with previous release_](https://github.com/crowdsecurity/cs-magento-bouncer/compare/v1.5.0...v2.0.0)
 

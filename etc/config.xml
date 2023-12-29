@@ -32,6 +32,8 @@
             <general>
                 <connection>
                     <auth_type>api_key</auth_type>
+                    <api_timeout>60</api_timeout>
+                    <api_connect_timeout>10</api_connect_timeout>
                 </connection>
                 <bouncing>
                     <level>normal_bouncing</level>
