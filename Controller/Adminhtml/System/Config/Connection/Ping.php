@@ -37,6 +37,7 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Constants;
+use Magento\Framework\Encryption\EncryptorInterface;
 
 class Ping extends Action implements HttpPostActionInterface
 {
@@ -54,23 +55,30 @@ class Ping extends Action implements HttpPostActionInterface
      * @var Helper
      */
     protected $helper;
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
 
     /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param RegistryBouncer $registryBouncer
      * @param Helper $helper
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         RegistryBouncer $registryBouncer,
-        Helper $helper
+        Helper $helper,
+        EncryptorInterface $encryptor
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->registryBouncer = $registryBouncer;
         $this->helper = $helper;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -93,7 +101,13 @@ class Ping extends Action implements HttpPostActionInterface
             $tlsCaCert =
                 ($authType === Constants::AUTH_TLS) ? $this->getRequest()->getParam('tls_ca_cert_path', "") : "";
             $userAgent = Constants::BASE_USER_AGENT;
-            $apiKey = ($authType === Constants::AUTH_KEY) ? $this->getRequest()->getParam('bouncer_key') : "";
+            $apiKey = ($authType === Constants::AUTH_KEY) ?
+                $this->getRequest()->getParam('bouncer_key')
+                : "";
+            if($apiKey && strpos($apiKey, ':') !== false){
+                $apiKey = $this->encryptor->decrypt($apiKey);
+            }
+
             $useCurl = (bool)$this->getRequest()->getParam('use_curl', false);
             $apiTimeout = (int)$this->getRequest()->getParam('api_timeout', Constants::API_TIMEOUT);
             $apiConnectTimeout =
@@ -139,10 +153,9 @@ class Ping extends Action implements HttpPostActionInterface
         $resultJson = $this->resultJsonFactory->create();
 
         $suffixMessageMain = ($authType === Constants::AUTH_TLS) ?
-            'Auth type: TLS <br>Url: %1<br>Cert: %2<br>Key: %3<br>Verify peer: %4<br>
-CA cert: %5<br>Use cURL: %6 <br>Api timeout: %7' :
-            'Auth type: Api key <br>Url: %1 <br>Api key: %2<br>
-Use cURL: %3 <br>Api timeout: %4';
+            'Auth type: TLS <br>Url: %1 <br>Cert: %2 <br>Key: %3 <br>Verify peer: %4 <br>
+CA cert: %5 <br>Use cURL: %6 <br>Api timeout: %7' :
+            'Auth type: Api key <br>Url: %1 <br>Api key: %2<br>Use cURL: %3 <br>Api timeout: %4';
 
         if ($useCurl) {
             $suffixMessageMain .= ($authType === Constants::AUTH_TLS) ? ' <br>
