@@ -30,7 +30,7 @@
         "magento/framework": ">=102",
         "crowdsec/bouncer": "^2.1.0",
         "swaggest/json-schema": "0.12.39",
-        "symfony/cache": "^5.4.11 || ^6.4.0 || ^7.0.0"
+        "crowdsec/magento-symfony-cache": "1.1.0 || 2.2.0 || 3.0.0"
     },
     "autoload": {
         "files": [
