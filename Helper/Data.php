@@ -33,7 +33,6 @@ use CrowdSec\LapiClient\Bouncer as BouncerClient;
 use LogicException;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\Area;
-use Magento\Framework\Exception\FileSystemException;
 use Magento\Store\Model\ScopeInterface;
 use CrowdSec\Bouncer\Logger\Logger;
 use CrowdSec\Bouncer\Logger\Handlers\DebugFactory as DebugHandler;

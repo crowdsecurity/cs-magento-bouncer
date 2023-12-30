@@ -34,6 +34,7 @@
                     <auth_type>api_key</auth_type>
                     <api_timeout>60</api_timeout>
                     <api_connect_timeout>10</api_connect_timeout>
+                    <api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
                 </connection>
                 <bouncing>
                     <level>normal_bouncing</level>

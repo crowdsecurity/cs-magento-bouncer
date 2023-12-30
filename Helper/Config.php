@@ -54,12 +54,7 @@ class Config extends AbstractHelper
     public const REFRESH_CRON_EXPR_FULL_PATH = 'groups/advanced/groups/mode/fields/refresh_cron_expr/value';
     public const SECTION = 'crowdsec_bouncer';
     public const STREAM_MODE_FULL_PATH = 'groups/advanced/groups/mode/fields/stream/value';
-
-    // General configs
     public const TEXT_SEPARATOR = ',';
-    /**
-     * The path of trusted forward ips as array setting
-     */
     public const TRUSTED_FORWARD_IPS_PATH = self::SECTION . '/advanced/remediation/trust_ip_forward_array';
     public const XML_PATH_ADMIN_ENABLED = self::SECTION . '/general/bouncing/admin_enabled';
     public const XML_PATH_ADVANCED_CACHE_BAD = self::SECTION . '/advanced/cache/bad_ip_cache_duration';
@@ -73,14 +68,12 @@ class Config extends AbstractHelper
     public const XML_PATH_ADVANCED_DISABLE_PROD_LOG = self::SECTION . '/advanced/debug/disable_prod_log';
     public const XML_PATH_ADVANCED_DISPLAY_ERRORS = self::SECTION . '/advanced/debug/display_errors';
     public const XML_PATH_ADVANCED_FORCED_TEST_FWD_IP = self::SECTION . '/advanced/debug/forced_test_forwarded_ip';
-    // Theme configs
     public const XML_PATH_ADVANCED_FORCED_TEST_IP = self::SECTION . '/advanced/debug/forced_test_ip';
     public const XML_PATH_ADVANCED_GEOLOCATION_ENABLED = self::SECTION . '/advanced/geolocation/enabled';
     public const XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_PATH = self::SECTION .
                                                                  '/advanced/geolocation/maxmind_database_path';
     public const XML_PATH_ADVANCED_GEOLOCATION_MAXMIND_DB_TYPE = self::SECTION .
                                                                  '/advanced/geolocation/maxmind_database_type';
-    public const XML_PATH_ADVANCED_GEOLOCATION_SAVE_RESULT = self::SECTION . '/advanced/geolocation/save_result';
     public const XML_PATH_ADVANCED_GEOLOCATION_TYPE = self::SECTION . '/advanced/geolocation/type';
     public const XML_PATH_ADVANCED_HIDE_MENTIONS = self::SECTION . '/advanced/remediation/hide_mentions';
     public const XML_PATH_ADVANCED_MODE_STREAM = self::SECTION . '/advanced/mode/stream';
@@ -120,8 +113,6 @@ class Config extends AbstractHelper
     public const XML_PATH_THEME_COLOR_PRIMARY = self::SECTION . '/theme/color/text_primary';
     public const XML_PATH_THEME_COLOR_SECOND = self::SECTION . '/theme/color/text_secondary';
     public const XML_PATH_THEME_COLOR_TEXT_BUTTON = self::SECTION . '/theme/color/text_button';
-
-    // Events configs
     public const XML_PATH_THEME_COLOR_TEXT_ERROR = self::SECTION . '/theme/color/text_error_message';
     public const XML_PATH_THEME_CUSTOM_CSS = self::SECTION . '/theme/css/custom';
     public const XML_PATH_USE_CURL = self::SECTION . '/general/connection/use_curl';
@@ -182,8 +173,8 @@ class Config extends AbstractHelper
      * @param DirectoryList $directoryList
      */
     public function __construct(
-        Context       $context,
-        Json          $serializer,
+        Context $context,
+        Json $serializer,
         DirectoryList $directoryList
     ) {
         parent::__construct($context);
@@ -244,7 +235,7 @@ class Config extends AbstractHelper
     public function getApiKey(): string
     {
         if (!isset($this->_globals['api_key'])) {
-            $this->_globals['api_key'] = trim((string)$this->scopeConfig->getValue(self::XML_PATH_API_KEY));
+            $this->_globals['api_key'] = (string)$this->scopeConfig->getValue(self::XML_PATH_API_KEY);
         }
 
         return (string)$this->_globals['api_key'];
@@ -529,7 +520,6 @@ class Config extends AbstractHelper
     public function getTLS(): array
     {
         if (!isset($this->_globals['tls'])) {
-
             $result = [
                 'tls_cert_path' => $this->getVarFullPath(
                     (string)$this->scopeConfig->getValue(self::XML_PATH_API_TLS_CERT)

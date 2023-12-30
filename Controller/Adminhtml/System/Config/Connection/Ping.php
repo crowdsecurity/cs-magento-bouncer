@@ -104,10 +104,6 @@ class Ping extends Action implements HttpPostActionInterface
             $apiKey = ($authType === Constants::AUTH_KEY) ?
                 $this->getRequest()->getParam('bouncer_key')
                 : "";
-            if($apiKey && strpos($apiKey, ':') !== false){
-                $apiKey = $this->encryptor->decrypt($apiKey);
-            }
-
             $useCurl = (bool)$this->getRequest()->getParam('use_curl', false);
             $apiTimeout = (int)$this->getRequest()->getParam('api_timeout', Constants::API_TIMEOUT);
             $apiConnectTimeout =
