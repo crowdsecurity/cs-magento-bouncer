@@ -37,7 +37,6 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use CrowdSec\Bouncer\Registry\CurrentBouncer as RegistryBouncer;
 use CrowdSec\Bouncer\Helper\Data as Helper;
 use CrowdSec\Bouncer\Constants;
-use Magento\Framework\Encryption\EncryptorInterface;
 
 class Ping extends Action implements HttpPostActionInterface
 {
@@ -55,10 +54,6 @@ class Ping extends Action implements HttpPostActionInterface
      * @var Helper
      */
     protected $helper;
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
 
     /**
      * Constructor method.
@@ -67,20 +62,17 @@ class Ping extends Action implements HttpPostActionInterface
      * @param JsonFactory $resultJsonFactory
      * @param RegistryBouncer $registryBouncer
      * @param Helper $helper
-     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         RegistryBouncer $registryBouncer,
-        Helper $helper,
-        EncryptorInterface $encryptor
+        Helper $helper
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
         $this->registryBouncer = $registryBouncer;
         $this->helper = $helper;
-        $this->encryptor = $encryptor;
     }
 
     /**
