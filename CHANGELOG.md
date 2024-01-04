@@ -8,7 +8,7 @@ The [public API](https://semver.org/spec/v2.0.0.html#spec-item-1) for this proje
 functions provided by the module.
 
 
-## [2.1.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v2.1.0) - 2024-??-??
+## [2.1.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v2.1.0) - 2024-01-??
 [_Compare with previous release_](https://github.com/crowdsecurity/cs-magento-bouncer/compare/v2.0.0...v2.1.0)
 
 
@@ -16,16 +16,18 @@ functions provided by the module.
 
 - Encrypt bouncer key in database
 
-
 ### Removed
 
 - Removed Events log feature
-
 
 ### Added
 
 - Add `api_connect_timeout` configuration for `Curl` request handler
 - Add `api_timeout` configuration
+
+### Fixed
+
+- Allow `crowdsec/symfony-cache:3.0.0` dependency to avoid composer conflict with some Magento 2.4.6 patch versions
 
 ---
 
