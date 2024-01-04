@@ -35,6 +35,8 @@
 $ajaxUrl = $escaper->escapeJs($block->getAjaxUrl());
 $errorMessage = $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Connection ping.')));
 $urlField = $escaper->escapeJs($block->getUrlField());
+$apiTimeoutField = $escaper->escapeJs($block->getApiTimeoutField());
+$apiConnectTimeoutField = $escaper->escapeJs($block->getApiConnectTimeoutField());
 $authField = $escaper->escapeJs($block->getAuthTypeField());
 $tlsCertField = $escaper->escapeJs($block->getTlsCertPathField());
 $tlsKeyField = $escaper->escapeJs($block->getTlsKeyPathField());
@@ -58,7 +60,9 @@ require(['prototype'], function(){
             tls_verify_peer: $('{$tlsVerifyPeerField}').value,
             tls_ca_cert_path: $('{$tlsCaCertField}').value,
             bouncer_key: $('{$keyField}').value,
-            use_curl: $('{$useCurlField}').value
+            use_curl: $('{$useCurlField}').value,
+            api_timeout: $('{$apiTimeoutField}').value,
+            api_connect_timeout: $('{$apiConnectTimeoutField}').value
         };
 
         new Ajax.Request('{$ajaxUrl}', {

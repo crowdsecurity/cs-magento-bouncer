@@ -200,7 +200,11 @@ describe(`Test cURL in Live mode`, () => {
         await page.click("#crowdsec_bouncer_general_connection_test");
         await expect(page).toMatchText(
             "#lapi_ping_result",
-            /Connection test result: success.*Use cURL: true/,
+            /Use cURL: true/,
+        );
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Connection test result: success/,
         );
         await onAdminSaveSettings();
     });
@@ -291,7 +295,11 @@ describe(`Test TLS auth in Live mode`, () => {
         await wait(2000);
         await expect(page).toMatchText(
             "#lapi_ping_result",
-            /Connection test result: success.*Auth type: TLS.*Use cURL: true/,
+            /Connection test result: success.*Auth type: TLS/,
+        );
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Use cURL: true/,
         );
 
         // Good settings with curl
@@ -313,7 +321,11 @@ describe(`Test TLS auth in Live mode`, () => {
 
         await expect(page).toMatchText(
             "#lapi_ping_result",
-            /Connection test result: success.*Auth type: TLS.*Use cURL: true/,
+            /Connection test result: success.*Auth type: TLS/,
+        );
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Use cURL: true/,
         );
 
         // Good settings without curl
@@ -326,7 +338,11 @@ describe(`Test TLS auth in Live mode`, () => {
 
         await expect(page).toMatchText(
             "#lapi_ping_result",
-            /Connection test result: success.*Auth type: TLS.*Use cURL: false/,
+            /Connection test result: success.*Auth type: TLS/,
+        );
+        await expect(page).toMatchText(
+            "#lapi_ping_result",
+            /Use cURL: false/,
         );
 
         await onAdminSaveSettings();

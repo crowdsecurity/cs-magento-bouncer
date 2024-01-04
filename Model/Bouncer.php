@@ -27,6 +27,7 @@
 
 namespace CrowdSec\Bouncer\Model;
 
+use CrowdSec\RemediationEngine\CacheStorage\CacheStorageException;
 use CrowdSecBouncer\BouncerException;
 use CrowdSec\RemediationEngine\LapiRemediation;
 use Laminas\Http\Exception\InvalidArgumentException;
@@ -56,7 +57,7 @@ class Bouncer extends AbstractBouncer
      * @param array $configs
      * @param Http|null $response
      * @throws BouncerException
-     * @throws \CrowdSec\RemediationEngine\CacheStorage\CacheStorageException
+     * @throws CacheStorageException
      * @throws \LogicException
      */
     public function __construct(Helper $helper, array $configs, ?Http $response = null)
@@ -161,7 +162,7 @@ class Bouncer extends AbstractBouncer
      * @throws BouncerException
      * @throws InvalidArgumentException
      */
-    public function sendResponse(string $body, int $statusCode): void
+    protected function sendResponse(string $body, int $statusCode): void
     {
         if ($this->response) {
             $noCacheControl = 'no-store, no-cache, must-revalidate, max-age=0,post-check=0, pre-check=0';

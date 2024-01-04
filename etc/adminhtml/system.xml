@@ -53,10 +53,11 @@
                         <source_model>CrowdSec\Bouncer\Model\Config\Source\ConnexionType</source_model>
                         <comment><![CDATA[Choose between API key and TLS (pki) authentication]]></comment>
                     </field>
-                    <field id="api_key" translate="label,comment,tooltip tooltip" type="text" sortOrder="300" showInDefault="1">
+                    <field id="api_key" translate="label,comment,tooltip tooltip" type="password" sortOrder="300" showInDefault="1">
                         <label>Your bouncer key</label>
                         <comment><![CDATA[Generated with the cscli command, ex: <em>cscli bouncers add magento2-bouncer</em>]]></comment>
                         <validate>required-entry</validate>
+                       <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                         <depends>
                             <field id="crowdsec_bouncer/general/connection/auth_type">api_key</field>
                         </depends>
@@ -101,7 +102,20 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <comment><![CDATA[Enable if you want to call Local API with <i>cURL</i> instead of <i>file_get_contents</i>.]]></comment>
                     </field>
-                    <field id="test"  translate="button_label" sortOrder="900" showInDefault="1">
+                    <field id="api_timeout" translate="label,comment,tooltip" type="text" sortOrder="900" showInDefault="1" canRestore="1">
+                        <label><![CDATA[Global timeout]]></label>
+                        <comment><![CDATA[The global timeout (in seconds) when calling Local API. If set to 0, timeout will be unlimited.]]></comment>
+                        <validate>required-entry validate-digits</validate>
+                    </field>
+                    <field id="api_connect_timeout" translate="label,comment,tooltip" type="text" sortOrder="1000" showInDefault="1" canRestore="1">
+                        <label><![CDATA[Connection timeout]]></label>
+                        <comment><![CDATA[The timeout (in seconds) for the connection phase when calling Local API. If set to a 0, timeout will be unlimited.]]></comment>
+                        <depends>
+                            <field id="crowdsec_bouncer/general/connection/use_curl">1</field>
+                        </depends>
+                        <validate>required-entry validate-digits</validate>
+                    </field>
+                    <field id="test"  translate="button_label" sortOrder="1100" showInDefault="1">
                         <button_label>Test connection</button_label>
                         <frontend_model>CrowdSec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping</frontend_model>
                     </field>
@@ -487,62 +501,6 @@
                     <field id="forced_test_forwarded_ip" translate="label,comment,tooltip" type="text" sortOrder="500" showInDefault="1">
                         <label><![CDATA[Forced test forwarded IP ]]></label>
                         <comment><![CDATA[Do not use in production. For test purpose only. This IP will be used instead of the current X-Forwarded-For IP if any.]]></comment>
-                    </field>
-                </group>
-            </group>
-            <!-- Events -->
-            <group id="events" translate="label,comment,tooltip" showInDefault="1">
-            <attribute type="expanded">1</attribute>
-            <label>Events</label>
-                <!-- Events logging -->
-                <group id="log" translate="label,comment,tooltip" showInDefault="1">
-                    <label><![CDATA[Logging]]></label>
-                    <comment><![CDATA[Using it in combination to a specific CrowdSec scenario allows detecting suspicious behavior as credential or credit card stuffing.<br> When enabled, you can choose which processes to track.]]></comment>
-                    <attribute type="expanded">1</attribute>
-                    <field id="enabled" translate="label,comment,tooltip" type="select" sortOrder="100" showInDefault="1">
-                        <label>Enable events log</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment><![CDATA[Logs will be written in "var/log/crowdsec-events.log".]]></comment>
-                    </field>
-                    <field id="customer_register" translate="label,comment,tooltip" type="select" sortOrder="200" showInDefault="1">
-                        <label>Track customer registration</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment><![CDATA[]]></comment>
-                        <depends>
-                            <field id="crowdsec_bouncer/events/log/enabled">1</field>
-                        </depends>
-                    </field>
-                    <field id="customer_login" translate="label,comment,tooltip" type="select" sortOrder="300" showInDefault="1">
-                        <label>Track customer login</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment><![CDATA[]]></comment>
-                        <depends>
-                            <field id="crowdsec_bouncer/events/log/enabled">1</field>
-                        </depends>
-                    </field>
-                    <field id="admin_login" translate="label,comment,tooltip" type="select" sortOrder="400" showInDefault="1">
-                        <label>Track admin user login</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment><![CDATA[]]></comment>
-                        <depends>
-                            <field id="crowdsec_bouncer/events/log/enabled">1</field>
-                        </depends>
-                    </field>
-                    <field id="add_to_cart" translate="label,comment,tooltip" type="select" sortOrder="500" showInDefault="1">
-                        <label>Track add to cart process</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment><![CDATA[]]></comment>
-                        <depends>
-                            <field id="crowdsec_bouncer/events/log/enabled">1</field>
-                        </depends>
-                    </field>
-                    <field id="order" translate="label,comment,tooltip" type="select" sortOrder="600" showInDefault="1">
-                        <label>Track order process</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment><![CDATA[]]></comment>
-                        <depends>
-                            <field id="crowdsec_bouncer/events/log/enabled">1</field>
-                        </depends>
                     </field>
                 </group>
             </group>

@@ -80,9 +80,9 @@ class Config
      */
     public function __construct(
         ManagerInterface $messageManager,
-        Helper           $helper,
-        RegistryBouncer   $registryBouncer,
-        WriterInterface  $configWriter
+        Helper $helper,
+        RegistryBouncer $registryBouncer,
+        WriterInterface $configWriter
     ) {
         $this->messageManager = $messageManager;
         $this->helper = $helper;
@@ -98,9 +98,9 @@ class Config
      * @return array[]
      * @throws BouncerException
      */
-    protected function _getTLS($subject, $isTLS)
+    protected function _getTLS($subject, $isTLS): array
     {
-        $result = ['old'=>[], 'new' => []];
+        $result = ['old' => [], 'new' => []];
         if ($isTLS) {
             $oldTls = $this->helper->getTLS();
             $oldTlsCert = $oldTls['tls_cert_path'];
@@ -128,7 +128,6 @@ class Config
             ];
 
             $result['old'] = $oldTls;
-
         }
 
         return $result;
@@ -282,10 +281,10 @@ class Config
      * @throws BouncerException|CacheException
      */
     public function _handleStreamMode(
-        bool   $oldStreamMode,
-        bool   $newStreamMode,
-        bool   $refreshCronExprChanged,
-        bool   $cacheChanged,
+        bool $oldStreamMode,
+        bool $newStreamMode,
+        bool $refreshCronExprChanged,
+        bool $cacheChanged,
         string $newCacheSystem,
         string $newRedisDsn,
         string $newMemcachedDsn,
@@ -329,10 +328,10 @@ class Config
      * @throws CacheException
      */
     protected function _handleRefresh(
-        bool   $oldStreamMode,
-        bool   $newStreamMode,
-        bool   $refreshCronExprChanged,
-        bool   $cacheChanged,
+        bool $oldStreamMode,
+        bool $newStreamMode,
+        bool $refreshCronExprChanged,
+        bool $cacheChanged,
         string $newCacheSystem,
         string $newRedisDsn,
         string $newMemcachedDsn,
@@ -367,9 +366,9 @@ class Config
      * @throws BouncerException
      */
     protected function _handleRefreshCronExpr(
-        bool   $oldStreamMode,
-        bool   $newStreamMode,
-        bool   $cronExprChanged,
+        bool $oldStreamMode,
+        bool $newStreamMode,
+        bool $cronExprChanged,
         string $newCronExpr
     ) {
         if ($oldStreamMode !== $newStreamMode && $newStreamMode === false && $newCronExpr !== self::CRON_DISABLE) {
@@ -390,7 +389,7 @@ class Config
                 $this->helper->validateCronExpr($newCronExpr);
             } catch (Exception $e) {
                 $this->messageManager->getMessages(true);
-                throw new BouncerException("Refresh cron expression ($newCronExpr) is not valid: ". $e->getMessage());
+                throw new BouncerException("Refresh cron expression ($newCronExpr) is not valid: " . $e->getMessage());
             }
         }
     }
@@ -408,7 +407,7 @@ class Config
     protected function _handlePruneCronExpr(
         string $oldCacheSystem,
         string $newCacheSystem,
-        bool   $cronExprChanged,
+        bool $cronExprChanged,
         string $newCronExpr
     ) {
         if ($oldCacheSystem !== $newCacheSystem &&
@@ -431,7 +430,7 @@ class Config
                 $this->helper->validateCronExpr($newCronExpr);
             } catch (Exception $e) {
                 $this->messageManager->getMessages(true);
-                throw new BouncerException("Pruning cron expression ($newCronExpr) is not valid: ". $e->getMessage());
+                throw new BouncerException("Pruning cron expression ($newCronExpr) is not valid: " . $e->getMessage());
             }
         }
     }
@@ -450,12 +449,12 @@ class Config
     ) {
         // Test connection if params changed
         if ($oldConnection != $newConnection && !empty($newConnection['api_url'])) {
-            $finalApiKey = $newConnection['api_key']??"";
-            $finalCert = $newConnection['tls']['tls_cert_path']??"";
-            $finalKey = $newConnection['tls']['tls_key_path']??"" ;
-            $finalVerify = $newConnection['tls']['tls_verify_peer']??false;
-            $finalCaCert = $newConnection['tls']['tls_ca_cert_path']??"";
-            $finalUseCurl = $newConnection['use_curl']??false;
+            $finalApiKey = $newConnection['api_key'] ?? "";
+            $finalCert = $newConnection['tls']['tls_cert_path'] ?? "";
+            $finalKey = $newConnection['tls']['tls_key_path'] ?? "";
+            $finalVerify = $newConnection['tls']['tls_verify_peer'] ?? false;
+            $finalCaCert = $newConnection['tls']['tls_ca_cert_path'] ?? "";
+            $finalUseCurl = $newConnection['use_curl'] ?? false;
             try {
                 $configs = $this->helper->getBouncerConfigs();
                 $currentConfigs = [
@@ -480,10 +479,10 @@ class Config
                 $message = 'Connection test failed with <br>auth_type=' . $newConnection['auth_type']
                            . '<br>url=' . $newConnection['api_url']
                            . '<br>use curl=' . (!empty($finalUseCurl) ? 'true' : 'false')
-                           . '<br>api key=' . ($finalApiKey ?? "")
+                           . '<br>api key=******'
                            . '<br>tls cert path=' . ($finalCert ?? "")
                            . '<br>tls key path=' . ($finalKey ?? "")
-                           . '<br>tls ca cert path=' . ($finalCaCert?? "")
+                           . '<br>tls ca cert path=' . ($finalCaCert ?? "")
                            . '<br>tls verify peer=' . (!empty($finalVerify) ? 'true' : 'false')
                            . '<br>: ';
                 throw new BouncerException($message . $e->getMessage());
@@ -504,8 +503,8 @@ class Config
      * @throws LogicException
      */
     protected function _handleNewClearCache(
-        bool   $oldStreamMode,
-        bool   $newStreamMode,
+        bool $oldStreamMode,
+        bool $newStreamMode,
         string $newCacheSystem,
         string $newRedisDsn,
         string $newMemcachedDsn,
@@ -536,7 +535,7 @@ class Config
      * @throws LogicException
      */
     protected function _handleOldClearCache(
-        bool   $cacheChanged,
+        bool $cacheChanged,
         string $oldCacheSystem,
         string $oldMemcachedDsn,
         string $oldRedisDsn,
@@ -558,7 +557,7 @@ class Config
      * @throws InvalidArgumentException|LogicException|BouncerException
      */
     protected function _handleTestCache(
-        bool   $cacheChanged,
+        bool $cacheChanged,
         string $cacheSystem,
         string $memcachedDsn,
         string $redisDsn,
@@ -726,7 +725,7 @@ class Config
      * @return void
      */
     private function displayCacheClearMessage(
-        bool   $clearCacheResult,
+        bool $clearCacheResult,
         Phrase $cacheLabel,
         Phrase $preMessage = null
     ): void {

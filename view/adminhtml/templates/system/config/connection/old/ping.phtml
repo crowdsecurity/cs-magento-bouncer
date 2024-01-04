@@ -44,7 +44,9 @@
                 tls_key_path: $('<?= $block->escapeJs($block->getTlsKeyPathField()) ?>').value,
                 tls_verify_peer: $('<?= $block->escapeJs($block->getTlsVerifyPeerField()) ?>').value,
                 tls_ca_cert_path: $('<?= $block->escapeJs($block->getTlsCaCertPathField()) ?>').value,
-                use_curl: $('<?= $block->escapeJs($block->getUseCurlField()) ?>').value
+                use_curl: $('<?= $block->escapeJs($block->getUseCurlField()) ?>').value,
+                api_connect: $('<?= $block->escapeJs($block->getApiTimeoutField()) ?>').value,
+                api_connect_timeout: $('<?= $block->escapeJs($block->getApiConnectTimeoutField()) ?>').value
             };
 
             new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {

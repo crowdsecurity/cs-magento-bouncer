@@ -33,7 +33,6 @@ use CrowdSec\LapiClient\Bouncer as BouncerClient;
 use LogicException;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\Area;
-use Magento\Framework\Exception\FileSystemException;
 use Magento\Store\Model\ScopeInterface;
 use CrowdSec\Bouncer\Logger\Logger;
 use CrowdSec\Bouncer\Logger\Handlers\DebugFactory as DebugHandler;
@@ -135,7 +134,7 @@ class Data extends Config
      *
      * @return array
      * @throws LogicException
-     * @throws FileSystemException|BouncerException
+     * @throws BouncerException
      */
     public function getBouncerConfigs(): array
     {
@@ -154,7 +153,8 @@ class Data extends Config
                 'api_key' => $this->getApiKey(),
                 'user_agent_version' => Constants::VERSION,
                 'user_agent_suffix' => 'Magento2',
-                'api_timeout' => Constants::API_TIMEOUT,
+                'api_timeout' => $this->getApiTimeout(),
+                'api_connect_timeout' => $this->getApiConnectTimeout(),
                 'use_curl' => $this->isUseCurl(),
                 // Debug
                 'debug_mode' => $this->isDebugLog(),
