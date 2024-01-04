@@ -61,6 +61,8 @@ class Ping extends Action implements HttpPostActionInterface
     private $encryptor;
 
     /**
+     * Constructor method.
+     *
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param RegistryBouncer $registryBouncer
@@ -82,6 +84,28 @@ class Ping extends Action implements HttpPostActionInterface
     }
 
     /**
+     * Create main suffixe message
+     *
+     * @param string $authType
+     * @param bool $useCurl
+     * @return string
+     */
+    private function getMainSuffixeMessage(string $authType, bool $useCurl): string
+    {
+        $suffixMessageMain = ($authType === Constants::AUTH_TLS) ?
+            'Auth type: TLS <br>Url: %1 <br>Cert: %2 <br>Key: %3 <br>Verify peer: %4 <br>
+CA cert: %5 <br>Use cURL: %6 <br>Api timeout: %7' :
+            'Auth type: Api key <br>Url: %1 <br>Api key: %2<br>Use cURL: %3 <br>Api timeout: %4';
+
+        if ($useCurl) {
+            $suffixMessageMain .= ($authType === Constants::AUTH_TLS) ? ' <br>
+ Api connection timeout: %8' : ' <br>Api connection timeout: %5';
+        }
+
+        return $suffixMessageMain;
+    }
+
+    /**
      * Test connection
      *
      * @return Json
@@ -92,6 +116,8 @@ class Ping extends Action implements HttpPostActionInterface
         $useCurl = "";
         $tlsVerifyPeer = "";
         $authType = "";
+        $apiTimeout = "";
+        $apiConnectTimeout = "";
         try {
             $baseUri = $this->getRequest()->getParam('api_url');
             $authType = $this->getRequest()->getParam('auth_type');
@@ -148,34 +174,26 @@ class Ping extends Action implements HttpPostActionInterface
 
         $resultJson = $this->resultJsonFactory->create();
 
-        $suffixMessageMain = ($authType === Constants::AUTH_TLS) ?
-            'Auth type: TLS <br>Url: %1 <br>Cert: %2 <br>Key: %3 <br>Verify peer: %4 <br>
-CA cert: %5 <br>Use cURL: %6 <br>Api timeout: %7' :
-            'Auth type: Api key <br>Url: %1 <br>Api key: %2<br>Use cURL: %3 <br>Api timeout: %4';
-
-        if ($useCurl) {
-            $suffixMessageMain .= ($authType === Constants::AUTH_TLS) ? ' <br>
- Api connection timeout: %8' : ' <br>Api connection timeout: %5';
-        }
+        $suffixMessageMain = $this->getMainSuffixeMessage($authType, $useCurl);
 
         $suffixMessage = ($authType === Constants::AUTH_TLS) ? '<br><br>' . __(
-                $suffixMessageMain,
-                $baseUri ?? "",
-                $tlsCert ?? "",
-                $tlsKey ?? "",
-                $tlsVerifyPeer,
-                $tlsCaCert ?? "",
-                $useCurlMessage ?? "",
-                $apiTimeout ?? "",
-                $apiConnectTimeout ?? ""
-            ) : '<br><br>' . __(
-                $suffixMessageMain,
-                $baseUri ?? "",
-                $apiKey ?? "",
-                $useCurlMessage ?? "",
-                $apiTimeout ?? "",
-                $apiConnectTimeout ?? ""
-            );
+            $suffixMessageMain,
+            $baseUri ?? "",
+            $tlsCert ?? "",
+            $tlsKey ?? "",
+            $tlsVerifyPeer,
+            $tlsCaCert ?? "",
+            $useCurlMessage ?? "",
+            $apiTimeout,
+            $apiConnectTimeout
+        ) : '<br><br>' . __(
+            $suffixMessageMain,
+            $baseUri ?? "",
+            $apiKey ?? "",
+            $useCurlMessage ?? "",
+            $apiTimeout,
+            $apiConnectTimeout
+        );
 
         return $resultJson->setData([
             'connection' => $result,

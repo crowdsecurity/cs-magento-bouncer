@@ -9,18 +9,24 @@ use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use CrowdSec\Bouncer\Helper\Config;
 
-
 class EncryptBouncerKey implements DataPatchInterface
 {
     /**
      * @var EncryptorInterface
      */
     private $encryptor;
+
     /**
      * @var ModuleDataSetupInterface
      */
     private $moduleDataSetup;
 
+    /**
+     * Constructor method.
+     *
+     * @param EncryptorInterface $encryptor
+     * @param ModuleDataSetupInterface $moduleDataSetup
+     */
     public function __construct(
         EncryptorInterface $encryptor,
         ModuleDataSetupInterface $moduleDataSetup
@@ -29,6 +35,11 @@ class EncryptBouncerKey implements DataPatchInterface
         $this->moduleDataSetup = $moduleDataSetup;
     }
 
+    /**
+     * Apply patch.
+     *
+     * @return void
+     */
     public function apply()
     {
         $bouncerKeyPath = Config::XML_PATH_API_KEY;
@@ -39,7 +50,7 @@ class EncryptBouncerKey implements DataPatchInterface
         $config = $this->moduleDataSetup->getConnection()->fetchAll($select);
         if (!empty($config)) {
             $value = $config[0]['value'] ?? '';
-            if($value){
+            if ($value) {
                 $this->moduleDataSetup->getConnection()->update(
                     $configTable,
                     ['value' => $this->encryptor->encrypt($value)],
@@ -49,11 +60,21 @@ class EncryptBouncerKey implements DataPatchInterface
         }
     }
 
+    /**
+     * Retrieve dependencies.
+     *
+     * @return array|string[]
+     */
     public static function getDependencies()
     {
         return [];
     }
 
+    /**
+     * Retrieve aliases
+     *
+     * @return array|string[]
+     */
     public function getAliases()
     {
         return [];

@@ -39,7 +39,6 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Psr\Cache\CacheException;
 use Psr\Cache\InvalidArgumentException;
 use Magento\Config\Model\Config as MagentoConfig;
-use Magento\Framework\Encryption\EncryptorInterface;
 
 /**
  * Plugin to handle crowdsec section config updates
@@ -72,31 +71,23 @@ class Config
     protected $registryBouncer;
 
     /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
-    /**
      * Constructor
      *
      * @param ManagerInterface $messageManager
      * @param Helper $helper
      * @param RegistryBouncer $registryBouncer
      * @param WriterInterface $configWriter
-     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         ManagerInterface $messageManager,
         Helper $helper,
         RegistryBouncer $registryBouncer,
-        WriterInterface $configWriter,
-        EncryptorInterface $encryptor
+        WriterInterface $configWriter
     ) {
         $this->messageManager = $messageManager;
         $this->helper = $helper;
         $this->registryBouncer = $registryBouncer;
         $this->configWriter = $configWriter;
-        $this->encryptor = $encryptor;
     }
 
     /**

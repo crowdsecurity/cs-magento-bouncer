@@ -89,7 +89,6 @@ class Ping extends Button
      */
     protected $_useCurlField = 'crowdsec_bouncer_general_connection_use_curl';
 
-
     /**
      * Api timeout field name
      *
@@ -103,7 +102,6 @@ class Ping extends Button
      * @var string
      */
     protected $_apiConnectTimeoutField = 'crowdsec_bouncer_general_connection_api_connect_timeout';
-
 
     /** @var string  */
     protected $template = 'CrowdSec_Bouncer::system/config/connection/ping.phtml';

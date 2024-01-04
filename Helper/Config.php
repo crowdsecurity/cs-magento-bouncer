@@ -92,7 +92,6 @@ class Config extends AbstractHelper
     public const XML_PATH_API_URL = self::SECTION . '/general/connection/api_url';
     // Advanced configs
     public const XML_PATH_BOUNCING_LEVEL = self::SECTION . '/general/bouncing/level';
-    public const XML_PATH_EVENTS_LOG_ROOT = self::SECTION . '/events/log/';
     public const XML_PATH_FRONT_ENABLED = self::SECTION . '/general/bouncing/front_enabled';
     public const XML_PATH_THEME_BAN_FOOTER = self::SECTION . '/theme/ban/wall_footer';
     public const XML_PATH_THEME_BAN_SUBTITLE = self::SECTION . '/theme/ban/wall_subtitle';
@@ -133,7 +132,6 @@ class Config extends AbstractHelper
         'forced_test_forwarded_ip' => null,
         'can_display_errors' => null,
         'is_prod_log_disabled' => null,
-        'is_events_log_enabled' => [],
         'is_stream_mode' => null,
         'refresh_cron_expr' => null,
         'prune_cron_expr' => null,
@@ -613,23 +611,6 @@ class Config extends AbstractHelper
         }
 
         return (bool)$this->_globals['is_debug_log'];
-    }
-
-    /**
-     * Get events log enabled config
-     *
-     * @param string $process
-     * @return bool
-     */
-    public function isEventsLogEnabled(string $process): bool
-    {
-        if (!isset($this->_globals['is_events_log_enabled'][$process])) {
-            $enabled = (bool)$this->scopeConfig->getValue(self::XML_PATH_EVENTS_LOG_ROOT . 'enabled');
-            $this->_globals['is_events_log_enabled'][$process] =
-                $enabled && $this->scopeConfig->getValue(self::XML_PATH_EVENTS_LOG_ROOT . $process);
-        }
-
-        return (bool)$this->_globals['is_events_log_enabled'][$process];
     }
 
     /**
