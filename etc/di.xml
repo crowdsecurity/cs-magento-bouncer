@@ -42,25 +42,9 @@
             </argument>
         </arguments>
     </type>
-    <type name="CrowdSec\Bouncer\Logger\EventLogger">
-        <arguments>
-            <argument name="name" xsi:type="string">crowdsec-events</argument>
-            <argument name="handlers"  xsi:type="array">
-                <item name="event" xsi:type="object">CrowdSec\Bouncer\Logger\Handlers\Event</item>
-            </argument>
-        </arguments>
-    </type>
     <!-- Plugins -->
     <type name="Magento\Framework\App\FrontControllerInterface">
         <!-- Bouncing -->
         <plugin name="crowdsec-front-controller" type="CrowdSec\Bouncer\Plugin\FrontController" sortOrder="1" />
-    </type>
-    <type name="Magento\Customer\Model\AccountManagement">
-        <!-- Event logging:customer authenticate -->
-        <plugin name="crowdsec-customer-account-management" type="CrowdSec\Bouncer\Plugin\Customer\AccountManagement" sortOrder="10" />
-    </type>
-    <type name="Magento\Customer\Controller\Account\CreatePost">
-        <!-- Event logging:customer register -->
-        <plugin name="crowdsec-customer-account-create-post" type="CrowdSec\Bouncer\Plugin\Customer\AccountCreatePostController" sortOrder="10" />
     </type>
 </config>

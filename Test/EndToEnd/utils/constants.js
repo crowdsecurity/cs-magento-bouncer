@@ -11,7 +11,6 @@ const { TIMEOUT } = process.env;
 const { CURRENT_IP } = process.env;
 const { PROXY_IP } = process.env;
 const DEBUG_LOG_PATH = `${__dirname}/../../../../../var/log/crowdsec-bouncer-debug.log`;
-const EVENT_LOG_PATH = `${__dirname}/../../../../../var/log/crowdsec-events.log`;
 const JAPAN_IP = "210.249.74.42";
 const FRANCE_IP = "78.119.253.85";
 const { VAR_PATH, TLS_PATH } = process.env;
@@ -28,7 +27,6 @@ module.exports = {
     ADMIN_LOGIN,
     ADMIN_PASSWORD,
     DEBUG_LOG_PATH,
-    EVENT_LOG_PATH,
     M2_URL,
     BOUNCER_KEY,
     CURRENT_IP,

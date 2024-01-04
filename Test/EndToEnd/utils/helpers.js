@@ -53,17 +53,11 @@ const ensureConfigVisibilty = async () => {
     if (!visible) {
         await page.click("#crowdsec_bouncer_advanced-head");
     }
-    visible = await page.isVisible("#crowdsec_bouncer_events");
-    if (!visible) {
-        await page.click("#crowdsec_bouncer_events-head");
-    }
     visible = await page.isVisible("#crowdsec_bouncer_general");
     await expect(visible).toBeTruthy();
     visible = await page.isVisible("#crowdsec_bouncer_theme");
     await expect(visible).toBeTruthy();
     visible = await page.isVisible("#crowdsec_bouncer_advanced");
-    await expect(visible).toBeTruthy();
-    visible = await page.isVisible("#crowdsec_bouncer_events");
     await expect(visible).toBeTruthy();
 };
 
@@ -173,13 +167,6 @@ const setDefaultConfig = async (save = true, direct = true) => {
     await selectElement("crowdsec_bouncer_advanced_debug_log", "1");
     await selectElement("crowdsec_bouncer_advanced_debug_display_errors", "1");
     await fillInput("crowdsec_bouncer_advanced_debug_forced_test_ip", "");
-    // Events
-    await selectElement("crowdsec_bouncer_events_log_enabled", "1");
-    await selectElement("crowdsec_bouncer_events_log_customer_register", "1");
-    await selectElement("crowdsec_bouncer_events_log_customer_login", "1");
-    await selectElement("crowdsec_bouncer_events_log_admin_login", "1");
-    await selectElement("crowdsec_bouncer_events_log_add_to_cart", "1");
-    await selectElement("crowdsec_bouncer_events_log_order", "1");
 
     if (save) {
         await onAdminSaveSettings();

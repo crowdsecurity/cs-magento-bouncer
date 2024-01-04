@@ -42,7 +42,7 @@ class EncryptBouncerKey implements DataPatchInterface
             if($value){
                 $this->moduleDataSetup->getConnection()->update(
                     $configTable,
-                    ['value' => $this->encryptor->encrypt($config[0]['value'])],
+                    ['value' => $this->encryptor->encrypt($value)],
                     ['path = ?' => $bouncerKeyPath]
                 );
             }

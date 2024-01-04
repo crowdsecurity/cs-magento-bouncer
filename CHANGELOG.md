@@ -17,6 +17,11 @@ functions provided by the module.
 - Encrypt bouncer key in database
 
 
+### Removed
+
+- Removed Events log feature
+
+
 ### Added
 
 - Add `api_connect_timeout` configuration for `Curl` request handler
