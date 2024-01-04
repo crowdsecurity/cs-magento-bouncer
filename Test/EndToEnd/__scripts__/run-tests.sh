@@ -43,7 +43,7 @@ HOSTNAME=$(ddev exec printenv DDEV_HOSTNAME | sed 's/\r//g')
 M2VERSION=$(ddev exec printenv DDEV_PROJECT | sed 's/\r//g')
 M2_URL=https://$HOSTNAME
 PROXY_IP=$(ddev find-ip ddev-router)
-BOUNCER_KEY=$(ddev exec bin/magento config:show crowdsec_bouncer/general/connection/api_key | sed 's/\r//g')
+BOUNCER_KEY=$(ddev exec cat .ddev/commands/host/bouncer_key_plain.txt | sed 's/\r//g')
 JEST_PARAMS="--bail=true  --runInBand --verbose"
 TLS_PATH="crowdsec/tls" # Relative to var path
 # If FAIL_FAST, will exit on first individual test fail
