@@ -480,9 +480,9 @@ class Config
                            . '<br>url=' . $newConnection['api_url']
                            . '<br>use curl=' . (!empty($finalUseCurl) ? 'true' : 'false')
                            . '<br>api key=******'
-                           . '<br>tls cert path=' . ($finalCert ?? "")
-                           . '<br>tls key path=' . ($finalKey ?? "")
-                           . '<br>tls ca cert path=' . ($finalCaCert ?? "")
+                           . '<br>tls cert path=' . $finalCert
+                           . '<br>tls key path=' . $finalKey
+                           . '<br>tls ca cert path=' . $finalCaCert
                            . '<br>tls verify peer=' . (!empty($finalVerify) ? 'true' : 'false')
                            . '<br>: ';
                 throw new BouncerException($message . $e->getMessage());
