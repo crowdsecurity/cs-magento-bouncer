@@ -24,12 +24,16 @@
  * @author   CrowdSec team
  *
  */
+/**
+ *
+ * @phpcs:disable Magento2.Legacy.EscapeMethodsOnBlockClass
+ *
+ */
 
 ?>
 
 <?php
 /** @var \CrowdSec\Bouncer\Block\Adminhtml\System\Config\Cache\Refresh $block */
-/** @var \Magento\Framework\Escaper $escaper */
 ?>
 <script>
     require(['prototype'], function(){
@@ -40,11 +44,11 @@
 
             params = {};
 
-            new Ajax.Request('<?= $escaper->escapeJs($escaper->escapeUrl($block->getAjaxUrl())) ?>', {
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
                 parameters: params,
                 onSuccess: function(response) {
                     var result =
-                        '<?= $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Cache refresh.'))) ?>';
+                        '<?= $block->escapeJs($block->escapeHtml(__('Error during CrowdSec Cache refresh.'))) ?>';
                     try {
                         if (response.responseText.isJSON()) {
                             response = response.responseText.evalJSON();
@@ -74,8 +78,8 @@
 
 <div class="actions actions-refresh-cache actions-crowdsec">
     <button onclick="javascript:refreshCache(); return false;" class="action-refresh-cache" type="button" id="<?=
-    $escaper->escapeHtmlAttr($block->getHtmlId()) ?>">
-        <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
     <p class="hidden" id="cache_refresh_result"></p>
 </div>

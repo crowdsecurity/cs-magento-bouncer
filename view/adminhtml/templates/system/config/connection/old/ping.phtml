@@ -24,11 +24,15 @@
  * @author   CrowdSec team
  *
  */
+/**
+ *
+ * @phpcs:disable Magento2.Legacy.EscapeMethodsOnBlockClass
+ *
+ */
 ?>
 
 <?php
 /** @var \CrowdSec\Bouncer\Block\Adminhtml\System\Config\Connection\Ping $block */
-/** @var \Magento\Framework\Escaper $escaper */
 ?>
 <script>
     require(['prototype'], function(){
@@ -38,23 +42,23 @@
             var pingConnectionMessage = $('lapi_ping_result');
 
             params = {
-                api_url: $('<?= $escaper->escapeJs($block->getUrlField()) ?>').value,
-                bouncer_key: $('<?= $escaper->escapeJs($block->getKeyField()) ?>').value,
-                auth_type: $('<?= $escaper->escapeJs($block->getAuthTypeField()) ?>').value,
-                tls_cert_path: $('<?= $escaper->escapeJs($block->getTlsCertPathField()) ?>').value,
-                tls_key_path: $('<?= $escaper->escapeJs($block->getTlsKeyPathField()) ?>').value,
-                tls_verify_peer: $('<?= $escaper->escapeJs($block->getTlsVerifyPeerField()) ?>').value,
-                tls_ca_cert_path: $('<?= $escaper->escapeJs($block->getTlsCaCertPathField()) ?>').value,
-                use_curl: $('<?= $escaper->escapeJs($block->getUseCurlField()) ?>').value,
-                api_connect: $('<?= $escaper->escapeJs($block->getApiTimeoutField()) ?>').value,
-                api_connect_timeout: $('<?= $escaper->escapeJs($block->getApiConnectTimeoutField()) ?>').value
+                api_url: $('<?= $block->escapeJs($block->getUrlField()) ?>').value,
+                bouncer_key: $('<?= $block->escapeJs($block->getKeyField()) ?>').value,
+                auth_type: $('<?= $block->escapeJs($block->getAuthTypeField()) ?>').value,
+                tls_cert_path: $('<?= $block->escapeJs($block->getTlsCertPathField()) ?>').value,
+                tls_key_path: $('<?= $block->escapeJs($block->getTlsKeyPathField()) ?>').value,
+                tls_verify_peer: $('<?= $block->escapeJs($block->getTlsVerifyPeerField()) ?>').value,
+                tls_ca_cert_path: $('<?= $block->escapeJs($block->getTlsCaCertPathField()) ?>').value,
+                use_curl: $('<?= $block->escapeJs($block->getUseCurlField()) ?>').value,
+                api_connect: $('<?= $block->escapeJs($block->getApiTimeoutField()) ?>').value,
+                api_connect_timeout: $('<?= $block->escapeJs($block->getApiConnectTimeoutField()) ?>').value
             };
 
-            new Ajax.Request('<?= $escaper->escapeJs($escaper->escapeUrl($block->getAjaxUrl())) ?>', {
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
                 parameters: params,
                 onSuccess: function(response) {
                     var result =
-                        '<?= $escaper->escapeJs($escaper->escapeHtml(__('Error during CrowdSec Connection ping.'))) ?>';
+                        '<?= $block->escapeJs($block->escapeHtml(__('Error during CrowdSec Connection ping.'))) ?>';
                     try {
                         if (response.responseText.isJSON()) {
                             response = response.responseText.evalJSON();
@@ -84,8 +88,8 @@
 
 <div class="actions actions-ping-connection actions-crowdsec">
     <button onclick="javascript:pingConnection(); return false;" class="action-ping-connection" type="button" id="<?=
-    $escaper->escapeHtmlAttr($block->getHtmlId()) ?>">
-        <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
     <p class="hidden" id="lapi_ping_result"></p>
 </div>

@@ -24,11 +24,15 @@
  * @author   CrowdSec team
  *
  */
+/**
+ *
+ * @phpcs:disable Magento2.Legacy.EscapeMethodsOnBlockClass
+ *
+ */
 ?>
 
 <?php
 /** @var \CrowdSec\Bouncer\Block\Adminhtml\System\Config\Geolocation\Country $block */
-/** @var \Magento\Framework\Escaper $escaper */
 ?>
 <script>
     require(['prototype'], function(){
@@ -36,23 +40,23 @@
 //<![CDATA[
         function testGeolocation() {
             var testGeolocationMessage = $('geolocation_test_result');
-            var dataBaseType = $('<?= $escaper->escapeJs($block->getGeolocationMaxmindDatabaseTypeField()) ?>');
-            var dataBasePath = $('<?= $escaper->escapeJs($block->getGeolocationMaxmindDatabasePathField()) ?>');
+            var dataBaseType = $('<?= $block->escapeJs($block->getGeolocationMaxmindDatabaseTypeField()) ?>');
+            var dataBasePath = $('<?= $block->escapeJs($block->getGeolocationMaxmindDatabasePathField()) ?>');
 
             params = {
-                geolocation_type: $('<?= $escaper->escapeJs($block->getGeolocationTypeField()) ?>').value,
+                geolocation_type: $('<?= $block->escapeJs($block->getGeolocationTypeField()) ?>').value,
                 geolocation_maxmind_database_type: dataBaseType.value,
                 geolocation_maxmind_database_path: dataBasePath.value,
-                forced_test_ip: $('<?= $escaper->escapeJs($block->getForcedTestIpField()) ?>').value,
-                cache_duration: $('<?= $escaper->escapeJs($block->getCacheDurationField()) ?>').value
+                forced_test_ip: $('<?= $block->escapeJs($block->getForcedTestIpField()) ?>').value,
+                cache_duration: $('<?= $block->escapeJs($block->getCacheDurationField()) ?>').value
             };
 
-            new Ajax.Request('<?= $escaper->escapeJs($escaper->escapeUrl($block->getAjaxUrl())) ?>', {
+            new Ajax.Request('<?= $block->escapeJs($block->escapeUrl($block->getAjaxUrl())) ?>', {
                 parameters: params,
                 onSuccess: function(response) {
                     var result =
-                        '<?= $escaper->escapeJs(
-                            $escaper->escapeHtml(__('Error during CrowdSec geolocation test.'))
+                        '<?= $block->escapeJs(
+                            $block->escapeHtml(__('Error during CrowdSec geolocation test.'))
                         ) ?>';
                     try {
                         if (response.responseText.isJSON()) {
@@ -83,8 +87,8 @@
 
 <div class="actions actions-test-geolocation actions-crowdsec">
     <button onclick="javascript:testGeolocation(); return false;" class="action-test-geolocation" type="button" id="<?=
-    $escaper->escapeHtmlAttr($block->getHtmlId()) ?>">
-        <span><?= $escaper->escapeHtml($block->getButtonLabel()) ?></span>
+    $block->escapeHtmlAttr($block->getHtmlId()) ?>">
+        <span><?= $block->escapeHtml($block->getButtonLabel()) ?></span>
     </button>
     <p class="hidden" id="geolocation_test_result"></p>
 </div>
