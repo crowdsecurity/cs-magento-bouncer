@@ -47,7 +47,7 @@ jobs:
                     echo "VERSION_SOURCES=$(echo ${{ env.EXTENSION_ZIP_NAME }}-${{ env.VERSION_NUMBER }} )" >> $GITHUB_ENV
 
             -   name: Clone sources
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     path: ${{ env.VERSION_SOURCES }}
 
@@ -99,7 +99,7 @@ jobs:
                     zip -r ${{ env.VERSION_SOURCES }}.zip ${{ env.VERSION_SOURCES }}/ -x '${{ env.VERSION_SOURCES }}/.git*'
 
             -   name: Clone zip validator
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     repository: julienloizelet/m2-extension-zip-validator
                     path: zip-validator
@@ -110,7 +110,7 @@ jobs:
                     php zip-validator/validate_m2_package.php  ${{ env.VERSION_SOURCES }}.zip
 
             -   name: Create Tag ${{ github.event.inputs.tag_name }}
-                uses: actions/github-script@v6
+                uses: actions/github-script@v7
                 with:
                     github-token: ${{ github.token }}
                     script: |
@@ -127,7 +127,7 @@ jobs:
                     echo "$VERSION_RELEASE_NOTES" >> CHANGELOG.txt
 
             -   name: Create release ${{ env.VERSION_NUMBER }}
-                uses: softprops/action-gh-release@v1
+                uses: softprops/action-gh-release@v2
                 with:
                     files: ${{ env.VERSION_SOURCES }}.zip
                     body_path: CHANGELOG.txt
@@ -145,10 +145,10 @@ jobs:
           include:
             - m2-version: '2.3.7'
               php-version: '7.4'
-            - m2-version: '2.4.5'
-              php-version: '8.1'
             - m2-version: '2.4.6'
               php-version: '8.2'
+            - m2-version: '2.4.7'
+              php-version: '8.3'
 
       name: After release test suite
       if: success()
@@ -162,7 +162,7 @@ jobs:
       steps:
 
         - name: Install Magento 2 with DDEV
-          uses: julienloizelet/magento2-ddev-installation@v2.1.1
+          uses: julienloizelet/magento2-ddev-installation@v3
           with:
             php_version: ${{ matrix.php-version }}
             magento_version: ${{ matrix.m2-version }}
@@ -180,7 +180,7 @@ jobs:
           run: ddev get julienloizelet/ddev-playwright
 
         - name: Clone M2 ${{ env.EXTENSION_NAME }} files
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
           with:
             path: module-sources
 
@@ -208,8 +208,8 @@ jobs:
           run: |
             ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
-        - name: Disable some extensions for 2.4.6
-          if: startsWith(matrix.m2-version, '2.4.6')
+        - name: Disable some extensions for 2.4.6 and superior
+          if: contains(fromJson('["2.4.6", "2.4.7"]'),matrix.m2-version)
           run: |
             ddev magento module:disable Magento_AdminAdobeImsTwoFactorAuth
 

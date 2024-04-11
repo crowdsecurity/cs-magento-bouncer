@@ -29,8 +29,8 @@ jobs:
             php-version: '7.4'
           - m2-version: '2.4.0'
             php-version: '7.4'
-          - m2-version: '2.4.6'
-            php-version: '8.2'
+          - m2-version: '2.4.7'
+            php-version: '8.3'
 
     name: Static and unit test suite
     runs-on: ubuntu-latest
@@ -41,7 +41,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/magento2-ddev-installation@v2.1.1
+        uses: julienloizelet/magento2-ddev-installation@v3
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
@@ -49,7 +49,7 @@ jobs:
           magento_repository: "https://repo.magento.com/"
 
       - name: Clone M2 Crowdsec Bouncer files
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 
