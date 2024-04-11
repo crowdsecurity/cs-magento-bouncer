@@ -28,10 +28,10 @@ jobs:
         include:
           - m2-version: '2.3.7'
             php-version: '7.4'
-          - m2-version: '2.4.5'
-            php-version: '8.1'
           - m2-version: '2.4.6'
             php-version: '8.2'
+          - m2-version: '2.4.7'
+            php-version: '8.3'
 
     name: End-to-end test suite
     if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
@@ -44,7 +44,7 @@ jobs:
     steps:
 
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/magento2-ddev-installation@v2.1.1
+        uses: julienloizelet/magento2-ddev-installation@v3
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
@@ -62,7 +62,7 @@ jobs:
         run: ddev get julienloizelet/ddev-playwright
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 
@@ -79,8 +79,8 @@ jobs:
         run: |
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
-      - name: Disable some extensions for 2.4.6
-        if: startsWith(matrix.m2-version, '2.4.6')
+      - name: Disable some extensions for 2.4.6 and superior
+        if: contains(fromJson('["2.4.6", "2.4.7"]'),matrix.m2-version)
         run: |
           ddev magento module:disable Magento_AdminAdobeImsTwoFactorAuth
 

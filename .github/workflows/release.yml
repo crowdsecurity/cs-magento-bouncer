@@ -1,19 +1,18 @@
 name: Release
-# example: gh workflow run release.yml -f tag_name=v1.1.4 -f draft=true
+# example: gh workflow run release.yml -f tag_name=v1.1.4
 on:
     workflow_dispatch:
         inputs:
             tag_name:
                 type: string
+                description: Tag name
                 required: true
-            draft:
+            only_zip_for_marketplace:
                 type: boolean
-                description: Draft release
-                default: false
-            prerelease:
-                type: boolean
-                description: Prerelease
-                default: false
+                description: Only create zip for marketplace
+                required: true
+                default: true
+
 
 env:
   # Allow ddev get to use a GitHub token to prevent rate limiting by tests
@@ -47,7 +46,7 @@ jobs:
                     echo "VERSION_SOURCES=$(echo ${{ env.EXTENSION_ZIP_NAME }}-${{ env.VERSION_NUMBER }} )" >> $GITHUB_ENV
 
             -   name: Clone sources
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     path: ${{ env.VERSION_SOURCES }}
 
@@ -99,7 +98,7 @@ jobs:
                     zip -r ${{ env.VERSION_SOURCES }}.zip ${{ env.VERSION_SOURCES }}/ -x '${{ env.VERSION_SOURCES }}/.git*'
 
             -   name: Clone zip validator
-                uses: actions/checkout@v3
+                uses: actions/checkout@v4
                 with:
                     repository: julienloizelet/m2-extension-zip-validator
                     path: zip-validator
@@ -110,7 +109,8 @@ jobs:
                     php zip-validator/validate_m2_package.php  ${{ env.VERSION_SOURCES }}.zip
 
             -   name: Create Tag ${{ github.event.inputs.tag_name }}
-                uses: actions/github-script@v6
+                if: github.event.inputs.only_zip_for_marketplace != 'true'
+                uses: actions/github-script@v7
                 with:
                     github-token: ${{ github.token }}
                     script: |
@@ -122,19 +122,29 @@ jobs:
                         })
 
             -   name: Prepare release notes
+                if: github.event.inputs.only_zip_for_marketplace != 'true'
                 run: |
                     VERSION_RELEASE_NOTES=$(awk -v ver="[${{ env.VERSION_NUMBER }}]($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/v${{ env.VERSION_NUMBER }})" '/^## / { if (p) { exit }; if ($2 == ver) { p=1; next} } p && NF' ${{ env.VERSION_SOURCES }}/CHANGELOG.md | sed ':a;N;$!ba;s/\n---/ /g')
                     echo "$VERSION_RELEASE_NOTES" >> CHANGELOG.txt
 
             -   name: Create release ${{ env.VERSION_NUMBER }}
-                uses: softprops/action-gh-release@v1
+                if: github.event.inputs.only_zip_for_marketplace != 'true'
+                uses: softprops/action-gh-release@v2
                 with:
                     files: ${{ env.VERSION_SOURCES }}.zip
                     body_path: CHANGELOG.txt
                     name: ${{ env.VERSION_NUMBER }}
                     tag_name: ${{ github.event.inputs.tag_name }}
-                    draft: ${{ github.event.inputs.draft }}
-                    prerelease: ${{ github.event.inputs.prerelease }}
+                    draft: false
+                    prerelease: false
+
+            - name: Save zip
+              if: github.event.inputs.only_zip_for_marketplace == 'true'
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{ env.VERSION_SOURCES }}.zip
+                  path: ${{ env.VERSION_SOURCES }}.zip
+                  retention-days: 60
 
 
     after-release:
@@ -145,13 +155,13 @@ jobs:
           include:
             - m2-version: '2.3.7'
               php-version: '7.4'
-            - m2-version: '2.4.5'
-              php-version: '8.1'
             - m2-version: '2.4.6'
               php-version: '8.2'
+            - m2-version: '2.4.7'
+              php-version: '8.3'
 
       name: After release test suite
-      if: success()
+      if: success() && github.event.inputs.only_zip_for_marketplace != 'true'
       needs: [ create-release ]
       runs-on: ubuntu-latest
       env:
@@ -162,7 +172,7 @@ jobs:
       steps:
 
         - name: Install Magento 2 with DDEV
-          uses: julienloizelet/magento2-ddev-installation@v2.1.1
+          uses: julienloizelet/magento2-ddev-installation@v3
           with:
             php_version: ${{ matrix.php-version }}
             magento_version: ${{ matrix.m2-version }}
@@ -180,7 +190,7 @@ jobs:
           run: ddev get julienloizelet/ddev-playwright
 
         - name: Clone M2 ${{ env.EXTENSION_NAME }} files
-          uses: actions/checkout@v3
+          uses: actions/checkout@v4
           with:
             path: module-sources
 
@@ -208,8 +218,8 @@ jobs:
           run: |
             ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
-        - name: Disable some extensions for 2.4.6
-          if: startsWith(matrix.m2-version, '2.4.6')
+        - name: Disable some extensions for 2.4.6 and superior
+          if: contains(fromJson('["2.4.6", "2.4.7"]'),matrix.m2-version)
           run: |
             ddev magento module:disable Magento_AdminAdobeImsTwoFactorAuth
 
