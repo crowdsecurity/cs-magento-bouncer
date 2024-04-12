@@ -12,8 +12,9 @@ functions provided by the module.
 ## [2.1.1](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v2.1.1) - 2024-04-12
 [_Compare with previous release_](https://github.com/crowdsecurity/cs-magento-bouncer/compare/v2.1.0...v2.1.1)
 
+### Changed
 
-- Release for Magento 2.4.7 and PHP 8.3 compatibility
+- No change: released on marketplace to confirm compatibility with Magento 2.4.7 and PHP 8.3
 
 
 ---
