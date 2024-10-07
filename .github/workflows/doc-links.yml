@@ -1,17 +1,22 @@
+name: Documentation links
+
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
-    contents: write
-    pull-requests: write
+  contents: read
 
-name: Markdown files test and update
 jobs:
-  markdown-test-and-update:
-    name: Markdown files test and update
+  markdown-test-links:
+    name: Markdown test links
     runs-on: ubuntu-latest
     steps:
-
       - name: Clone sources
         uses: actions/checkout@v4
         with:
@@ -33,12 +38,3 @@ jobs:
           cd extension
           awesome_bot README.md --skip-save-results --allow-dupe --base-url http://localhost:8080/
           awesome_bot doc/*.md --skip-save-results --allow-dupe --white-list repo.magento.com,ddev.site,Composer-plugin-against-Dependency-Confusion-attacks --base-url http://localhost:8080/doc/
-
-      - name: Generate table of contents
-        uses: technote-space/toc-generator@v4
-        with:
-          MAX_HEADER_LEVEL: 5
-          COMMIT_NAME: CrowdSec Dev Bot
-          TARGET_PATHS: 'doc/*.md'
-          CHECK_ONLY_DEFAULT_BRANCH: true
-          CREATE_PR: true

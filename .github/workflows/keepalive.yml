@@ -1,20 +1,17 @@
 name: Keep Alive
 on:
-
   schedule:
-    - cron: '0 3 * * 4'
+    - cron: "0 3 * * 4"
 
 permissions:
   actions: write
 
 jobs:
   keep-alive:
-
     name: Keep Alive
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Clone project files
         uses: actions/checkout@v4
 
@@ -22,4 +19,4 @@ jobs:
       - uses: gautamkrishnar/keepalive-workflow@v2
         with:
           time_elapsed: 45
-          workflow_files: "static-and-unit-test-suite.yml"
+          workflow_files: "end-to-end-test-suite.yml"

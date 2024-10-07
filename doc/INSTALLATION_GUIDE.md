@@ -4,10 +4,10 @@
 
 ## Installation Guide
 
+**Table of Contents**
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**
 
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -23,7 +23,6 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-
 ## Requirements
 
 - Magento >= 2.3
@@ -32,7 +31,7 @@
 
 Use `Composer` by simply adding `crowdsec/magento2-module-bouncer` as a dependency:
 
-    composer require crowdsec/magento2-module-bouncer 
+    composer require crowdsec/magento2-module-bouncer
 
 ## Post Installation
 
@@ -48,15 +47,12 @@ After enabling the module, the Magento 2 system must be upgraded.
 
 If the system mode is set to production, run the compile command first. This is not necessary for the developer mode.
 
-
     bin/magento setup:di:compile
 
 Then run the upgrade command:
 
-
     bin/magento setup:upgrade
 
-    
 ### Clear Cache
 
 The Magento 2 cache should be cleared by running the flush command.
@@ -68,7 +64,6 @@ The Magento 2 cache should be cleared by running the flush command.
 At last, you have to deploy the static content:
 
     bin/magento setup:static-content:deploy -f
-
 
 ## Troubleshooting
 
@@ -104,12 +99,15 @@ To avoid this error and install the latest known Packagist release `y.y.y`, you 
     }
 },
 ```
+
 And then run the same command:
+
 ```bash
 composer require crowdsec/magento2-module-bouncer --no-plugins
 ```
 
 As an alternative, you can also exclude the `crowdsec/magento2-module-bouncer` from the `repo.magento.com` repository:
+
 ```
 "repositories": {
     "0": {
@@ -121,4 +119,3 @@ As an alternative, you can also exclude the `crowdsec/magento2-module-bouncer` f
 ```
 
 Thus, running `composer require crowdsec/magento2-module-bouncer` will always pick up the latest `y.y.y` Packagist release.
-

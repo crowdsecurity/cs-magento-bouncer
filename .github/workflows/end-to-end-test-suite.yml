@@ -4,7 +4,9 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**.md'
+      - "**.md"
+  schedule:
+    - cron: "25 02 * * THU"
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -26,12 +28,12 @@ jobs:
       matrix:
         # Last 2 patches for the current minor, and last patch for the previous minor, greatest php version
         include:
-          - m2-version: '2.3.7'
-            php-version: '7.4'
-          - m2-version: '2.4.6'
-            php-version: '8.2'
-          - m2-version: '2.4.7'
-            php-version: '8.3'
+          - m2-version: "2.3.7"
+            php-version: "7.4"
+          - m2-version: "2.4.6"
+            php-version: "8.2"
+          - m2-version: "2.4.7"
+            php-version: "8.3"
 
     name: End-to-end test suite
     if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
@@ -42,7 +44,6 @@ jobs:
       EXTENSION_PATH: "crowdsec-bouncer"
 
     steps:
-
       - name: Install Magento 2 with DDEV
         uses: julienloizelet/magento2-ddev-installation@v3
         with:
@@ -172,4 +173,3 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
         timeout-minutes: 30
         if: failure() && github.event.inputs.debug_enabled == 'true'
-
