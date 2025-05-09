@@ -26,10 +26,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Last 2 patches for the current minor, and last patch for the previous minor, greatest php version
+        # Last 2 patches for the current minor, greatest php version
         include:
-          - m2-version: "2.3.7"
-            php-version: "7.4"
           - m2-version: "2.4.6"
             php-version: "8.2"
           - m2-version: "2.4.7"
