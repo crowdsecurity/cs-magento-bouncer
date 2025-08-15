@@ -23,7 +23,7 @@ jobs:
         include:
           - m2-version: '2.4.6'
             php-version: '8.2'
-          - m2-version: '2.4.7'
+          - m2-version: '2.4.8'
             php-version: '8.3'
 
     name: End-to-end auto-prepend-file mode test suite
@@ -70,7 +70,7 @@ jobs:
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
       - name: Disable some extensions for 2.4.6 and superior
-        if: contains(fromJson('["2.4.6", "2.4.7"]'),matrix.m2-version)
+        if: contains(fromJson('["2.4.6", "2.4.7", "2.4.8"]'),matrix.m2-version)
         run: |
           ddev magento module:disable Magento_AdminAdobeImsTwoFactorAuth
 

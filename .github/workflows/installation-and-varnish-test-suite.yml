@@ -28,7 +28,7 @@ jobs:
         include:
           - m2-version: '2.3.7'
             php-version: '7.4'
-          - m2-version: '2.4.7'
+          - m2-version: '2.4.8'
             php-version: '8.3'
 
     name: Installation and Varnish test suite
@@ -81,7 +81,7 @@ jobs:
           ddev magento setup:performance:generate-fixtures ./varnish-profile.xml
 
       - name: Disable some extensions for 2.4.7
-        if: startsWith(matrix.m2-version, '2.4.7')
+        if: startsWith(matrix.m2-version, '2.4.8')
         run: |
           ddev magento maintenance:enable
           ddev magento module:disable --clear-static-content Magento_AdminAdobeImsTwoFactorAuth
