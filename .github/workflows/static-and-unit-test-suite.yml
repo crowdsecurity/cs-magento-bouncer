@@ -27,7 +27,7 @@ jobs:
             php-version: "7.4"
           - m2-version: "2.4.0"
             php-version: "7.4"
-          - m2-version: "2.4.7"
+          - m2-version: "2.4.8"
             php-version: "8.3"
 
     name: Static and unit test suite

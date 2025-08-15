@@ -40,17 +40,15 @@ class Bouncer extends AbstractBouncer
 {
 
     /**
-     * @var null | Http
-     */
-    protected $response;
-
-    /**
      * @var Helper
      */
     protected $helper;
-
     /** @var bool */
     protected $remediationDisplay = false;
+    /**
+     * @var null | Http
+     */
+    protected $response;
 
     /**
      * @param Helper $helper
@@ -73,24 +71,13 @@ class Bouncer extends AbstractBouncer
     }
 
     /**
-     * Remediation display setter
+     * Get the current HTTP method
      *
-     * @param bool $value
-     * @return void
+     * @return string
      */
-    public function setRemediationDisplay(bool $value): void
+    public function getHttpMethod(): string
     {
-        $this->remediationDisplay = $value;
-    }
-
-    /**
-     * Remediation display getter
-     *
-     * @return bool
-     */
-    public function hasRemediationDisplay(): bool
-    {
-        return $this->remediationDisplay;
+        return $this->helper->getHttpMethod();
     }
 
     /**
@@ -105,6 +92,17 @@ class Bouncer extends AbstractBouncer
     }
 
     /**
+     * Get the value of a posted field.
+     *
+     * @param string $name
+     * @return string|null
+     */
+    public function getPostedVariable(string $name): ?string
+    {
+        return $this->helper->getPostedVariable($name);
+    }
+
+    /**
      * Get the current IP, even if it's the IP of a proxy
      *
      * @return string
@@ -112,6 +110,36 @@ class Bouncer extends AbstractBouncer
     public function getRemoteIp(): string
     {
         return $this->helper->getRemoteIp();
+    }
+
+    /**
+     * Fake implementation as we don't use AppSec
+     *
+     * @return array
+     */
+    public function getRequestHeaders():array
+    {
+        return [];
+    }
+
+    /**
+     * Fake implementation as we don't use AppSec
+     *
+     * @return string
+     */
+    public function getRequestHost(): string
+    {
+        return '';
+    }
+
+    /**
+     * Fake implementation as we don't use AppSec
+     *
+     * @return string
+     */
+    public function getRequestRawBody(): string
+    {
+        return '';
     }
 
     /**
@@ -125,24 +153,34 @@ class Bouncer extends AbstractBouncer
     }
 
     /**
-     * Get the current HTTP method
+     * Fake implementation as we don't use AppSec
      *
      * @return string
      */
-    public function getHttpMethod(): string
+    public function getRequestUserAgent(): string
     {
-        return $this->helper->getHttpMethod();
+        return '';
     }
 
     /**
-     * Get the value of a posted field.
+     * Remediation display getter
      *
-     * @param string $name
-     * @return string|null
+     * @return bool
      */
-    public function getPostedVariable(string $name): ?string
+    public function hasRemediationDisplay(): bool
     {
-        return $this->helper->getPostedVariable($name);
+        return $this->remediationDisplay;
+    }
+
+    /**
+     * Remediation display setter
+     *
+     * @param bool $value
+     * @return void
+     */
+    public function setRemediationDisplay(bool $value): void
+    {
+        $this->remediationDisplay = $value;
     }
 
     /**
