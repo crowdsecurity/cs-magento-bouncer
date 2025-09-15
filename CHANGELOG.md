@@ -8,7 +8,7 @@ The [public API](https://semver.org/spec/v2.0.0.html#spec-item-1) for this proje
 functions provided by the module.
 
 
-## [2.2.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v2.2.0) - 2025-??-??
+## [2.2.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v2.2.0) - 2025-09-15
 [_Compare with previous release_](https://github.com/crowdsecurity/cs-magento-bouncer/compare/v2.1.1...v2.2.0)
 
 ### Changed
