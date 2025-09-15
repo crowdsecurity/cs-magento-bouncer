@@ -21,13 +21,12 @@ jobs:
       matrix:
         # Last 2 patches for the current minor, greatest php version
         include:
-          - m2-version: '2.4.6'
+          - m2-version: '2.4.7'
             php-version: '8.2'
           - m2-version: '2.4.8'
             php-version: '8.3'
 
     name: End-to-end auto-prepend-file mode test suite
-    if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
     runs-on: ubuntu-latest
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"

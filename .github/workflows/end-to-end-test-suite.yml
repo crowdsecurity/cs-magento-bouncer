@@ -34,7 +34,6 @@ jobs:
             php-version: "8.3"
 
     name: End-to-end test suite
-    if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
     runs-on: ubuntu-latest
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"

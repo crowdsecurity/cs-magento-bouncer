@@ -33,7 +33,7 @@ class Constants extends LibConstants
 {
 
     /** @var string The last version of this library */
-    public const VERSION = 'v2.1.1';
+    public const VERSION = 'v2.2.0';
 
     /** @var string The user agent used to send request to Local API */
     public const BASE_USER_AGENT = 'Magento 2 CrowdSec Bouncer/'.self::VERSION;
