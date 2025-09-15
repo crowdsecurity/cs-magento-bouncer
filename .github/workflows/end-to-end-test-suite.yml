@@ -28,13 +28,12 @@ jobs:
       matrix:
         # Last 2 patches for the current minor, greatest php version
         include:
-          - m2-version: "2.4.6"
-            php-version: "8.2"
           - m2-version: "2.4.7"
+            php-version: "8.3"
+          - m2-version: "2.4.8"
             php-version: "8.3"
 
     name: End-to-end test suite
-    if: ${{ !contains(github.event.head_commit.message, 'chore(') }}
     runs-on: ubuntu-latest
     env:
       EXTENSION_PACKAGE_NAME: "crowdsec/magento2-module-bouncer"
@@ -43,7 +42,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/magento2-ddev-installation@v3
+        uses: julienloizelet/magento2-ddev-installation@v4
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
@@ -79,7 +78,7 @@ jobs:
           ddev composer require ${{ env.EXTENSION_PACKAGE_NAME }}:@dev --no-interaction
 
       - name: Disable some extensions for 2.4.6 and superior
-        if: contains(fromJson('["2.4.6", "2.4.7"]'),matrix.m2-version)
+        if: contains(fromJson('["2.4.6", "2.4.7", "2.4.8"]'),matrix.m2-version)
         run: |
           ddev magento module:disable Magento_AdminAdobeImsTwoFactorAuth
 

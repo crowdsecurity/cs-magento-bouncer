@@ -34,7 +34,7 @@
 
 There are many ways to install this extension on a local Magento 2 environment.
 
-We are using [DDEV](https://ddev.readthedocs.io/en/stable/) because it is quite simple to use and customize.
+We are using [DDEV](https://docs.ddev.com/en/stable/) because it is quite simple to use and customize.
 
 You may use your own local stack, but we provide here some useful tools that depends on DDEV.
 
@@ -68,7 +68,7 @@ commands, you must respect the sub folders naming: `my-own-modules` and `crowdse
 #### DDEV installation
 
 This project is fully compatible with DDEV 1.21.6, and it is recommended to use this specific version. For the DDEV
-installation, please follow the [official instructions](https://ddev.readthedocs.io/en/stable/#installation).
+installation, please follow the [official instructions](https://docs.ddev.com/en/stable/).
 
 #### Create a Magento 2 DDEV project with some DDEV add-ons
 
@@ -258,7 +258,7 @@ ddev reload-vcl
 
 For information, here are the differences between the back office generated `default.vcl` and the `default.vcl` we use:
 
-- We changed the probe url from `"/pub/health_check.php"` to `"/health_check.php"` as explained in the [official documentation](https://devdocs.magento.com/guides/v2.4/config-guide/varnish/config-varnish-advanced.html):
+- We changed the probe url from `"/pub/health_check.php"` to `"/health_check.php"` as explained in the official documentation:
 
 ```
  .probe = {
@@ -270,7 +270,7 @@ For information, here are the differences between the back office generated `def
     }
 ```
 
-- We added this part for Marketplace EQP Varnish test simulation as explained in the [official documentation](https://devdocs.magento.com/marketplace/sellers/installation-and-varnish-tests.html#additional-magento-configuration):
+- We added this part for Marketplace EQP Varnish test simulation as explained in the official documentation:
 
 ```
 if (resp.http.x-varnish ~ " ") {

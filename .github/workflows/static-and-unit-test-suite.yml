@@ -19,15 +19,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # First and last patch for the current and previous minor, greatest php version
+        # Last patch for the current and previous minor, greatest php version
         include:
-          - m2-version: "2.3.0"
-            php-version: "7.2"
           - m2-version: "2.3.7"
             php-version: "7.4"
-          - m2-version: "2.4.0"
-            php-version: "7.4"
-          - m2-version: "2.4.7"
+          - m2-version: "2.4.8"
             php-version: "8.3"
 
     name: Static and unit test suite
@@ -39,7 +35,7 @@ jobs:
 
     steps:
       - name: Install Magento 2 with DDEV
-        uses: julienloizelet/magento2-ddev-installation@v3
+        uses: julienloizelet/magento2-ddev-installation@v4
         with:
           php_version: ${{ matrix.php-version }}
           magento_version: ${{ matrix.m2-version }}
@@ -85,9 +81,9 @@ jobs:
           ddev exec cat dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon
           ddev phpstan vendor/${{ env.EXTENSION_PACKAGE_NAME }} --debug
 
-      - name: Fix Unit Test for Magento 2.4.6
+      - name: Fix Unit Test for Magento 2.4.8
         # @see https://github.com/magento/magento2/issues/36702
-        if: contains(fromJson('["2.4.6"]'),matrix.m2-version)
+        if: contains(fromJson('["2.4.8"]'),matrix.m2-version)
         run: sed -i  's/allure\/allure.config.php/dev\/tests\/unit\/allure\/allure.config.php/g' dev/tests/unit/phpunit.xml.dist
 
       - name: PHP UNIT
