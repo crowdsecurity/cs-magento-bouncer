@@ -151,12 +151,8 @@ jobs:
       strategy:
         fail-fast: false
         matrix:
-          # Last 2 patches for the current minor, and last patch for the previous minor, greatest php version
+          # Last patch for the current minor, greatest php version
           include:
-            - m2-version: '2.3.7'
-              php-version: '7.4'
-            - m2-version: '2.4.7'
-              php-version: '8.3'
             - m2-version: '2.4.8'
               php-version: '8.3'
 
@@ -172,7 +168,7 @@ jobs:
       steps:
 
         - name: Install Magento 2 with DDEV
-          uses: julienloizelet/magento2-ddev-installation@v3
+          uses: julienloizelet/magento2-ddev-installation@v4
           with:
             php_version: ${{ matrix.php-version }}
             magento_version: ${{ matrix.m2-version }}
