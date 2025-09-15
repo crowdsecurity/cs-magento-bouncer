@@ -48,7 +48,7 @@ Varnish itself, we adopt the following strategy :
 
 ## Magento 2.2
 
-As Magento 2.2 is not compatible with PHP 7.2 until [2.2.9](https://github.com/magento/magento2/blob/2.2.9/composer.json#L11) and has reached end of support in [2019](https://devdocs.magento.com/release/released-versions.html#22), we did not try to make this extension compatible with it.
+As Magento 2.2 is not compatible with PHP 7.2 until [2.2.9](https://github.com/magento/magento2/blob/2.2.9/composer.json#L11) and has reached end of support in 2019, we did not try to make this extension compatible with it.
 
 ## Why `crowdsec/magento-symfony-cache` ?
 
