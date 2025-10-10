@@ -78,8 +78,8 @@ class TrustedForwardedIps extends Value
         TypeListInterface $cacheTypeList,
         WriterInterface $configWriter,
         Json $serializer,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->configWriter = $configWriter;

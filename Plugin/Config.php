@@ -611,7 +611,7 @@ class Config
         string $memcachedDsn,
         string $redisDsn,
         Phrase $cacheLabel,
-        Phrase $preMessage = null
+        ?Phrase $preMessage = null
     ): void {
         try {
             $configs = $this->helper->getBouncerConfigs();
@@ -727,7 +727,7 @@ class Config
     private function displayCacheClearMessage(
         bool $clearCacheResult,
         Phrase $cacheLabel,
-        Phrase $preMessage = null
+        ?Phrase $preMessage = null
     ): void {
         $clearCacheMessage =
             $clearCacheResult ? __('%1 cache has been cleared.', $cacheLabel) :
