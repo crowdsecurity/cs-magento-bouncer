@@ -48,7 +48,7 @@ jobs:
           magento_repository: "https://repo.magento.com/"
 
       - name: Clone M2 Crowdsec Bouncer files
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 

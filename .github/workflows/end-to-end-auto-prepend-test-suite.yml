@@ -54,7 +54,7 @@ jobs:
         run: ddev get julienloizelet/ddev-playwright
 
       - name: Clone M2 ${{ env.EXTENSION_NAME }} files
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: my-own-modules/${{ env.EXTENSION_PATH }}
 

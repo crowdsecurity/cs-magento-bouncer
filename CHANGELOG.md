@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 The [public API](https://semver.org/spec/v2.0.0.html#spec-item-1) for this project is defined by the set of
 functions provided by the module.
 
+## [2.2.1](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v2.2.1) - 2025-10-10
+[_Compare with previous release_](https://github.com/crowdsecurity/cs-magento-bouncer/compare/v2.2.0...v2.2.1)
+
+### Fixed
+
+- Fix deprecation warning on PHP 8.4 ([PR 28](https://github.com/crowdsecurity/cs-magento-bouncer/pull/28))
+
+
+---
 
 ## [2.2.0](https://github.com/crowdsecurity/cs-magento-bouncer/releases/tag/v2.2.0) - 2025-09-15
 [_Compare with previous release_](https://github.com/crowdsecurity/cs-magento-bouncer/compare/v2.1.1...v2.2.0)
