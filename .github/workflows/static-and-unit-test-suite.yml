@@ -28,6 +28,7 @@ jobs:
         include:
           - m2-version: "2.3.7"
             php-version: "7.4"
+            composer_version: "2.8.12"
           - m2-version: "2.4.8"
             php-version: "8.3"
 
@@ -46,6 +47,7 @@ jobs:
           magento_version: ${{ matrix.m2-version }}
           composer_auth: ${{ secrets.M2_COMPOSER_AUTH }}
           magento_repository: "https://repo.magento.com/"
+          composer_version: ${{ matrix.composer_version }}
 
       - name: Clone M2 Crowdsec Bouncer files
         uses: actions/checkout@v5
